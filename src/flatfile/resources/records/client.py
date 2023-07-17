@@ -33,239 +33,417 @@ from .types.records_response import RecordsResponse
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
+
+
 class RecordsClient:
-    def __init__(self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION
-    , client_wrapper: SyncClientWrapper):
+    def __init__(
+        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: SyncClientWrapper
+    ):
         self._environment = environment
         self._client_wrapper = client_wrapper
-    def get(self, sheet_id: SheetId, *, version_id: typing.Optional[str] = None, since_version_id: typing.Optional[VersionId] = None, sort_field: typing.Optional[SortField] = None, sort_direction: typing.Optional[SortDirection] = None, filter: typing.Optional[Filter] = None, filter_field: typing.Optional[FilterField] = None, search_value: typing.Optional[SearchValue] = None, search_field: typing.Optional[SearchField] = None, ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]], page_size: typing.Optional[int] = None, page_number: typing.Optional[int] = None, include_counts: typing.Optional[bool] = None, include_links: typing.Optional[bool] = None, include_messages: typing.Optional[bool] = None, for: typing.Optional[EventId] = None, q: typing.Optional[str] = None) -> RecordsResponse:
-        _response = self._client_wrapper.httpx_client.request("GET", urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"), 
-            params=remove_none_from_dict({"versionId": version_id, "sinceVersionId": since_version_id, "sortField": sort_field, "sortDirection": sort_direction, "filter": filter, "filterField": filter_field, "searchValue": search_value, "searchField": search_field, "ids": ids, "pageSize": page_size, "pageNumber": page_number, "includeCounts": include_counts, "includeLinks": include_links, "includeMessages": include_messages, "for": for, "q": q, },
+
+    def get(
+        self,
+        sheet_id: SheetId,
+        *,
+        version_id: typing.Optional[str] = None,
+        since_version_id: typing.Optional[VersionId] = None,
+        sort_field: typing.Optional[SortField] = None,
+        sort_direction: typing.Optional[SortDirection] = None,
+        filter: typing.Optional[Filter] = None,
+        filter_field: typing.Optional[FilterField] = None,
+        search_value: typing.Optional[SearchValue] = None,
+        search_field: typing.Optional[SearchField] = None,
+        ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]],
+        page_size: typing.Optional[int] = None,
+        page_number: typing.Optional[int] = None,
+        include_counts: typing.Optional[bool] = None,
+        include_links: typing.Optional[bool] = None,
+        include_messages: typing.Optional[bool] = None,
+        for_: typing.Optional[EventId] = None,
+        q: typing.Optional[str] = None,
+    ) -> RecordsResponse:
+        _response = self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"),
+            params=remove_none_from_dict(
+                {
+                    "versionId": version_id,
+                    "sinceVersionId": since_version_id,
+                    "sortField": sort_field,
+                    "sortDirection": sort_direction,
+                    "filter": filter,
+                    "filterField": filter_field,
+                    "searchValue": search_value,
+                    "searchField": search_field,
+                    "ids": ids,
+                    "pageSize": page_size,
+                    "pageNumber": page_number,
+                    "includeCounts": include_counts,
+                    "includeLinks": include_links,
+                    "includeMessages": include_messages,
+                    "for": for_,
+                    "q": q,
+                }
             ),
             headers=self._client_wrapper.get_headers(),
-            timeout=60)
+            timeout=60,
+        )
         if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(RecordsResponse, _response.json())# type: ignore
+            return pydantic.parse_obj_as(RecordsResponse, _response.json())  # type: ignore
         if _response.status_code == 400:
-            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json())# type: ignore
-            )
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         if _response.status_code == 404:
-            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json())# type: ignore
-            )
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
-    def update(self, sheet_id: SheetId, *, for: typing.Optional[EventId] = None, request: Records) -> VersionResponse:
-        _response = self._client_wrapper.httpx_client.request("PUT", urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"), 
-            params=remove_none_from_dict({"for": for, },
-            ),
+
+    def update(self, sheet_id: SheetId, *, for_: typing.Optional[EventId] = None, request: Records) -> VersionResponse:
+        _response = self._client_wrapper.httpx_client.request(
+            "PUT",
+            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"),
+            params=remove_none_from_dict({"for": for_}),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
-            timeout=60)
+            timeout=60,
+        )
         if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(VersionResponse, _response.json())# type: ignore
+            return pydantic.parse_obj_as(VersionResponse, _response.json())  # type: ignore
         if _response.status_code == 400:
-            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json())# type: ignore
-            )
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         if _response.status_code == 404:
-            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json())# type: ignore
-            )
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
+
     def insert(self, sheet_id: SheetId, *, request: typing.List[RecordData]) -> RecordsResponse:
-        _response = self._client_wrapper.httpx_client.request("POST", urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"), 
+        _response = self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
-            timeout=60)
+            timeout=60,
+        )
         if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(RecordsResponse, _response.json())# type: ignore
+            return pydantic.parse_obj_as(RecordsResponse, _response.json())  # type: ignore
         if _response.status_code == 400:
-            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json())# type: ignore
-            )
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         if _response.status_code == 404:
-            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json())# type: ignore
-            )
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
-    def delete(self, sheet_id: SheetId, *, ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]) -> Success:
-        _response = self._client_wrapper.httpx_client.request("DELETE", urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"), 
-            params=remove_none_from_dict({"ids": ids, },
-            ),
+
+    def delete(
+        self, sheet_id: SheetId, *, ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]
+    ) -> Success:
+        _response = self._client_wrapper.httpx_client.request(
+            "DELETE",
+            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"),
+            params=remove_none_from_dict({"ids": ids}),
             headers=self._client_wrapper.get_headers(),
-            timeout=60)
+            timeout=60,
+        )
         if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(Success, _response.json())# type: ignore
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
         if _response.status_code == 400:
-            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json())# type: ignore
-            )
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         if _response.status_code == 404:
-            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json())# type: ignore
-            )
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
-    def find_and_replace_deprecated(self, sheet_id: SheetId, *, field_key: str, search_value: str, filter: typing.Optional[Filter] = None, page_size: typing.Optional[int] = None, page_number: typing.Optional[int] = None, replace: typing.Any) -> RecordsResponse:
-        _response = self._client_wrapper.httpx_client.request("PUT", urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/replace"), 
-            params=remove_none_from_dict({"fieldKey": field_key, "searchValue": search_value, "filter": filter, "pageSize": page_size, "pageNumber": page_number, },
+
+    def find_and_replace_deprecated(
+        self,
+        sheet_id: SheetId,
+        *,
+        field_key: str,
+        search_value: str,
+        filter: typing.Optional[Filter] = None,
+        page_size: typing.Optional[int] = None,
+        page_number: typing.Optional[int] = None,
+        replace: typing.Any,
+    ) -> RecordsResponse:
+        _response = self._client_wrapper.httpx_client.request(
+            "PUT",
+            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/replace"),
+            params=remove_none_from_dict(
+                {
+                    "fieldKey": field_key,
+                    "searchValue": search_value,
+                    "filter": filter,
+                    "pageSize": page_size,
+                    "pageNumber": page_number,
+                }
             ),
-            json=jsonable_encoder({
-                "replace": replace,
-            }
-            ),
+            json=jsonable_encoder({"replace": replace}),
             headers=self._client_wrapper.get_headers(),
-            timeout=60)
+            timeout=60,
+        )
         if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(RecordsResponse, _response.json())# type: ignore
+            return pydantic.parse_obj_as(RecordsResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
-    def find_and_replace(self, sheet_id: SheetId, *, filter: typing.Optional[Filter] = None, filter_field: typing.Optional[FilterField] = None, search_value: typing.Optional[SearchValue] = None, search_field: typing.Optional[SearchField] = None, ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]], find: typing.Optional[CellValueUnion] = OMIT, replace: typing.Optional[CellValueUnion] = OMIT, field_key: str) -> VersionResponse:
-        _request: typing.Dict[str, typing.Any] = {
-            "fieldKey": field_key,
-        }
+
+    def find_and_replace(
+        self,
+        sheet_id: SheetId,
+        *,
+        filter: typing.Optional[Filter] = None,
+        filter_field: typing.Optional[FilterField] = None,
+        search_value: typing.Optional[SearchValue] = None,
+        search_field: typing.Optional[SearchField] = None,
+        ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]],
+        find: typing.Optional[CellValueUnion] = OMIT,
+        replace: typing.Optional[CellValueUnion] = OMIT,
+        field_key: str,
+    ) -> VersionResponse:
+        _request: typing.Dict[str, typing.Any] = {"fieldKey": field_key}
         if find is not OMIT:
             _request["find"] = find
         if replace is not OMIT:
             _request["replace"] = replace
-        _response = self._client_wrapper.httpx_client.request("PUT", urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/find-replace"), 
-            params=remove_none_from_dict({"filter": filter, "filterField": filter_field, "searchValue": search_value, "searchField": search_field, "ids": ids, },
+        _response = self._client_wrapper.httpx_client.request(
+            "PUT",
+            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/find-replace"),
+            params=remove_none_from_dict(
+                {
+                    "filter": filter,
+                    "filterField": filter_field,
+                    "searchValue": search_value,
+                    "searchField": search_field,
+                    "ids": ids,
+                }
             ),
             json=jsonable_encoder(_request),
             headers=self._client_wrapper.get_headers(),
-            timeout=60)
+            timeout=60,
+        )
         if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(VersionResponse, _response.json())# type: ignore
+            return pydantic.parse_obj_as(VersionResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
+
+
 class AsyncRecordsClient:
-    def __init__(self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION
-    , client_wrapper: AsyncClientWrapper):
+    def __init__(
+        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: AsyncClientWrapper
+    ):
         self._environment = environment
         self._client_wrapper = client_wrapper
-    async def get(self, sheet_id: SheetId, *, version_id: typing.Optional[str] = None, since_version_id: typing.Optional[VersionId] = None, sort_field: typing.Optional[SortField] = None, sort_direction: typing.Optional[SortDirection] = None, filter: typing.Optional[Filter] = None, filter_field: typing.Optional[FilterField] = None, search_value: typing.Optional[SearchValue] = None, search_field: typing.Optional[SearchField] = None, ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]], page_size: typing.Optional[int] = None, page_number: typing.Optional[int] = None, include_counts: typing.Optional[bool] = None, include_links: typing.Optional[bool] = None, include_messages: typing.Optional[bool] = None, for: typing.Optional[EventId] = None, q: typing.Optional[str] = None) -> RecordsResponse:
-        _response = await self._client_wrapper.httpx_client.request("GET", urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"), 
-            params=remove_none_from_dict({"versionId": version_id, "sinceVersionId": since_version_id, "sortField": sort_field, "sortDirection": sort_direction, "filter": filter, "filterField": filter_field, "searchValue": search_value, "searchField": search_field, "ids": ids, "pageSize": page_size, "pageNumber": page_number, "includeCounts": include_counts, "includeLinks": include_links, "includeMessages": include_messages, "for": for, "q": q, },
+
+    async def get(
+        self,
+        sheet_id: SheetId,
+        *,
+        version_id: typing.Optional[str] = None,
+        since_version_id: typing.Optional[VersionId] = None,
+        sort_field: typing.Optional[SortField] = None,
+        sort_direction: typing.Optional[SortDirection] = None,
+        filter: typing.Optional[Filter] = None,
+        filter_field: typing.Optional[FilterField] = None,
+        search_value: typing.Optional[SearchValue] = None,
+        search_field: typing.Optional[SearchField] = None,
+        ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]],
+        page_size: typing.Optional[int] = None,
+        page_number: typing.Optional[int] = None,
+        include_counts: typing.Optional[bool] = None,
+        include_links: typing.Optional[bool] = None,
+        include_messages: typing.Optional[bool] = None,
+        for_: typing.Optional[EventId] = None,
+        q: typing.Optional[str] = None,
+    ) -> RecordsResponse:
+        _response = await self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"),
+            params=remove_none_from_dict(
+                {
+                    "versionId": version_id,
+                    "sinceVersionId": since_version_id,
+                    "sortField": sort_field,
+                    "sortDirection": sort_direction,
+                    "filter": filter,
+                    "filterField": filter_field,
+                    "searchValue": search_value,
+                    "searchField": search_field,
+                    "ids": ids,
+                    "pageSize": page_size,
+                    "pageNumber": page_number,
+                    "includeCounts": include_counts,
+                    "includeLinks": include_links,
+                    "includeMessages": include_messages,
+                    "for": for_,
+                    "q": q,
+                }
             ),
             headers=self._client_wrapper.get_headers(),
-            timeout=60)
+            timeout=60,
+        )
         if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(RecordsResponse, _response.json())# type: ignore
+            return pydantic.parse_obj_as(RecordsResponse, _response.json())  # type: ignore
         if _response.status_code == 400:
-            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json())# type: ignore
-            )
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         if _response.status_code == 404:
-            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json())# type: ignore
-            )
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
-    async def update(self, sheet_id: SheetId, *, for: typing.Optional[EventId] = None, request: Records) -> VersionResponse:
-        _response = await self._client_wrapper.httpx_client.request("PUT", urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"), 
-            params=remove_none_from_dict({"for": for, },
-            ),
+
+    async def update(
+        self, sheet_id: SheetId, *, for_: typing.Optional[EventId] = None, request: Records
+    ) -> VersionResponse:
+        _response = await self._client_wrapper.httpx_client.request(
+            "PUT",
+            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"),
+            params=remove_none_from_dict({"for": for_}),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
-            timeout=60)
+            timeout=60,
+        )
         if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(VersionResponse, _response.json())# type: ignore
+            return pydantic.parse_obj_as(VersionResponse, _response.json())  # type: ignore
         if _response.status_code == 400:
-            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json())# type: ignore
-            )
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         if _response.status_code == 404:
-            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json())# type: ignore
-            )
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
+
     async def insert(self, sheet_id: SheetId, *, request: typing.List[RecordData]) -> RecordsResponse:
-        _response = await self._client_wrapper.httpx_client.request("POST", urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"), 
+        _response = await self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
-            timeout=60)
+            timeout=60,
+        )
         if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(RecordsResponse, _response.json())# type: ignore
+            return pydantic.parse_obj_as(RecordsResponse, _response.json())  # type: ignore
         if _response.status_code == 400:
-            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json())# type: ignore
-            )
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         if _response.status_code == 404:
-            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json())# type: ignore
-            )
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
-    async def delete(self, sheet_id: SheetId, *, ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]) -> Success:
-        _response = await self._client_wrapper.httpx_client.request("DELETE", urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"), 
-            params=remove_none_from_dict({"ids": ids, },
-            ),
+
+    async def delete(
+        self, sheet_id: SheetId, *, ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]
+    ) -> Success:
+        _response = await self._client_wrapper.httpx_client.request(
+            "DELETE",
+            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"),
+            params=remove_none_from_dict({"ids": ids}),
             headers=self._client_wrapper.get_headers(),
-            timeout=60)
+            timeout=60,
+        )
         if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(Success, _response.json())# type: ignore
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
         if _response.status_code == 400:
-            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json())# type: ignore
-            )
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         if _response.status_code == 404:
-            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json())# type: ignore
-            )
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
-    async def find_and_replace_deprecated(self, sheet_id: SheetId, *, field_key: str, search_value: str, filter: typing.Optional[Filter] = None, page_size: typing.Optional[int] = None, page_number: typing.Optional[int] = None, replace: typing.Any) -> RecordsResponse:
-        _response = await self._client_wrapper.httpx_client.request("PUT", urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/replace"), 
-            params=remove_none_from_dict({"fieldKey": field_key, "searchValue": search_value, "filter": filter, "pageSize": page_size, "pageNumber": page_number, },
+
+    async def find_and_replace_deprecated(
+        self,
+        sheet_id: SheetId,
+        *,
+        field_key: str,
+        search_value: str,
+        filter: typing.Optional[Filter] = None,
+        page_size: typing.Optional[int] = None,
+        page_number: typing.Optional[int] = None,
+        replace: typing.Any,
+    ) -> RecordsResponse:
+        _response = await self._client_wrapper.httpx_client.request(
+            "PUT",
+            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/replace"),
+            params=remove_none_from_dict(
+                {
+                    "fieldKey": field_key,
+                    "searchValue": search_value,
+                    "filter": filter,
+                    "pageSize": page_size,
+                    "pageNumber": page_number,
+                }
             ),
-            json=jsonable_encoder({
-                "replace": replace,
-            }
-            ),
+            json=jsonable_encoder({"replace": replace}),
             headers=self._client_wrapper.get_headers(),
-            timeout=60)
+            timeout=60,
+        )
         if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(RecordsResponse, _response.json())# type: ignore
+            return pydantic.parse_obj_as(RecordsResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
-    async def find_and_replace(self, sheet_id: SheetId, *, filter: typing.Optional[Filter] = None, filter_field: typing.Optional[FilterField] = None, search_value: typing.Optional[SearchValue] = None, search_field: typing.Optional[SearchField] = None, ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]], find: typing.Optional[CellValueUnion] = OMIT, replace: typing.Optional[CellValueUnion] = OMIT, field_key: str) -> VersionResponse:
-        _request: typing.Dict[str, typing.Any] = {
-            "fieldKey": field_key,
-        }
+
+    async def find_and_replace(
+        self,
+        sheet_id: SheetId,
+        *,
+        filter: typing.Optional[Filter] = None,
+        filter_field: typing.Optional[FilterField] = None,
+        search_value: typing.Optional[SearchValue] = None,
+        search_field: typing.Optional[SearchField] = None,
+        ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]],
+        find: typing.Optional[CellValueUnion] = OMIT,
+        replace: typing.Optional[CellValueUnion] = OMIT,
+        field_key: str,
+    ) -> VersionResponse:
+        _request: typing.Dict[str, typing.Any] = {"fieldKey": field_key}
         if find is not OMIT:
             _request["find"] = find
         if replace is not OMIT:
             _request["replace"] = replace
-        _response = await self._client_wrapper.httpx_client.request("PUT", urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/find-replace"), 
-            params=remove_none_from_dict({"filter": filter, "filterField": filter_field, "searchValue": search_value, "searchField": search_field, "ids": ids, },
+        _response = await self._client_wrapper.httpx_client.request(
+            "PUT",
+            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/find-replace"),
+            params=remove_none_from_dict(
+                {
+                    "filter": filter,
+                    "filterField": filter_field,
+                    "searchValue": search_value,
+                    "searchField": search_field,
+                    "ids": ids,
+                }
             ),
             json=jsonable_encoder(_request),
             headers=self._client_wrapper.get_headers(),
-            timeout=60)
+            timeout=60,
+        )
         if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(VersionResponse, _response.json())# type: ignore
+            return pydantic.parse_obj_as(VersionResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
