@@ -6,6 +6,7 @@ import typing
 import pydantic
 
 from ....core.datetime_utils import serialize_datetime
+from ...environments.types.guest_authentication_enum import GuestAuthenticationEnum
 from .internal_space_config_base import InternalSpaceConfigBase
 
 
@@ -16,6 +17,9 @@ class SpaceConfig(InternalSpaceConfigBase):
 
     name: typing.Optional[str] = pydantic.Field(description="The name of the space")
     display_order: typing.Optional[int] = pydantic.Field(alias="displayOrder", description="The display order")
+    guest_authentication: typing.Optional[typing.List[GuestAuthenticationEnum]] = pydantic.Field(
+        alias="guestAuthentication"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

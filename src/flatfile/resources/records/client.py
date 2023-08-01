@@ -101,11 +101,10 @@ class RecordsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update(self, sheet_id: SheetId, *, for_: typing.Optional[EventId] = None, request: Records) -> VersionResponse:
+    def update(self, sheet_id: SheetId, *, request: Records) -> VersionResponse:
         _response = self._client_wrapper.httpx_client.request(
             "PUT",
             urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"),
-            params=remove_none_from_dict({"for": for_}),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -308,13 +307,10 @@ class AsyncRecordsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update(
-        self, sheet_id: SheetId, *, for_: typing.Optional[EventId] = None, request: Records
-    ) -> VersionResponse:
+    async def update(self, sheet_id: SheetId, *, request: Records) -> VersionResponse:
         _response = await self._client_wrapper.httpx_client.request(
             "PUT",
             urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"),
-            params=remove_none_from_dict({"for": for_}),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,

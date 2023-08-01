@@ -11,6 +11,7 @@ from .certainty import Certainty
 
 class Metadata(pydantic.BaseModel):
     certainty: typing.Optional[Certainty]
+    confidence: typing.Optional[float]
     source: typing.Optional[str]
 
     def json(self, **kwargs: typing.Any) -> str:

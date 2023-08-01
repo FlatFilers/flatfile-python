@@ -2,9 +2,11 @@
 
 from .cell_value import CellValue
 from .cell_value_union import CellValueUnion
+from .cell_value_with_links import CellValueWithLinks
 from .record import Record
 from .record_counts import RecordCounts
 from .record_data import RecordData
+from .record_data_with_links import RecordDataWithLinks
 from .record_with_links import RecordWithLinks
 from .records import Records
 from .records_response import RecordsResponse
@@ -17,9 +19,11 @@ from .validation_type import ValidationType
 __all__ = [
     "CellValue",
     "CellValueUnion",
+    "CellValueWithLinks",
     "Record",
     "RecordCounts",
     "RecordData",
+    "RecordDataWithLinks",
     "RecordWithLinks",
     "Records",
     "RecordsResponse",

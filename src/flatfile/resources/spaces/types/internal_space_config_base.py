@@ -10,22 +10,19 @@ from ...commons.types.action import Action
 from ...commons.types.environment_id import EnvironmentId
 from ...commons.types.space_config_id import SpaceConfigId
 from ...commons.types.workbook_id import WorkbookId
-from ...environments.types.guest_authentication_enum import GuestAuthenticationEnum
 from .space_access import SpaceAccess
 
 
 class InternalSpaceConfigBase(pydantic.BaseModel):
     space_config_id: typing.Optional[SpaceConfigId] = pydantic.Field(alias="spaceConfigId")
-    environment_id: EnvironmentId = pydantic.Field(alias="environmentId")
+    environment_id: typing.Optional[EnvironmentId] = pydantic.Field(alias="environmentId")
     primary_workbook_id: typing.Optional[WorkbookId] = pydantic.Field(alias="primaryWorkbookId")
     metadata: typing.Optional[typing.Any] = pydantic.Field(description="Metadata for the space")
     actions: typing.Optional[typing.List[Action]]
-    guest_authentication: typing.Optional[typing.List[GuestAuthenticationEnum]] = pydantic.Field(
-        alias="guestAuthentication"
-    )
     access: typing.Optional[typing.List[SpaceAccess]]
     auto_configure: typing.Optional[bool] = pydantic.Field(alias="autoConfigure")
     namespace: typing.Optional[str]
+    labels: typing.Optional[typing.List[str]]
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

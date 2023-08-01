@@ -8,6 +8,7 @@ import pydantic
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.space_id import SpaceId
 from ...commons.types.user_id import UserId
+from ...environments.types.guest_authentication_enum import GuestAuthenticationEnum
 from .internal_space_config_base import InternalSpaceConfigBase
 from .space_size import SpaceSize
 
@@ -38,6 +39,7 @@ class Space(InternalSpaceConfigBase):
     is_collaborative: typing.Optional[bool] = pydantic.Field(alias="isCollaborative")
     size: typing.Optional[SpaceSize]
     upgraded_at: typing.Optional[dt.datetime] = pydantic.Field(alias="upgradedAt")
+    guest_authentication: typing.List[GuestAuthenticationEnum] = pydantic.Field(alias="guestAuthentication")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

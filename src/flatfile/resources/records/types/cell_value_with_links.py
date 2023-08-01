@@ -4,12 +4,12 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
-from ...commons.types.success import Success
-from ...records.types.record_counts import RecordCounts
+from .cell_value import CellValue
+from .records import Records
 
 
-class RecordCountsResponseData(Success):
-    counts: RecordCounts
+class CellValueWithLinks(CellValue):
+    links: typing.Optional[Records]
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

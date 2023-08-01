@@ -32,8 +32,8 @@ class File(pydantic.BaseModel):
         alias="bytesReceived",
         description="Number of bytes that have been uploaded so far (useful for progress tracking)",
     )
-    created_at: str = pydantic.Field(alias="createdAt", description="Date the file was created")
-    updated_at: str = pydantic.Field(alias="updatedAt", description="Date the file was last updated")
+    created_at: dt.datetime = pydantic.Field(alias="createdAt", description="Date the file was created")
+    updated_at: dt.datetime = pydantic.Field(alias="updatedAt", description="Date the file was last updated")
     space_id: SpaceId = pydantic.Field(alias="spaceId")
     workbook_id: typing.Optional[WorkbookId] = pydantic.Field(alias="workbookId")
     sheet_id: typing.Optional[SheetId] = pydantic.Field(alias="sheetId")

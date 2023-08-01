@@ -3,14 +3,24 @@
 import datetime as dt
 import typing
 
+import pydantic
+
 from ....core.datetime_utils import serialize_datetime
-from .record import Record
+from ...commons.types.record_id import RecordId
+from .record_data_with_links import RecordDataWithLinks
+from .validation_message import ValidationMessage
 
 
-class RecordWithLinks(Record):
+class RecordWithLinks(pydantic.BaseModel):
     """
     A single row of data in a Sheet, including links to related rows
     """
+
+    id: RecordId
+    values: RecordDataWithLinks
+    valid: typing.Optional[bool]
+    messages: typing.Optional[typing.List[ValidationMessage]]
+    metadata: typing.Optional[typing.Dict[str, typing.Any]]
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -22,5 +32,4 @@ class RecordWithLinks(Record):
 
     class Config:
         frozen = True
-        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

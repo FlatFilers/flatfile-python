@@ -3,9 +3,11 @@
 from .types import (
     CellValue,
     CellValueUnion,
+    CellValueWithLinks,
     Record,
     RecordCounts,
     RecordData,
+    RecordDataWithLinks,
     RecordWithLinks,
     Records,
     RecordsResponse,
@@ -19,9 +21,11 @@ from .types import (
 __all__ = [
     "CellValue",
     "CellValueUnion",
+    "CellValueWithLinks",
     "Record",
     "RecordCounts",
     "RecordData",
+    "RecordDataWithLinks",
     "RecordWithLinks",
     "Records",
     "RecordsResponse",
