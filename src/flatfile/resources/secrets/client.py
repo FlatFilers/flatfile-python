@@ -10,7 +10,6 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
-from ...environment import FlatfileEnvironment
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.environment_id import EnvironmentId
@@ -25,16 +24,21 @@ OMIT = typing.cast(typing.Any, ...)
 
 
 class SecretsClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: SyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     def list(self, *, environment_id: EnvironmentId, space_id: typing.Optional[SpaceId] = None) -> SecretsResponse:
+        """
+        Fetch all secrets for a given environmentId and optionally apply space overrides
+
+        Parameters:
+            - environment_id: EnvironmentId.
+
+            - space_id: typing.Optional[SpaceId].
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "secrets"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "secrets"),
             params=remove_none_from_dict({"environmentId": environment_id, "spaceId": space_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -52,9 +56,15 @@ class SecretsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def upsert(self, *, request: WriteSecret) -> SecretsResponse:
+        """
+        Insert or Update a Secret by name for environment or space
+
+        Parameters:
+            - request: WriteSecret.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "secrets"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "secrets"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -72,9 +82,15 @@ class SecretsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def delete(self, secret_id: SecretId) -> SecretsResponse:
+        """
+        Deletes a specific Secret from the Environment or Space as is the case
+
+        Parameters:
+            - secret_id: SecretId.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"secrets/{secret_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"secrets/{secret_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -92,18 +108,23 @@ class SecretsClient:
 
 
 class AsyncSecretsClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: AsyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     async def list(
         self, *, environment_id: EnvironmentId, space_id: typing.Optional[SpaceId] = None
     ) -> SecretsResponse:
+        """
+        Fetch all secrets for a given environmentId and optionally apply space overrides
+
+        Parameters:
+            - environment_id: EnvironmentId.
+
+            - space_id: typing.Optional[SpaceId].
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "secrets"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "secrets"),
             params=remove_none_from_dict({"environmentId": environment_id, "spaceId": space_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -121,9 +142,15 @@ class AsyncSecretsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def upsert(self, *, request: WriteSecret) -> SecretsResponse:
+        """
+        Insert or Update a Secret by name for environment or space
+
+        Parameters:
+            - request: WriteSecret.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "secrets"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "secrets"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -141,9 +168,15 @@ class AsyncSecretsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def delete(self, secret_id: SecretId) -> SecretsResponse:
+        """
+        Deletes a specific Secret from the Environment or Space as is the case
+
+        Parameters:
+            - secret_id: SecretId.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"secrets/{secret_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"secrets/{secret_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )

@@ -6,6 +6,11 @@ import typing
 import pydantic
 
 from ....core.datetime_utils import serialize_datetime
+from ...commons.types.filter import Filter
+from ...commons.types.filter_field import FilterField
+from ...commons.types.record_id import RecordId
+from ...commons.types.search_field import SearchField
+from ...commons.types.search_value import SearchValue
 from ...commons.types.sheet_id import SheetId
 
 
@@ -18,6 +23,16 @@ class MutateJobConfig(pydantic.BaseModel):
     mutation_id: typing.Optional[str] = pydantic.Field(
         alias="mutationId",
         description="If the mutation was generated through some sort of id-ed process, this links this job and that process.",
+    )
+    filter: typing.Optional[Filter]
+    filter_field: typing.Optional[FilterField] = pydantic.Field(alias="filterField")
+    search_value: typing.Optional[SearchValue] = pydantic.Field(alias="searchValue")
+    search_field: typing.Optional[SearchField] = pydantic.Field(alias="searchField")
+    q: typing.Optional[str]
+    ids: typing.Optional[typing.List[RecordId]] = pydantic.Field(
+        description=(
+            "The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records\n"
+        )
     )
 
     def json(self, **kwargs: typing.Any) -> str:

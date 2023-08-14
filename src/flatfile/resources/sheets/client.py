@@ -9,7 +9,6 @@ import pydantic
 from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.remove_none_from_dict import remove_none_from_dict
-from ...environment import FlatfileEnvironment
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.errors import Errors
@@ -30,16 +29,19 @@ from .types.sheet_response import SheetResponse
 
 
 class SheetsClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: SyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     def list(self, *, workbook_id: WorkbookId) -> ListSheetsResponse:
+        """
+        Returns sheets in a workbook
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "sheets"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "sheets"),
             params=remove_none_from_dict({"workbookId": workbook_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -53,9 +55,15 @@ class SheetsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def get(self, sheet_id: SheetId) -> SheetResponse:
+        """
+        Returns a sheet in a workbook
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -68,9 +76,15 @@ class SheetsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def delete(self, sheet_id: SheetId) -> Success:
+        """
+        Deletes a specific sheet from a workbook
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+        """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -87,9 +101,15 @@ class SheetsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def validate(self, sheet_id: SheetId) -> Success:
+        """
+        Trigger data hooks and validation to run on a sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/validate"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/validate"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -119,9 +139,34 @@ class SheetsClient:
         search_field: typing.Optional[SearchField] = None,
         ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]],
     ) -> str:
+        """
+        Returns records from a sheet in a workbook as a csv file
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - version_id: typing.Optional[str].
+
+            - since_version_id: typing.Optional[VersionId].
+
+            - sort_field: typing.Optional[SortField].
+
+            - sort_direction: typing.Optional[SortDirection]. Sort direction - asc (ascending) or desc (descending)
+
+            - filter: typing.Optional[Filter]. Options to filter records
+
+            - filter_field: typing.Optional[FilterField].
+
+            - search_value: typing.Optional[SearchValue].
+
+            - search_field: typing.Optional[SearchField].
+
+            - ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/download"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/download"),
             params=remove_none_from_dict(
                 {
                     "versionId": version_id,
@@ -159,9 +204,31 @@ class SheetsClient:
         by_field: typing.Optional[bool] = None,
         q: typing.Optional[str] = None,
     ) -> RecordCountsResponse:
+        """
+        Returns counts of records from a sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - version_id: typing.Optional[str].
+
+            - since_version_id: typing.Optional[VersionId].
+
+            - filter: typing.Optional[Filter]. Options to filter records
+
+            - filter_field: typing.Optional[FilterField].
+
+            - search_value: typing.Optional[SearchValue].
+
+            - search_field: typing.Optional[SearchField].
+
+            - by_field: typing.Optional[bool]. If true, the error counts for each field will also be returned
+
+            - q: typing.Optional[str]. An FFQL query used to filter the result set to be counted
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/counts"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/counts"),
             params=remove_none_from_dict(
                 {
                     "versionId": version_id,
@@ -187,16 +254,19 @@ class SheetsClient:
 
 
 class AsyncSheetsClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: AsyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     async def list(self, *, workbook_id: WorkbookId) -> ListSheetsResponse:
+        """
+        Returns sheets in a workbook
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "sheets"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "sheets"),
             params=remove_none_from_dict({"workbookId": workbook_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -210,9 +280,15 @@ class AsyncSheetsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def get(self, sheet_id: SheetId) -> SheetResponse:
+        """
+        Returns a sheet in a workbook
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -225,9 +301,15 @@ class AsyncSheetsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def delete(self, sheet_id: SheetId) -> Success:
+        """
+        Deletes a specific sheet from a workbook
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -244,9 +326,15 @@ class AsyncSheetsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def validate(self, sheet_id: SheetId) -> Success:
+        """
+        Trigger data hooks and validation to run on a sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/validate"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/validate"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -276,9 +364,34 @@ class AsyncSheetsClient:
         search_field: typing.Optional[SearchField] = None,
         ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]],
     ) -> str:
+        """
+        Returns records from a sheet in a workbook as a csv file
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - version_id: typing.Optional[str].
+
+            - since_version_id: typing.Optional[VersionId].
+
+            - sort_field: typing.Optional[SortField].
+
+            - sort_direction: typing.Optional[SortDirection]. Sort direction - asc (ascending) or desc (descending)
+
+            - filter: typing.Optional[Filter]. Options to filter records
+
+            - filter_field: typing.Optional[FilterField].
+
+            - search_value: typing.Optional[SearchValue].
+
+            - search_field: typing.Optional[SearchField].
+
+            - ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/download"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/download"),
             params=remove_none_from_dict(
                 {
                     "versionId": version_id,
@@ -316,9 +429,31 @@ class AsyncSheetsClient:
         by_field: typing.Optional[bool] = None,
         q: typing.Optional[str] = None,
     ) -> RecordCountsResponse:
+        """
+        Returns counts of records from a sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - version_id: typing.Optional[str].
+
+            - since_version_id: typing.Optional[VersionId].
+
+            - filter: typing.Optional[Filter]. Options to filter records
+
+            - filter_field: typing.Optional[FilterField].
+
+            - search_value: typing.Optional[SearchValue].
+
+            - search_field: typing.Optional[SearchField].
+
+            - by_field: typing.Optional[bool]. If true, the error counts for each field will also be returned
+
+            - q: typing.Optional[str]. An FFQL query used to filter the result set to be counted
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/counts"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/counts"),
             params=remove_none_from_dict(
                 {
                     "versionId": version_id,

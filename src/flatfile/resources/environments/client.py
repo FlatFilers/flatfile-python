@@ -10,7 +10,6 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
-from ...environment import FlatfileEnvironment
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.environment_id import EnvironmentId
@@ -28,18 +27,23 @@ OMIT = typing.cast(typing.Any, ...)
 
 
 class EnvironmentsClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: SyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     def list(
         self, *, page_size: typing.Optional[int] = None, page_number: typing.Optional[int] = None
     ) -> ListEnvironmentsResponse:
+        """
+        Get all environments
+
+        Parameters:
+            - page_size: typing.Optional[int]. Number of environments to return in a page (default 10)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of environments to return
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "environments"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "environments"),
             params=remove_none_from_dict({"pageSize": page_size, "pageNumber": page_number}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -53,9 +57,15 @@ class EnvironmentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def create(self, *, request: EnvironmentConfigCreate) -> EnvironmentResponse:
+        """
+        Create a new environment
+
+        Parameters:
+            - request: EnvironmentConfigCreate.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "environments"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "environments"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -69,9 +79,15 @@ class EnvironmentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def get_environment_event_token(self, *, environment_id: EnvironmentId) -> EventTokenResponse:
+        """
+        Get a token which can be used to subscribe to events for this environment
+
+        Parameters:
+            - environment_id: EnvironmentId. ID of environment to return
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "environments/subscription-token"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "environments/subscription-token"),
             params=remove_none_from_dict({"environmentId": environment_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -89,9 +105,15 @@ class EnvironmentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def get(self, environment_id: str) -> EnvironmentResponse:
+        """
+        Returns a single environment
+
+        Parameters:
+            - environment_id: str. ID of the environment to return. To fetch the current environment, pass `current`
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"environments/{environment_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"environments/{environment_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -108,9 +130,17 @@ class EnvironmentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def update(self, environment_id: str, *, request: EnvironmentConfigUpdate) -> Environment:
+        """
+        Updates a single environment, to change the name for example
+
+        Parameters:
+            - environment_id: str. ID of the environment to update
+
+            - request: EnvironmentConfigUpdate.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"environments/{environment_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"environments/{environment_id}"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -124,9 +154,15 @@ class EnvironmentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def delete(self, environment_id: str) -> Success:
+        """
+        Deletes a single environment
+
+        Parameters:
+            - environment_id: str. ID of the environment to delete
+        """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"environments/{environment_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"environments/{environment_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -144,18 +180,23 @@ class EnvironmentsClient:
 
 
 class AsyncEnvironmentsClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: AsyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     async def list(
         self, *, page_size: typing.Optional[int] = None, page_number: typing.Optional[int] = None
     ) -> ListEnvironmentsResponse:
+        """
+        Get all environments
+
+        Parameters:
+            - page_size: typing.Optional[int]. Number of environments to return in a page (default 10)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of environments to return
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "environments"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "environments"),
             params=remove_none_from_dict({"pageSize": page_size, "pageNumber": page_number}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -169,9 +210,15 @@ class AsyncEnvironmentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def create(self, *, request: EnvironmentConfigCreate) -> EnvironmentResponse:
+        """
+        Create a new environment
+
+        Parameters:
+            - request: EnvironmentConfigCreate.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "environments"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "environments"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -185,9 +232,15 @@ class AsyncEnvironmentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def get_environment_event_token(self, *, environment_id: EnvironmentId) -> EventTokenResponse:
+        """
+        Get a token which can be used to subscribe to events for this environment
+
+        Parameters:
+            - environment_id: EnvironmentId. ID of environment to return
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "environments/subscription-token"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "environments/subscription-token"),
             params=remove_none_from_dict({"environmentId": environment_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -205,9 +258,15 @@ class AsyncEnvironmentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def get(self, environment_id: str) -> EnvironmentResponse:
+        """
+        Returns a single environment
+
+        Parameters:
+            - environment_id: str. ID of the environment to return. To fetch the current environment, pass `current`
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"environments/{environment_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"environments/{environment_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -224,9 +283,17 @@ class AsyncEnvironmentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def update(self, environment_id: str, *, request: EnvironmentConfigUpdate) -> Environment:
+        """
+        Updates a single environment, to change the name for example
+
+        Parameters:
+            - environment_id: str. ID of the environment to update
+
+            - request: EnvironmentConfigUpdate.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"environments/{environment_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"environments/{environment_id}"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -240,9 +307,15 @@ class AsyncEnvironmentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def delete(self, environment_id: str) -> Success:
+        """
+        Deletes a single environment
+
+        Parameters:
+            - environment_id: str. ID of the environment to delete
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"environments/{environment_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"environments/{environment_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )

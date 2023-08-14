@@ -12,6 +12,7 @@ class EnumPropertyOption(pydantic.BaseModel):
     label: typing.Optional[str] = pydantic.Field(
         description="A visual label for this option, defaults to value if not provided"
     )
+    description: typing.Optional[str] = pydantic.Field(description="A short description for this option")
     color: typing.Optional[str] = pydantic.Field(description="An optional color to assign this option")
     icon: typing.Optional[str] = pydantic.Field(description="A reference pointer to a previously registered icon")
     meta: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(

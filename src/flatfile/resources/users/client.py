@@ -10,7 +10,6 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
-from ...environment import FlatfileEnvironment
 from ..commons.types.user_id import UserId
 from .types.exchange_token_response import ExchangeTokenResponse
 from .types.list_api_tokens_response import ListApiTokensResponse
@@ -23,16 +22,19 @@ OMIT = typing.cast(typing.Any, ...)
 
 
 class UsersClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: SyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     def list(self, *, email: typing.Optional[str] = None) -> ListUsersResponse:
+        """
+        Gets a list of users
+
+        Parameters:
+            - email: typing.Optional[str]. Email of guest to return
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "users"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "users"),
             params=remove_none_from_dict({"email": email}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -46,9 +48,15 @@ class UsersClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def create(self, *, request: UserConfig) -> UserResponse:
+        """
+        A user is a privileged user that logs in with a username and password.
+
+        Parameters:
+            - request: UserConfig.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "users"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "users"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -62,9 +70,15 @@ class UsersClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def get(self, user_id: UserId) -> UserResponse:
+        """
+        Gets a user
+
+        Parameters:
+            - user_id: UserId. The user id
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"users/{user_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"users/{user_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -84,9 +98,21 @@ class UsersClient:
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
     ) -> ListApiTokensResponse:
+        """
+        Gets all the api tokens for a user.
+
+        Parameters:
+            - user_id: UserId. The user id
+
+            - tenant_id: str.
+
+            - page_size: typing.Optional[int]. Number of tokens to return in a page (default 10)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"users/{user_id}/api-token"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"users/{user_id}/api-token"),
             params=remove_none_from_dict({"tenantId": tenant_id, "pageSize": page_size, "pageNumber": page_number}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -100,9 +126,17 @@ class UsersClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def create_api_token(self, user_id: UserId, *, tenant_id: str) -> None:
+        """
+        Creates an api token for authenticating against Flatfile APIs.
+
+        Parameters:
+            - user_id: UserId. The user id
+
+            - tenant_id: str.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"users/{user_id}/api-token"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"users/{user_id}/api-token"),
             params=remove_none_from_dict({"tenantId": tenant_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -122,6 +156,16 @@ class UsersClient:
         email: typing.Optional[str] = OMIT,
         space_id: typing.Optional[str] = OMIT,
     ) -> ExchangeTokenResponse:
+        """
+        Exchange an invitation for an access token
+
+        Parameters:
+            - token: typing.Optional[str]. The token to use for the request
+
+            - email: typing.Optional[str]. The invited guest's email, required if no token
+
+            - space_id: typing.Optional[str]. The spaceId, required if no token
+        """
         _request: typing.Dict[str, typing.Any] = {}
         if token is not OMIT:
             _request["token"] = token
@@ -131,7 +175,7 @@ class UsersClient:
             _request["spaceId"] = space_id
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "invitations/exchange"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "invitations/exchange"),
             json=jsonable_encoder(_request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -146,16 +190,19 @@ class UsersClient:
 
 
 class AsyncUsersClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: AsyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     async def list(self, *, email: typing.Optional[str] = None) -> ListUsersResponse:
+        """
+        Gets a list of users
+
+        Parameters:
+            - email: typing.Optional[str]. Email of guest to return
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "users"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "users"),
             params=remove_none_from_dict({"email": email}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -169,9 +216,15 @@ class AsyncUsersClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def create(self, *, request: UserConfig) -> UserResponse:
+        """
+        A user is a privileged user that logs in with a username and password.
+
+        Parameters:
+            - request: UserConfig.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "users"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "users"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -185,9 +238,15 @@ class AsyncUsersClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def get(self, user_id: UserId) -> UserResponse:
+        """
+        Gets a user
+
+        Parameters:
+            - user_id: UserId. The user id
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"users/{user_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"users/{user_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -207,9 +266,21 @@ class AsyncUsersClient:
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
     ) -> ListApiTokensResponse:
+        """
+        Gets all the api tokens for a user.
+
+        Parameters:
+            - user_id: UserId. The user id
+
+            - tenant_id: str.
+
+            - page_size: typing.Optional[int]. Number of tokens to return in a page (default 10)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"users/{user_id}/api-token"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"users/{user_id}/api-token"),
             params=remove_none_from_dict({"tenantId": tenant_id, "pageSize": page_size, "pageNumber": page_number}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -223,9 +294,17 @@ class AsyncUsersClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def create_api_token(self, user_id: UserId, *, tenant_id: str) -> None:
+        """
+        Creates an api token for authenticating against Flatfile APIs.
+
+        Parameters:
+            - user_id: UserId. The user id
+
+            - tenant_id: str.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"users/{user_id}/api-token"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"users/{user_id}/api-token"),
             params=remove_none_from_dict({"tenantId": tenant_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -245,6 +324,16 @@ class AsyncUsersClient:
         email: typing.Optional[str] = OMIT,
         space_id: typing.Optional[str] = OMIT,
     ) -> ExchangeTokenResponse:
+        """
+        Exchange an invitation for an access token
+
+        Parameters:
+            - token: typing.Optional[str]. The token to use for the request
+
+            - email: typing.Optional[str]. The invited guest's email, required if no token
+
+            - space_id: typing.Optional[str]. The spaceId, required if no token
+        """
         _request: typing.Dict[str, typing.Any] = {}
         if token is not OMIT:
             _request["token"] = token
@@ -254,7 +343,7 @@ class AsyncUsersClient:
             _request["spaceId"] = space_id
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "invitations/exchange"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "invitations/exchange"),
             json=jsonable_encoder(_request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,

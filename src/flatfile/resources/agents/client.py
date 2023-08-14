@@ -10,7 +10,6 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
-from ...environment import FlatfileEnvironment
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.agent_id import AgentId
@@ -27,16 +26,17 @@ OMIT = typing.cast(typing.Any, ...)
 
 
 class AgentsClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: SyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     def list(self, *, environment_id: EnvironmentId) -> ListAgentsResponse:
+        """
+        Parameters:
+            - environment_id: EnvironmentId.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "agents"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "agents"),
             params=remove_none_from_dict({"environmentId": environment_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -50,9 +50,15 @@ class AgentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def create(self, *, environment_id: EnvironmentId, request: AgentConfig) -> AgentResponse:
+        """
+        Parameters:
+            - environment_id: EnvironmentId.
+
+            - request: AgentConfig.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "agents"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "agents"),
             params=remove_none_from_dict({"environmentId": environment_id}),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
@@ -69,9 +75,15 @@ class AgentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def get(self, agent_id: AgentId, *, environment_id: EnvironmentId) -> AgentResponse:
+        """
+        Parameters:
+            - agent_id: AgentId.
+
+            - environment_id: EnvironmentId.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"agents/{agent_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}"),
             params=remove_none_from_dict({"environmentId": environment_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -89,9 +101,15 @@ class AgentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def get_agent_logs(self, agent_id: AgentId, *, environment_id: EnvironmentId) -> GetAgentLogsResponse:
+        """
+        Parameters:
+            - agent_id: AgentId.
+
+            - environment_id: EnvironmentId.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"agents/{agent_id}/logs"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}/logs"),
             params=remove_none_from_dict({"environmentId": environment_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -115,9 +133,17 @@ class AgentsClient:
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
     ) -> GetAgentLogsResponse:
+        """
+        Parameters:
+            - environment_id: EnvironmentId.
+
+            - page_size: typing.Optional[int]. Number of logs to return in a page (default 20)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "agents/logs"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "agents/logs"),
             params=remove_none_from_dict(
                 {"environmentId": environment_id, "pageSize": page_size, "pageNumber": page_number}
             ),
@@ -137,9 +163,15 @@ class AgentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def delete(self, agent_id: AgentId) -> Success:
+        """
+        Deletes a single agent
+
+        Parameters:
+            - agent_id: AgentId.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"agents/{agent_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -157,16 +189,17 @@ class AgentsClient:
 
 
 class AsyncAgentsClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: AsyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     async def list(self, *, environment_id: EnvironmentId) -> ListAgentsResponse:
+        """
+        Parameters:
+            - environment_id: EnvironmentId.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "agents"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "agents"),
             params=remove_none_from_dict({"environmentId": environment_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -180,9 +213,15 @@ class AsyncAgentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def create(self, *, environment_id: EnvironmentId, request: AgentConfig) -> AgentResponse:
+        """
+        Parameters:
+            - environment_id: EnvironmentId.
+
+            - request: AgentConfig.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "agents"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "agents"),
             params=remove_none_from_dict({"environmentId": environment_id}),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
@@ -199,9 +238,15 @@ class AsyncAgentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def get(self, agent_id: AgentId, *, environment_id: EnvironmentId) -> AgentResponse:
+        """
+        Parameters:
+            - agent_id: AgentId.
+
+            - environment_id: EnvironmentId.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"agents/{agent_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}"),
             params=remove_none_from_dict({"environmentId": environment_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -219,9 +264,15 @@ class AsyncAgentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def get_agent_logs(self, agent_id: AgentId, *, environment_id: EnvironmentId) -> GetAgentLogsResponse:
+        """
+        Parameters:
+            - agent_id: AgentId.
+
+            - environment_id: EnvironmentId.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"agents/{agent_id}/logs"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}/logs"),
             params=remove_none_from_dict({"environmentId": environment_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -245,9 +296,17 @@ class AsyncAgentsClient:
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
     ) -> GetAgentLogsResponse:
+        """
+        Parameters:
+            - environment_id: EnvironmentId.
+
+            - page_size: typing.Optional[int]. Number of logs to return in a page (default 20)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "agents/logs"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "agents/logs"),
             params=remove_none_from_dict(
                 {"environmentId": environment_id, "pageSize": page_size, "pageNumber": page_number}
             ),
@@ -267,9 +326,15 @@ class AsyncAgentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def delete(self, agent_id: AgentId) -> Success:
+        """
+        Deletes a single agent
+
+        Parameters:
+            - agent_id: AgentId.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"agents/{agent_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )

@@ -10,7 +10,6 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
-from ...environment import FlatfileEnvironment
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.errors import Errors
@@ -41,18 +40,23 @@ OMIT = typing.cast(typing.Any, ...)
 
 
 class WorkbooksClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: SyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     def list(
         self, *, space_id: typing.Optional[SpaceId] = None, include_counts: typing.Optional[bool] = None
     ) -> ListWorkbooksResponse:
+        """
+        Returns all workbooks matching a filter for an account or space
+
+        Parameters:
+            - space_id: typing.Optional[SpaceId].
+
+            - include_counts: typing.Optional[bool]. Include counts for the workbook
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "workbooks"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "workbooks"),
             params=remove_none_from_dict({"spaceId": space_id, "includeCounts": include_counts}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -68,9 +72,15 @@ class WorkbooksClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def create(self, *, request: CreateWorkbookConfig) -> WorkbookResponse:
+        """
+        Creates a workbook and adds it to a space
+
+        Parameters:
+            - request: CreateWorkbookConfig.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "workbooks"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "workbooks"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -86,9 +96,15 @@ class WorkbooksClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def get(self, workbook_id: WorkbookId) -> WorkbookResponse:
+        """
+        Returns a single workbook
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook to return
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -105,9 +121,15 @@ class WorkbooksClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def delete(self, workbook_id: WorkbookId) -> Success:
+        """
+        Deletes a workbook and all of its record data permanently
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook to delete
+        """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -124,9 +146,17 @@ class WorkbooksClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def update(self, workbook_id: WorkbookId, *, request: UpdateWorkbookConfig) -> WorkbookResponse:
+        """
+        Updates a workbook
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook to update
+
+            - request: UpdateWorkbookConfig.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -144,9 +174,15 @@ class WorkbooksClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def clone(self, workbook_id: WorkbookId) -> WorkbookResponse:
+        """
+        Clones a workbook
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook to clone
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}/clone"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/clone"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -163,9 +199,15 @@ class WorkbooksClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def get_sheets_deprecated(self, workbook_id: WorkbookId) -> ListSheetsResponse:
+        """
+        Returns sheets from a workbook
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}/sheets"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/sheets"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -182,9 +224,15 @@ class WorkbooksClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def rebuild_workbook(self, workbook_id: WorkbookId) -> Success:
+        """
+        Rebuild a workbook
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook to rebuild
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}/rebuild"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/rebuild"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -220,9 +268,47 @@ class WorkbooksClient:
         include_links: typing.Optional[bool] = None,
         include_messages: typing.Optional[bool] = None,
     ) -> RecordsResponse:
+        """
+        Returns records from a sheet in a workbook
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook
+
+            - sheet_id: SheetId. ID of sheet
+
+            - version_id: typing.Optional[VersionId].
+
+            - until_version_id: typing.Optional[VersionId].
+
+            - since_version_id: typing.Optional[VersionId].
+
+            - sort_field: typing.Optional[SortField].
+
+            - sort_direction: typing.Optional[SortDirection].
+
+            - filter: typing.Optional[Filter].
+
+            - filter_field: typing.Optional[FilterField].
+
+            - search_value: typing.Optional[SearchValue].
+
+            - search_field: typing.Optional[SearchField].
+
+            - page_size: typing.Optional[int]. Number of records to return in a page (default 1000 if pageNumber included)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+
+            - include_counts: typing.Optional[bool]. Include counts for the total records, valid records and records with errors
+
+            - include_links: typing.Optional[bool]. If true, linked records will be included in the results. Defaults to false
+
+            - include_messages: typing.Optional[bool]. Include error messages, defaults to false
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/records"),
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/records"
+            ),
             params=remove_none_from_dict(
                 {
                     "versionId": version_id,
@@ -259,9 +345,21 @@ class WorkbooksClient:
     def update_records_deprecated(
         self, workbook_id: WorkbookId, sheet_id: SheetId, *, request: Records
     ) -> VersionResponse:
+        """
+        Updates existing records in a workbook sheet
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook
+
+            - sheet_id: SheetId. ID of sheet
+
+            - request: Records.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "PUT",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/records"),
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/records"
+            ),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -281,9 +379,21 @@ class WorkbooksClient:
     def add_records_deprecated(
         self, workbook_id: WorkbookId, sheet_id: SheetId, *, request: typing.List[RecordData]
     ) -> RecordsResponse:
+        """
+        Adds records to a workbook sheet
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook
+
+            - sheet_id: SheetId. ID of sheet
+
+            - request: typing.List[RecordData].
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/records"),
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/records"
+            ),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -307,9 +417,21 @@ class WorkbooksClient:
         *,
         ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]],
     ) -> Success:
+        """
+        Deletes records from a workbook sheet
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook
+
+            - sheet_id: SheetId. ID of sheet
+
+            - ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+        """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/records"),
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/records"
+            ),
             params=remove_none_from_dict({"ids": ids}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -327,9 +449,19 @@ class WorkbooksClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def validate_sheet_deprecated(self, workbook_id: WorkbookId, sheet_id: SheetId) -> Success:
+        """
+        Trigger data hooks and validation to run on a sheet
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook
+
+            - sheet_id: SheetId. ID of sheet
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/validate"),
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/validate"
+            ),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -346,9 +478,19 @@ class WorkbooksClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def create_version_deprecated(self, workbook_id: WorkbookId, sheet_id: SheetId) -> VersionResponse:
+        """
+        Creates a new version of a workbook sheet
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook
+
+            - sheet_id: SheetId. ID of sheet
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/versions"),
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/versions"
+            ),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -366,18 +508,23 @@ class WorkbooksClient:
 
 
 class AsyncWorkbooksClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: AsyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     async def list(
         self, *, space_id: typing.Optional[SpaceId] = None, include_counts: typing.Optional[bool] = None
     ) -> ListWorkbooksResponse:
+        """
+        Returns all workbooks matching a filter for an account or space
+
+        Parameters:
+            - space_id: typing.Optional[SpaceId].
+
+            - include_counts: typing.Optional[bool]. Include counts for the workbook
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "workbooks"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "workbooks"),
             params=remove_none_from_dict({"spaceId": space_id, "includeCounts": include_counts}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -393,9 +540,15 @@ class AsyncWorkbooksClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def create(self, *, request: CreateWorkbookConfig) -> WorkbookResponse:
+        """
+        Creates a workbook and adds it to a space
+
+        Parameters:
+            - request: CreateWorkbookConfig.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "workbooks"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "workbooks"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -411,9 +564,15 @@ class AsyncWorkbooksClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def get(self, workbook_id: WorkbookId) -> WorkbookResponse:
+        """
+        Returns a single workbook
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook to return
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -430,9 +589,15 @@ class AsyncWorkbooksClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def delete(self, workbook_id: WorkbookId) -> Success:
+        """
+        Deletes a workbook and all of its record data permanently
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook to delete
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -449,9 +614,17 @@ class AsyncWorkbooksClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def update(self, workbook_id: WorkbookId, *, request: UpdateWorkbookConfig) -> WorkbookResponse:
+        """
+        Updates a workbook
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook to update
+
+            - request: UpdateWorkbookConfig.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -469,9 +642,15 @@ class AsyncWorkbooksClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def clone(self, workbook_id: WorkbookId) -> WorkbookResponse:
+        """
+        Clones a workbook
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook to clone
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}/clone"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/clone"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -488,9 +667,15 @@ class AsyncWorkbooksClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def get_sheets_deprecated(self, workbook_id: WorkbookId) -> ListSheetsResponse:
+        """
+        Returns sheets from a workbook
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}/sheets"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/sheets"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -507,9 +692,15 @@ class AsyncWorkbooksClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def rebuild_workbook(self, workbook_id: WorkbookId) -> Success:
+        """
+        Rebuild a workbook
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook to rebuild
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}/rebuild"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/rebuild"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -545,9 +736,47 @@ class AsyncWorkbooksClient:
         include_links: typing.Optional[bool] = None,
         include_messages: typing.Optional[bool] = None,
     ) -> RecordsResponse:
+        """
+        Returns records from a sheet in a workbook
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook
+
+            - sheet_id: SheetId. ID of sheet
+
+            - version_id: typing.Optional[VersionId].
+
+            - until_version_id: typing.Optional[VersionId].
+
+            - since_version_id: typing.Optional[VersionId].
+
+            - sort_field: typing.Optional[SortField].
+
+            - sort_direction: typing.Optional[SortDirection].
+
+            - filter: typing.Optional[Filter].
+
+            - filter_field: typing.Optional[FilterField].
+
+            - search_value: typing.Optional[SearchValue].
+
+            - search_field: typing.Optional[SearchField].
+
+            - page_size: typing.Optional[int]. Number of records to return in a page (default 1000 if pageNumber included)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+
+            - include_counts: typing.Optional[bool]. Include counts for the total records, valid records and records with errors
+
+            - include_links: typing.Optional[bool]. If true, linked records will be included in the results. Defaults to false
+
+            - include_messages: typing.Optional[bool]. Include error messages, defaults to false
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/records"),
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/records"
+            ),
             params=remove_none_from_dict(
                 {
                     "versionId": version_id,
@@ -584,9 +813,21 @@ class AsyncWorkbooksClient:
     async def update_records_deprecated(
         self, workbook_id: WorkbookId, sheet_id: SheetId, *, request: Records
     ) -> VersionResponse:
+        """
+        Updates existing records in a workbook sheet
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook
+
+            - sheet_id: SheetId. ID of sheet
+
+            - request: Records.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "PUT",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/records"),
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/records"
+            ),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -606,9 +847,21 @@ class AsyncWorkbooksClient:
     async def add_records_deprecated(
         self, workbook_id: WorkbookId, sheet_id: SheetId, *, request: typing.List[RecordData]
     ) -> RecordsResponse:
+        """
+        Adds records to a workbook sheet
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook
+
+            - sheet_id: SheetId. ID of sheet
+
+            - request: typing.List[RecordData].
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/records"),
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/records"
+            ),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -632,9 +885,21 @@ class AsyncWorkbooksClient:
         *,
         ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]],
     ) -> Success:
+        """
+        Deletes records from a workbook sheet
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook
+
+            - sheet_id: SheetId. ID of sheet
+
+            - ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/records"),
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/records"
+            ),
             params=remove_none_from_dict({"ids": ids}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -652,9 +917,19 @@ class AsyncWorkbooksClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def validate_sheet_deprecated(self, workbook_id: WorkbookId, sheet_id: SheetId) -> Success:
+        """
+        Trigger data hooks and validation to run on a sheet
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook
+
+            - sheet_id: SheetId. ID of sheet
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/validate"),
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/validate"
+            ),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -671,9 +946,19 @@ class AsyncWorkbooksClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def create_version_deprecated(self, workbook_id: WorkbookId, sheet_id: SheetId) -> VersionResponse:
+        """
+        Creates a new version of a workbook sheet
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook
+
+            - sheet_id: SheetId. ID of sheet
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/versions"),
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/sheets/{sheet_id}/versions"
+            ),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )

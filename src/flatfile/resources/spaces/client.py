@@ -10,7 +10,6 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
-from ...environment import FlatfileEnvironment
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.environment_id import EnvironmentId
@@ -28,10 +27,7 @@ OMIT = typing.cast(typing.Any, ...)
 
 
 class SpacesClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: SyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     def list(
@@ -46,9 +42,29 @@ class SpacesClient:
         sort_direction: typing.Optional[SortDirection] = None,
         is_collaborative: typing.Optional[bool] = None,
     ) -> ListSpacesResponse:
+        """
+        Returns all spaces for an account or environment
+
+        Parameters:
+            - environment_id: typing.Optional[EnvironmentId].
+
+            - page_size: typing.Optional[int]. Number of spaces to return in a page (default 10)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+
+            - search: typing.Optional[str].
+
+            - archived: typing.Optional[bool].
+
+            - sort_field: typing.Optional[GetSpacesSortField].
+
+            - sort_direction: typing.Optional[SortDirection].
+
+            - is_collaborative: typing.Optional[bool].
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "spaces"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "spaces"),
             params=remove_none_from_dict(
                 {
                     "environmentId": environment_id,
@@ -75,9 +91,15 @@ class SpacesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def create(self, *, request: SpaceConfig) -> SpaceResponse:
+        """
+        Creates a new space based on an existing Space Config
+
+        Parameters:
+            - request: SpaceConfig.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "spaces"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "spaces"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -95,9 +117,15 @@ class SpacesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def get(self, space_id: SpaceId) -> SpaceResponse:
+        """
+        Returns a single space
+
+        Parameters:
+            - space_id: SpaceId. ID of space to return
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"spaces/{space_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -114,9 +142,15 @@ class SpacesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def delete(self, space_id: SpaceId) -> Success:
+        """
+        Delete a space
+
+        Parameters:
+            - space_id: SpaceId. ID of space to delete
+        """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"spaces/{space_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -133,9 +167,17 @@ class SpacesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def update(self, space_id: SpaceId, *, request: SpaceConfig) -> SpaceResponse:
+        """
+        Update a space, to change the name for example
+
+        Parameters:
+            - space_id: SpaceId. ID of space to update
+
+            - request: SpaceConfig.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"spaces/{space_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -153,9 +195,15 @@ class SpacesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def archive_space(self, space_id: SpaceId) -> Success:
+        """
+        Sets archivedAt timestamp on a space
+
+        Parameters:
+            - space_id: SpaceId. ID of space to archive
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"spaces/{space_id}/archive"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/archive"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -173,10 +221,7 @@ class SpacesClient:
 
 
 class AsyncSpacesClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: AsyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     async def list(
@@ -191,9 +236,29 @@ class AsyncSpacesClient:
         sort_direction: typing.Optional[SortDirection] = None,
         is_collaborative: typing.Optional[bool] = None,
     ) -> ListSpacesResponse:
+        """
+        Returns all spaces for an account or environment
+
+        Parameters:
+            - environment_id: typing.Optional[EnvironmentId].
+
+            - page_size: typing.Optional[int]. Number of spaces to return in a page (default 10)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+
+            - search: typing.Optional[str].
+
+            - archived: typing.Optional[bool].
+
+            - sort_field: typing.Optional[GetSpacesSortField].
+
+            - sort_direction: typing.Optional[SortDirection].
+
+            - is_collaborative: typing.Optional[bool].
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "spaces"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "spaces"),
             params=remove_none_from_dict(
                 {
                     "environmentId": environment_id,
@@ -220,9 +285,15 @@ class AsyncSpacesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def create(self, *, request: SpaceConfig) -> SpaceResponse:
+        """
+        Creates a new space based on an existing Space Config
+
+        Parameters:
+            - request: SpaceConfig.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "spaces"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "spaces"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -240,9 +311,15 @@ class AsyncSpacesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def get(self, space_id: SpaceId) -> SpaceResponse:
+        """
+        Returns a single space
+
+        Parameters:
+            - space_id: SpaceId. ID of space to return
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"spaces/{space_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -259,9 +336,15 @@ class AsyncSpacesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def delete(self, space_id: SpaceId) -> Success:
+        """
+        Delete a space
+
+        Parameters:
+            - space_id: SpaceId. ID of space to delete
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"spaces/{space_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -278,9 +361,17 @@ class AsyncSpacesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def update(self, space_id: SpaceId, *, request: SpaceConfig) -> SpaceResponse:
+        """
+        Update a space, to change the name for example
+
+        Parameters:
+            - space_id: SpaceId. ID of space to update
+
+            - request: SpaceConfig.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"spaces/{space_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -298,9 +389,15 @@ class AsyncSpacesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def archive_space(self, space_id: SpaceId) -> Success:
+        """
+        Sets archivedAt timestamp on a space
+
+        Parameters:
+            - space_id: SpaceId. ID of space to archive
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"spaces/{space_id}/archive"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/archive"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )

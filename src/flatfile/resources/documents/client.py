@@ -9,7 +9,6 @@ import pydantic
 from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
-from ...environment import FlatfileEnvironment
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.document_id import DocumentId
@@ -25,16 +24,19 @@ OMIT = typing.cast(typing.Any, ...)
 
 
 class DocumentsClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: SyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     def list(self, space_id: SpaceId) -> ListDocumentsResponse:
+        """
+        Returns all documents for a space
+
+        Parameters:
+            - space_id: SpaceId. ID of space to return
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"spaces/{space_id}/documents"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/documents"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -51,9 +53,17 @@ class DocumentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def create(self, space_id: SpaceId, *, request: DocumentConfig) -> DocumentResponse:
+        """
+        Add a new document to the space
+
+        Parameters:
+            - space_id: SpaceId. ID of space to return
+
+            - request: DocumentConfig.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"spaces/{space_id}/documents"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/documents"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -71,9 +81,19 @@ class DocumentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def get(self, space_id: SpaceId, document_id: DocumentId) -> DocumentResponse:
+        """
+        Returns a single document
+
+        Parameters:
+            - space_id: SpaceId. ID of space to return
+
+            - document_id: DocumentId. ID of document to return
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"spaces/{space_id}/documents/{document_id}"),
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/documents/{document_id}"
+            ),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -90,9 +110,21 @@ class DocumentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def update(self, space_id: SpaceId, document_id: DocumentId, *, request: DocumentConfig) -> DocumentResponse:
+        """
+        updates a single document, for only the body and title
+
+        Parameters:
+            - space_id: SpaceId. ID of space to return
+
+            - document_id: DocumentId. ID of document to return
+
+            - request: DocumentConfig.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"spaces/{space_id}/documents/{document_id}"),
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/documents/{document_id}"
+            ),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -110,9 +142,19 @@ class DocumentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def delete(self, space_id: SpaceId, document_id: DocumentId) -> Success:
+        """
+        Deletes a single document
+
+        Parameters:
+            - space_id: SpaceId. ID of space to return
+
+            - document_id: DocumentId. ID of document to delete
+        """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"spaces/{space_id}/documents/{document_id}"),
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/documents/{document_id}"
+            ),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -130,16 +172,19 @@ class DocumentsClient:
 
 
 class AsyncDocumentsClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: AsyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     async def list(self, space_id: SpaceId) -> ListDocumentsResponse:
+        """
+        Returns all documents for a space
+
+        Parameters:
+            - space_id: SpaceId. ID of space to return
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"spaces/{space_id}/documents"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/documents"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -156,9 +201,17 @@ class AsyncDocumentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def create(self, space_id: SpaceId, *, request: DocumentConfig) -> DocumentResponse:
+        """
+        Add a new document to the space
+
+        Parameters:
+            - space_id: SpaceId. ID of space to return
+
+            - request: DocumentConfig.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"spaces/{space_id}/documents"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/documents"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -176,9 +229,19 @@ class AsyncDocumentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def get(self, space_id: SpaceId, document_id: DocumentId) -> DocumentResponse:
+        """
+        Returns a single document
+
+        Parameters:
+            - space_id: SpaceId. ID of space to return
+
+            - document_id: DocumentId. ID of document to return
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"spaces/{space_id}/documents/{document_id}"),
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/documents/{document_id}"
+            ),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -195,9 +258,21 @@ class AsyncDocumentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def update(self, space_id: SpaceId, document_id: DocumentId, *, request: DocumentConfig) -> DocumentResponse:
+        """
+        updates a single document, for only the body and title
+
+        Parameters:
+            - space_id: SpaceId. ID of space to return
+
+            - document_id: DocumentId. ID of document to return
+
+            - request: DocumentConfig.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"spaces/{space_id}/documents/{document_id}"),
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/documents/{document_id}"
+            ),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -215,9 +290,19 @@ class AsyncDocumentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def delete(self, space_id: SpaceId, document_id: DocumentId) -> Success:
+        """
+        Deletes a single document
+
+        Parameters:
+            - space_id: SpaceId. ID of space to return
+
+            - document_id: DocumentId. ID of document to delete
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"spaces/{space_id}/documents/{document_id}"),
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/documents/{document_id}"
+            ),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )

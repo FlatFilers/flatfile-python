@@ -10,7 +10,6 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
-from ...environment import FlatfileEnvironment
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.errors import Errors
@@ -27,6 +26,7 @@ from ..commons.types.success import Success
 from ..commons.types.version_id import VersionId
 from ..versions.types.version_response import VersionResponse
 from .types.cell_value_union import CellValueUnion
+from .types.get_records_response import GetRecordsResponse
 from .types.record_data import RecordData
 from .types.records import Records
 from .types.records_response import RecordsResponse
@@ -36,10 +36,7 @@ OMIT = typing.cast(typing.Any, ...)
 
 
 class RecordsClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: SyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     def get(
@@ -62,10 +59,48 @@ class RecordsClient:
         include_messages: typing.Optional[bool] = None,
         for_: typing.Optional[EventId] = None,
         q: typing.Optional[str] = None,
-    ) -> RecordsResponse:
+    ) -> GetRecordsResponse:
+        """
+        Returns records from a sheet in a workbook
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - version_id: typing.Optional[str].
+
+            - since_version_id: typing.Optional[VersionId].
+
+            - sort_field: typing.Optional[SortField].
+
+            - sort_direction: typing.Optional[SortDirection].
+
+            - filter: typing.Optional[Filter].
+
+            - filter_field: typing.Optional[FilterField]. Name of field by which to filter records
+
+            - search_value: typing.Optional[SearchValue].
+
+            - search_field: typing.Optional[SearchField].
+
+            - ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records. Maximum of 100 allowed.
+
+            - page_size: typing.Optional[int]. Number of records to return in a page (default 1000 if pageNumber included)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+
+            - include_counts: typing.Optional[bool]. Include counts for the total records, valid records and records with errors
+
+            - include_links: typing.Optional[bool]. If true, linked records will be included in the results. Defaults to false.
+
+            - include_messages: typing.Optional[bool]. Include error messages, defaults to false.
+
+            - for_: typing.Optional[EventId]. if "for" is provided, the query parameters will be pulled from the event payload
+
+            - q: typing.Optional[str]. An FFQL query used to filter the result set
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/records"),
             params=remove_none_from_dict(
                 {
                     "versionId": version_id,
@@ -90,7 +125,7 @@ class RecordsClient:
             timeout=60,
         )
         if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(RecordsResponse, _response.json())  # type: ignore
+            return pydantic.parse_obj_as(GetRecordsResponse, _response.json())  # type: ignore
         if _response.status_code == 400:
             raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         if _response.status_code == 404:
@@ -102,9 +137,17 @@ class RecordsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def update(self, sheet_id: SheetId, *, request: Records) -> VersionResponse:
+        """
+        Updates existing records in a workbook sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - request: Records.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "PUT",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/records"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -122,9 +165,17 @@ class RecordsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def insert(self, sheet_id: SheetId, *, request: typing.List[RecordData]) -> RecordsResponse:
+        """
+        Adds records to a workbook sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - request: typing.List[RecordData].
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/records"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -144,9 +195,18 @@ class RecordsClient:
     def delete(
         self, sheet_id: SheetId, *, ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]
     ) -> Success:
+        """
+        Deletes records from a workbook sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+
+        """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/records"),
             params=remove_none_from_dict({"ids": ids}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -174,9 +234,27 @@ class RecordsClient:
         page_number: typing.Optional[int] = None,
         replace: typing.Any,
     ) -> RecordsResponse:
+        """
+        Searches for the given searchValue in a field and replaces all instances of that value with replaceValue
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - field_key: str. A unique key used to identify a field in a sheet
+
+            - search_value: str. A value to find for a given field in a sheet. Wrap the value in "" for exact match
+
+            - filter: typing.Optional[Filter].
+
+            - page_size: typing.Optional[int]. Number of records to return in a page (default 1000 if pageNumber included)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+
+            - replace: typing.Any. The value to replace found values with
+        """
         _response = self._client_wrapper.httpx_client.request(
             "PUT",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/replace"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/replace"),
             params=remove_none_from_dict(
                 {
                     "fieldKey": field_key,
@@ -211,6 +289,28 @@ class RecordsClient:
         replace: typing.Optional[CellValueUnion] = OMIT,
         field_key: str,
     ) -> VersionResponse:
+        """
+        Searches for all values that match the 'find' value (globally or for a specific field via 'fieldKey') and replaces them with the 'replace' value. Wrap 'find' value in double quotes for exact match (""). Returns a versionId for the updated records
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - filter: typing.Optional[Filter].
+
+            - filter_field: typing.Optional[FilterField]. Name of field by which to filter records
+
+            - search_value: typing.Optional[SearchValue].
+
+            - search_field: typing.Optional[SearchField].
+
+            - ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+
+            - find: typing.Optional[CellValueUnion]. A value to find for a given field in a sheet. Wrap the value in "" for exact match
+
+            - replace: typing.Optional[CellValueUnion]. The value to replace found values with
+
+            - field_key: str. The value to replace found values with
+        """
         _request: typing.Dict[str, typing.Any] = {"fieldKey": field_key}
         if find is not OMIT:
             _request["find"] = find
@@ -218,7 +318,7 @@ class RecordsClient:
             _request["replace"] = replace
         _response = self._client_wrapper.httpx_client.request(
             "PUT",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/find-replace"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/find-replace"),
             params=remove_none_from_dict(
                 {
                     "filter": filter,
@@ -242,10 +342,7 @@ class RecordsClient:
 
 
 class AsyncRecordsClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: AsyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     async def get(
@@ -268,10 +365,48 @@ class AsyncRecordsClient:
         include_messages: typing.Optional[bool] = None,
         for_: typing.Optional[EventId] = None,
         q: typing.Optional[str] = None,
-    ) -> RecordsResponse:
+    ) -> GetRecordsResponse:
+        """
+        Returns records from a sheet in a workbook
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - version_id: typing.Optional[str].
+
+            - since_version_id: typing.Optional[VersionId].
+
+            - sort_field: typing.Optional[SortField].
+
+            - sort_direction: typing.Optional[SortDirection].
+
+            - filter: typing.Optional[Filter].
+
+            - filter_field: typing.Optional[FilterField]. Name of field by which to filter records
+
+            - search_value: typing.Optional[SearchValue].
+
+            - search_field: typing.Optional[SearchField].
+
+            - ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records. Maximum of 100 allowed.
+
+            - page_size: typing.Optional[int]. Number of records to return in a page (default 1000 if pageNumber included)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+
+            - include_counts: typing.Optional[bool]. Include counts for the total records, valid records and records with errors
+
+            - include_links: typing.Optional[bool]. If true, linked records will be included in the results. Defaults to false.
+
+            - include_messages: typing.Optional[bool]. Include error messages, defaults to false.
+
+            - for_: typing.Optional[EventId]. if "for" is provided, the query parameters will be pulled from the event payload
+
+            - q: typing.Optional[str]. An FFQL query used to filter the result set
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/records"),
             params=remove_none_from_dict(
                 {
                     "versionId": version_id,
@@ -296,7 +431,7 @@ class AsyncRecordsClient:
             timeout=60,
         )
         if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(RecordsResponse, _response.json())  # type: ignore
+            return pydantic.parse_obj_as(GetRecordsResponse, _response.json())  # type: ignore
         if _response.status_code == 400:
             raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         if _response.status_code == 404:
@@ -308,9 +443,17 @@ class AsyncRecordsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def update(self, sheet_id: SheetId, *, request: Records) -> VersionResponse:
+        """
+        Updates existing records in a workbook sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - request: Records.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "PUT",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/records"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -328,9 +471,17 @@ class AsyncRecordsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def insert(self, sheet_id: SheetId, *, request: typing.List[RecordData]) -> RecordsResponse:
+        """
+        Adds records to a workbook sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - request: typing.List[RecordData].
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/records"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -350,9 +501,18 @@ class AsyncRecordsClient:
     async def delete(
         self, sheet_id: SheetId, *, ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]
     ) -> Success:
+        """
+        Deletes records from a workbook sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/records"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/records"),
             params=remove_none_from_dict({"ids": ids}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -380,9 +540,27 @@ class AsyncRecordsClient:
         page_number: typing.Optional[int] = None,
         replace: typing.Any,
     ) -> RecordsResponse:
+        """
+        Searches for the given searchValue in a field and replaces all instances of that value with replaceValue
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - field_key: str. A unique key used to identify a field in a sheet
+
+            - search_value: str. A value to find for a given field in a sheet. Wrap the value in "" for exact match
+
+            - filter: typing.Optional[Filter].
+
+            - page_size: typing.Optional[int]. Number of records to return in a page (default 1000 if pageNumber included)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+
+            - replace: typing.Any. The value to replace found values with
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "PUT",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/replace"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/replace"),
             params=remove_none_from_dict(
                 {
                     "fieldKey": field_key,
@@ -417,6 +595,28 @@ class AsyncRecordsClient:
         replace: typing.Optional[CellValueUnion] = OMIT,
         field_key: str,
     ) -> VersionResponse:
+        """
+        Searches for all values that match the 'find' value (globally or for a specific field via 'fieldKey') and replaces them with the 'replace' value. Wrap 'find' value in double quotes for exact match (""). Returns a versionId for the updated records
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - filter: typing.Optional[Filter].
+
+            - filter_field: typing.Optional[FilterField]. Name of field by which to filter records
+
+            - search_value: typing.Optional[SearchValue].
+
+            - search_field: typing.Optional[SearchField].
+
+            - ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+
+            - find: typing.Optional[CellValueUnion]. A value to find for a given field in a sheet. Wrap the value in "" for exact match
+
+            - replace: typing.Optional[CellValueUnion]. The value to replace found values with
+
+            - field_key: str. The value to replace found values with
+        """
         _request: typing.Dict[str, typing.Any] = {"fieldKey": field_key}
         if find is not OMIT:
             _request["find"] = find
@@ -424,7 +624,7 @@ class AsyncRecordsClient:
             _request["replace"] = replace
         _response = await self._client_wrapper.httpx_client.request(
             "PUT",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/find-replace"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/find-replace"),
             params=remove_none_from_dict(
                 {
                     "filter": filter,

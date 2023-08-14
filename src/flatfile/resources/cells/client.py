@@ -9,7 +9,6 @@ import pydantic
 from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.remove_none_from_dict import remove_none_from_dict
-from ...environment import FlatfileEnvironment
 from ..commons.types.filter import Filter
 from ..commons.types.sheet_id import SheetId
 from ..commons.types.sort_direction import SortDirection
@@ -18,10 +17,7 @@ from .types.cells_response import CellsResponse
 
 
 class CellsClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: SyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     def get_values(
@@ -39,9 +35,35 @@ class CellsClient:
         include_counts: typing.Optional[bool] = None,
         search_value: typing.Optional[str] = None,
     ) -> CellsResponse:
+        """
+        Returns record cell values grouped by all fields in the sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - field_key: str. Returns results from the given field only. Otherwise all field cells are returned
+
+            - sort_field: typing.Optional[SortField].
+
+            - sort_direction: typing.Optional[SortDirection].
+
+            - filter: typing.Optional[Filter]. Options to filter records
+
+            - filter_field: typing.Optional[str]. Name of field by which to filter records
+
+            - page_size: typing.Optional[int]. Number of records to return in a page (default 1000 if pageNumber included)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+
+            - distinct: typing.Optional[bool]. When true, excludes duplicate values
+
+            - include_counts: typing.Optional[bool]. When both distinct and includeCounts are true, the count of distinct field values will be returned
+
+            - search_value: typing.Optional[str]. A value to find for a given field in a sheet. Wrap the value in "" for exact match
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/cells"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/cells"),
             params=remove_none_from_dict(
                 {
                     "fieldKey": field_key,
@@ -69,10 +91,7 @@ class CellsClient:
 
 
 class AsyncCellsClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: AsyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     async def get_values(
@@ -90,9 +109,35 @@ class AsyncCellsClient:
         include_counts: typing.Optional[bool] = None,
         search_value: typing.Optional[str] = None,
     ) -> CellsResponse:
+        """
+        Returns record cell values grouped by all fields in the sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - field_key: str. Returns results from the given field only. Otherwise all field cells are returned
+
+            - sort_field: typing.Optional[SortField].
+
+            - sort_direction: typing.Optional[SortDirection].
+
+            - filter: typing.Optional[Filter]. Options to filter records
+
+            - filter_field: typing.Optional[str]. Name of field by which to filter records
+
+            - page_size: typing.Optional[int]. Number of records to return in a page (default 1000 if pageNumber included)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+
+            - distinct: typing.Optional[bool]. When true, excludes duplicate values
+
+            - include_counts: typing.Optional[bool]. When both distinct and includeCounts are true, the count of distinct field values will be returned
+
+            - search_value: typing.Optional[str]. A value to find for a given field in a sheet. Wrap the value in "" for exact match
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"sheets/{sheet_id}/cells"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/cells"),
             params=remove_none_from_dict(
                 {
                     "fieldKey": field_key,

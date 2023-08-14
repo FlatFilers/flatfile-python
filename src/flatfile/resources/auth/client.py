@@ -8,7 +8,6 @@ import pydantic
 from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.remove_none_from_dict import remove_none_from_dict
-from ...environment import FlatfileEnvironment
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.environment_id import EnvironmentId
@@ -19,16 +18,17 @@ from .types.api_keys_response import ApiKeysResponse
 
 
 class AuthClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: SyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     def get_api_keys(self, *, environment_id: EnvironmentId) -> ApiKeysResponse:
+        """
+        Parameters:
+            - environment_id: EnvironmentId. ID of environment to search
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "auth/api-keys"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "auth/api-keys"),
             params=remove_none_from_dict({"environmentId": environment_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -46,9 +46,15 @@ class AuthClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def create_new_api_key(self, *, environment_id: str, type: ApiKeyType) -> ApiKeysResponse:
+        """
+        Parameters:
+            - environment_id: str. ID of environment to search
+
+            - type: ApiKeyType. API key type (SECRET or PUBLISHABLE)
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "auth/api-key"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "auth/api-key"),
             params=remove_none_from_dict({"environmentId": environment_id, "type": type}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -66,9 +72,15 @@ class AuthClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def delete_api_key(self, *, environment_id: str, key: str) -> Success:
+        """
+        Parameters:
+            - environment_id: str. ID of environment to search
+
+            - key: str. The API key to delete
+        """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", "auth/api-key"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "auth/api-key"),
             params=remove_none_from_dict({"environmentId": environment_id, "key": key}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -87,16 +99,17 @@ class AuthClient:
 
 
 class AsyncAuthClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: AsyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     async def get_api_keys(self, *, environment_id: EnvironmentId) -> ApiKeysResponse:
+        """
+        Parameters:
+            - environment_id: EnvironmentId. ID of environment to search
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "auth/api-keys"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "auth/api-keys"),
             params=remove_none_from_dict({"environmentId": environment_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -114,9 +127,15 @@ class AsyncAuthClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def create_new_api_key(self, *, environment_id: str, type: ApiKeyType) -> ApiKeysResponse:
+        """
+        Parameters:
+            - environment_id: str. ID of environment to search
+
+            - type: ApiKeyType. API key type (SECRET or PUBLISHABLE)
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "auth/api-key"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "auth/api-key"),
             params=remove_none_from_dict({"environmentId": environment_id, "type": type}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -134,9 +153,15 @@ class AsyncAuthClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def delete_api_key(self, *, environment_id: str, key: str) -> Success:
+        """
+        Parameters:
+            - environment_id: str. ID of environment to search
+
+            - key: str. The API key to delete
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", "auth/api-key"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "auth/api-key"),
             params=remove_none_from_dict({"environmentId": environment_id, "key": key}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,

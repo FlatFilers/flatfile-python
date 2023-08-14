@@ -10,7 +10,6 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
-from ...environment import FlatfileEnvironment
 from ..commons.types.environment_id import EnvironmentId
 from ..commons.types.file_id import FileId
 from ..commons.types.job_id import JobId
@@ -34,10 +33,7 @@ OMIT = typing.cast(typing.Any, ...)
 
 
 class JobsClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: SyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     def list(
@@ -51,9 +47,25 @@ class JobsClient:
         page_number: typing.Optional[int] = None,
         sort_direction: typing.Optional[SortDirection] = None,
     ) -> ListJobsResponse:
+        """
+        Parameters:
+            - environment_id: typing.Optional[EnvironmentId].
+
+            - space_id: typing.Optional[SpaceId].
+
+            - workbook_id: typing.Optional[WorkbookId].
+
+            - file_id: typing.Optional[FileId].
+
+            - page_size: typing.Optional[int]. Number of jobs to return in a page (default 20)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of jobs to return
+
+            - sort_direction: typing.Optional[SortDirection].
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "jobs"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "jobs"),
             params=remove_none_from_dict(
                 {
                     "environmentId": environment_id,
@@ -77,9 +89,13 @@ class JobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def create(self, *, request: JobConfig) -> JobResponse:
+        """
+        Parameters:
+            - request: JobConfig.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "jobs"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "jobs"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -93,9 +109,13 @@ class JobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def get(self, job_id: JobId) -> JobResponse:
+        """
+        Parameters:
+            - job_id: JobId.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -108,9 +128,15 @@ class JobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def update(self, job_id: JobId, *, request: JobUpdate) -> JobResponse:
+        """
+        Parameters:
+            - job_id: JobId.
+
+            - request: JobUpdate.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -124,9 +150,13 @@ class JobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def delete(self, job_id: JobId) -> Success:
+        """
+        Parameters:
+            - job_id: JobId.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -139,9 +169,15 @@ class JobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def execute(self, job_id: str) -> Success:
+        """
+        Execute a job and return the job
+
+        Parameters:
+            - job_id: str. ID of job to return
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}/execute"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/execute"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -154,9 +190,15 @@ class JobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def get_execution_plan(self, job_id: JobId) -> JobPlanResponse:
+        """
+        Returns a single job's execution plan
+
+        Parameters:
+            - job_id: JobId. ID of job to return
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}/plan"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/plan"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -169,9 +211,17 @@ class JobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def update_execution_plan(self, job_id: JobId, *, request: JobExecutionPlanRequest) -> JobPlanResponse:
+        """
+        Update a job's entire execution plan
+
+        Parameters:
+            - job_id: JobId. ID of job to return
+
+            - request: JobExecutionPlanRequest.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "PUT",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}/plan"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/plan"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -185,9 +235,17 @@ class JobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def update_execution_plan_fields(self, job_id: str, *, request: JobExecutionPlanConfigRequest) -> JobPlanResponse:
+        """
+        Update one or more individual fields on a job's execution plan
+
+        Parameters:
+            - job_id: str. ID of job to return
+
+            - request: JobExecutionPlanConfigRequest.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}/plan"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/plan"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -201,9 +259,17 @@ class JobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def ack(self, job_id: JobId, *, request: typing.Optional[JobAckDetails] = None) -> JobResponse:
+        """
+        Acknowledge a job and return the job
+
+        Parameters:
+            - job_id: JobId. ID of job to return
+
+            - request: typing.Optional[JobAckDetails].
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}/ack"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/ack"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -217,9 +283,15 @@ class JobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def ack_outcome(self, job_id: JobId) -> JobResponse:
+        """
+        Acknowledge a job outcome and return the job
+
+        Parameters:
+            - job_id: JobId. ID of job to return
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}/outcome/ack"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/outcome/ack"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -232,9 +304,17 @@ class JobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def complete(self, job_id: JobId, *, request: typing.Optional[JobOutcome] = None) -> JobResponse:
+        """
+        Complete a job and return the job
+
+        Parameters:
+            - job_id: JobId. ID of job to return
+
+            - request: typing.Optional[JobOutcome].
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}/complete"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/complete"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -248,9 +328,17 @@ class JobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def fail(self, job_id: JobId, *, request: typing.Optional[JobOutcome] = None) -> JobResponse:
+        """
+        Fail a job and return the job
+
+        Parameters:
+            - job_id: JobId. ID of job to return
+
+            - request: typing.Optional[JobOutcome].
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}/fail"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/fail"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -264,9 +352,17 @@ class JobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def cancel(self, job_id: JobId, *, request: typing.Optional[JobCancelDetails] = None) -> JobResponse:
+        """
+        Cancel a job and return the job
+
+        Parameters:
+            - job_id: JobId. ID of job to return
+
+            - request: typing.Optional[JobCancelDetails].
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}/cancel"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/cancel"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -281,10 +377,7 @@ class JobsClient:
 
 
 class AsyncJobsClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: AsyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     async def list(
@@ -298,9 +391,25 @@ class AsyncJobsClient:
         page_number: typing.Optional[int] = None,
         sort_direction: typing.Optional[SortDirection] = None,
     ) -> ListJobsResponse:
+        """
+        Parameters:
+            - environment_id: typing.Optional[EnvironmentId].
+
+            - space_id: typing.Optional[SpaceId].
+
+            - workbook_id: typing.Optional[WorkbookId].
+
+            - file_id: typing.Optional[FileId].
+
+            - page_size: typing.Optional[int]. Number of jobs to return in a page (default 20)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of jobs to return
+
+            - sort_direction: typing.Optional[SortDirection].
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "jobs"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "jobs"),
             params=remove_none_from_dict(
                 {
                     "environmentId": environment_id,
@@ -324,9 +433,13 @@ class AsyncJobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def create(self, *, request: JobConfig) -> JobResponse:
+        """
+        Parameters:
+            - request: JobConfig.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "jobs"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "jobs"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -340,9 +453,13 @@ class AsyncJobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def get(self, job_id: JobId) -> JobResponse:
+        """
+        Parameters:
+            - job_id: JobId.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -355,9 +472,15 @@ class AsyncJobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def update(self, job_id: JobId, *, request: JobUpdate) -> JobResponse:
+        """
+        Parameters:
+            - job_id: JobId.
+
+            - request: JobUpdate.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -371,9 +494,13 @@ class AsyncJobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def delete(self, job_id: JobId) -> Success:
+        """
+        Parameters:
+            - job_id: JobId.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -386,9 +513,15 @@ class AsyncJobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def execute(self, job_id: str) -> Success:
+        """
+        Execute a job and return the job
+
+        Parameters:
+            - job_id: str. ID of job to return
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}/execute"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/execute"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -401,9 +534,15 @@ class AsyncJobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def get_execution_plan(self, job_id: JobId) -> JobPlanResponse:
+        """
+        Returns a single job's execution plan
+
+        Parameters:
+            - job_id: JobId. ID of job to return
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}/plan"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/plan"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -416,9 +555,17 @@ class AsyncJobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def update_execution_plan(self, job_id: JobId, *, request: JobExecutionPlanRequest) -> JobPlanResponse:
+        """
+        Update a job's entire execution plan
+
+        Parameters:
+            - job_id: JobId. ID of job to return
+
+            - request: JobExecutionPlanRequest.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "PUT",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}/plan"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/plan"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -434,9 +581,17 @@ class AsyncJobsClient:
     async def update_execution_plan_fields(
         self, job_id: str, *, request: JobExecutionPlanConfigRequest
     ) -> JobPlanResponse:
+        """
+        Update one or more individual fields on a job's execution plan
+
+        Parameters:
+            - job_id: str. ID of job to return
+
+            - request: JobExecutionPlanConfigRequest.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}/plan"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/plan"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -450,9 +605,17 @@ class AsyncJobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def ack(self, job_id: JobId, *, request: typing.Optional[JobAckDetails] = None) -> JobResponse:
+        """
+        Acknowledge a job and return the job
+
+        Parameters:
+            - job_id: JobId. ID of job to return
+
+            - request: typing.Optional[JobAckDetails].
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}/ack"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/ack"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -466,9 +629,15 @@ class AsyncJobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def ack_outcome(self, job_id: JobId) -> JobResponse:
+        """
+        Acknowledge a job outcome and return the job
+
+        Parameters:
+            - job_id: JobId. ID of job to return
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}/outcome/ack"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/outcome/ack"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -481,9 +650,17 @@ class AsyncJobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def complete(self, job_id: JobId, *, request: typing.Optional[JobOutcome] = None) -> JobResponse:
+        """
+        Complete a job and return the job
+
+        Parameters:
+            - job_id: JobId. ID of job to return
+
+            - request: typing.Optional[JobOutcome].
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}/complete"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/complete"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -497,9 +674,17 @@ class AsyncJobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def fail(self, job_id: JobId, *, request: typing.Optional[JobOutcome] = None) -> JobResponse:
+        """
+        Fail a job and return the job
+
+        Parameters:
+            - job_id: JobId. ID of job to return
+
+            - request: typing.Optional[JobOutcome].
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}/fail"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/fail"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -513,9 +698,17 @@ class AsyncJobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def cancel(self, job_id: JobId, *, request: typing.Optional[JobCancelDetails] = None) -> JobResponse:
+        """
+        Cancel a job and return the job
+
+        Parameters:
+            - job_id: JobId. ID of job to return
+
+            - request: typing.Optional[JobCancelDetails].
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"jobs/{job_id}/cancel"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/cancel"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,

@@ -3,6 +3,8 @@
 from .cell_value import CellValue
 from .cell_value_union import CellValueUnion
 from .cell_value_with_links import CellValueWithLinks
+from .get_records_response import GetRecordsResponse
+from .get_records_response_data import GetRecordsResponseData
 from .record import Record
 from .record_counts import RecordCounts
 from .record_data import RecordData
@@ -20,6 +22,8 @@ __all__ = [
     "CellValue",
     "CellValueUnion",
     "CellValueWithLinks",
+    "GetRecordsResponse",
+    "GetRecordsResponseData",
     "Record",
     "RecordCounts",
     "RecordData",

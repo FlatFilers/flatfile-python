@@ -10,7 +10,6 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
-from ...environment import FlatfileEnvironment
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.action import Action
@@ -30,10 +29,7 @@ OMIT = typing.cast(typing.Any, ...)
 
 
 class FilesClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: SyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     def list(
@@ -44,9 +40,19 @@ class FilesClient:
         page_number: typing.Optional[int] = None,
         mode: typing.Optional[Mode] = None,
     ) -> ListFilesResponse:
+        """
+        Parameters:
+            - space_id: typing.Optional[str].
+
+            - page_size: typing.Optional[int]. Number of jobs to return in a page (default 20)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of jobs to return
+
+            - mode: typing.Optional[Mode]. The storage mode of file to fetch, defaults to "import"
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "files"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "files"),
             params=remove_none_from_dict(
                 {"spaceId": space_id, "pageSize": page_size, "pageNumber": page_number, "mode": mode}
             ),
@@ -64,9 +70,19 @@ class FilesClient:
     def upload(
         self, *, space_id: SpaceId, environment_id: EnvironmentId, mode: typing.Optional[Mode] = None, file: typing.IO
     ) -> FileResponse:
+        """
+        Parameters:
+            - space_id: SpaceId.
+
+            - environment_id: EnvironmentId.
+
+            - mode: typing.Optional[Mode].
+
+            - file: typing.IO.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "files"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "files"),
             data=jsonable_encoder({"spaceId": space_id, "environmentId": environment_id, "mode": mode}),
             files={"file": file},
             headers=self._client_wrapper.get_headers(),
@@ -83,9 +99,13 @@ class FilesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def get(self, file_id: str) -> FileResponse:
+        """
+        Parameters:
+            - file_id: str.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"files/{file_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{file_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -102,9 +122,13 @@ class FilesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def delete(self, file_id: str) -> Success:
+        """
+        Parameters:
+            - file_id: str.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"files/{file_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{file_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -130,6 +154,22 @@ class FilesClient:
         status: typing.Optional[ModelFileStatusEnum] = OMIT,
         actions: typing.Optional[typing.List[Action]] = OMIT,
     ) -> FileResponse:
+        """
+        Update a file, to change the workbook id for example
+
+        Parameters:
+            - file_id: str. ID of file to update
+
+            - workbook_id: typing.Optional[WorkbookId].
+
+            - name: typing.Optional[str]. The name of the file
+
+            - mode: typing.Optional[Mode]. The storage mode of file to update
+
+            - status: typing.Optional[ModelFileStatusEnum]. Status of the file
+
+            - actions: typing.Optional[typing.List[Action]]. The actions attached to the file
+        """
         _request: typing.Dict[str, typing.Any] = {}
         if workbook_id is not OMIT:
             _request["workbookId"] = workbook_id
@@ -143,7 +183,7 @@ class FilesClient:
             _request["actions"] = actions
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"files/{file_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{file_id}"),
             json=jsonable_encoder(_request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -161,15 +201,21 @@ class FilesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def download(self, file_id: FileId) -> typing.Iterator[bytes]:
+        """
+        Parameters:
+            - file_id: FileId.
+        """
         with self._client_wrapper.httpx_client.stream(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"files/{file_id}/download"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{file_id}/download"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         ) as _response:
             if 200 <= _response.status_code < 300:
                 for _chunk in _response.iter_bytes():
                     yield _chunk
+                return
+            _response.read()
             if _response.status_code == 400:
                 raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
             if _response.status_code == 404:
@@ -182,10 +228,7 @@ class FilesClient:
 
 
 class AsyncFilesClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: AsyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     async def list(
@@ -196,9 +239,19 @@ class AsyncFilesClient:
         page_number: typing.Optional[int] = None,
         mode: typing.Optional[Mode] = None,
     ) -> ListFilesResponse:
+        """
+        Parameters:
+            - space_id: typing.Optional[str].
+
+            - page_size: typing.Optional[int]. Number of jobs to return in a page (default 20)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of jobs to return
+
+            - mode: typing.Optional[Mode]. The storage mode of file to fetch, defaults to "import"
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "files"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "files"),
             params=remove_none_from_dict(
                 {"spaceId": space_id, "pageSize": page_size, "pageNumber": page_number, "mode": mode}
             ),
@@ -216,9 +269,19 @@ class AsyncFilesClient:
     async def upload(
         self, *, space_id: SpaceId, environment_id: EnvironmentId, mode: typing.Optional[Mode] = None, file: typing.IO
     ) -> FileResponse:
+        """
+        Parameters:
+            - space_id: SpaceId.
+
+            - environment_id: EnvironmentId.
+
+            - mode: typing.Optional[Mode].
+
+            - file: typing.IO.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "files"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "files"),
             data=jsonable_encoder({"spaceId": space_id, "environmentId": environment_id, "mode": mode}),
             files={"file": file},
             headers=self._client_wrapper.get_headers(),
@@ -235,9 +298,13 @@ class AsyncFilesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def get(self, file_id: str) -> FileResponse:
+        """
+        Parameters:
+            - file_id: str.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"files/{file_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{file_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -254,9 +321,13 @@ class AsyncFilesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def delete(self, file_id: str) -> Success:
+        """
+        Parameters:
+            - file_id: str.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"files/{file_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{file_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -282,6 +353,22 @@ class AsyncFilesClient:
         status: typing.Optional[ModelFileStatusEnum] = OMIT,
         actions: typing.Optional[typing.List[Action]] = OMIT,
     ) -> FileResponse:
+        """
+        Update a file, to change the workbook id for example
+
+        Parameters:
+            - file_id: str. ID of file to update
+
+            - workbook_id: typing.Optional[WorkbookId].
+
+            - name: typing.Optional[str]. The name of the file
+
+            - mode: typing.Optional[Mode]. The storage mode of file to update
+
+            - status: typing.Optional[ModelFileStatusEnum]. Status of the file
+
+            - actions: typing.Optional[typing.List[Action]]. The actions attached to the file
+        """
         _request: typing.Dict[str, typing.Any] = {}
         if workbook_id is not OMIT:
             _request["workbookId"] = workbook_id
@@ -295,7 +382,7 @@ class AsyncFilesClient:
             _request["actions"] = actions
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"files/{file_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{file_id}"),
             json=jsonable_encoder(_request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -313,15 +400,21 @@ class AsyncFilesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def download(self, file_id: FileId) -> typing.AsyncIterator[bytes]:
+        """
+        Parameters:
+            - file_id: FileId.
+        """
         async with self._client_wrapper.httpx_client.stream(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"files/{file_id}/download"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{file_id}/download"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         ) as _response:
             if 200 <= _response.status_code < 300:
                 async for _chunk in _response.aiter_bytes():
                     yield _chunk
+                return
+            await _response.aread()
             if _response.status_code == 400:
                 raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
             if _response.status_code == 404:

@@ -10,7 +10,6 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
-from ...environment import FlatfileEnvironment
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.environment_id import EnvironmentId
@@ -28,10 +27,7 @@ OMIT = typing.cast(typing.Any, ...)
 
 
 class EventsClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: SyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     def list(
@@ -46,9 +42,29 @@ class EventsClient:
         page_number: typing.Optional[int] = None,
         include_acknowledged: typing.Optional[bool] = None,
     ) -> ListAllEventsResponse:
+        """
+        Event topics that the Flatfile Platform emits.
+
+        Parameters:
+            - environment_id: EnvironmentId.
+
+            - space_id: typing.Optional[str].
+
+            - domain: typing.Optional[str]. Filter by event domain
+
+            - topic: typing.Optional[str]. Filter by event topic
+
+            - since: typing.Optional[str]. Filter by event timestamp
+
+            - page_size: typing.Optional[int]. Number of tokens to return in a page (default 10)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+
+            - include_acknowledged: typing.Optional[bool]. Include acknowledged events
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "events"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "events"),
             params=remove_none_from_dict(
                 {
                     "environmentId": environment_id,
@@ -73,9 +89,13 @@ class EventsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def create(self, *, request: Event) -> EventResponse:
+        """
+        Parameters:
+            - request: Event.
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "events"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "events"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -93,9 +113,13 @@ class EventsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def get(self, event_id: EventId) -> EventResponse:
+        """
+        Parameters:
+            - event_id: EventId. The event id
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"events/{event_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"events/{event_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -108,9 +132,13 @@ class EventsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def ack(self, event_id: EventId) -> Success:
+        """
+        Parameters:
+            - event_id: EventId. The event id
+        """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"events/{event_id}/ack"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"events/{event_id}/ack"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -125,9 +153,17 @@ class EventsClient:
     def get_event_token(
         self, *, space_id: typing.Optional[SpaceId] = None, scope: typing.Optional[str] = None
     ) -> EventTokenResponse:
+        """
+        Get a token which can be used to subscribe to events for this space
+
+        Parameters:
+            - space_id: typing.Optional[SpaceId]. The space id
+
+            - scope: typing.Optional[str]. The scope of the event stream (space or environment id)
+        """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "subscription"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "subscription"),
             params=remove_none_from_dict({"spaceId": space_id, "scope": scope}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -146,10 +182,7 @@ class EventsClient:
 
 
 class AsyncEventsClient:
-    def __init__(
-        self, *, environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION, client_wrapper: AsyncClientWrapper
-    ):
-        self._environment = environment
+    def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     async def list(
@@ -164,9 +197,29 @@ class AsyncEventsClient:
         page_number: typing.Optional[int] = None,
         include_acknowledged: typing.Optional[bool] = None,
     ) -> ListAllEventsResponse:
+        """
+        Event topics that the Flatfile Platform emits.
+
+        Parameters:
+            - environment_id: EnvironmentId.
+
+            - space_id: typing.Optional[str].
+
+            - domain: typing.Optional[str]. Filter by event domain
+
+            - topic: typing.Optional[str]. Filter by event topic
+
+            - since: typing.Optional[str]. Filter by event timestamp
+
+            - page_size: typing.Optional[int]. Number of tokens to return in a page (default 10)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+
+            - include_acknowledged: typing.Optional[bool]. Include acknowledged events
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "events"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "events"),
             params=remove_none_from_dict(
                 {
                     "environmentId": environment_id,
@@ -191,9 +244,13 @@ class AsyncEventsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def create(self, *, request: Event) -> EventResponse:
+        """
+        Parameters:
+            - request: Event.
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", "events"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "events"),
             json=jsonable_encoder(request),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -211,9 +268,13 @@ class AsyncEventsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def get(self, event_id: EventId) -> EventResponse:
+        """
+        Parameters:
+            - event_id: EventId. The event id
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"events/{event_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"events/{event_id}"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -226,9 +287,13 @@ class AsyncEventsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def ack(self, event_id: EventId) -> Success:
+        """
+        Parameters:
+            - event_id: EventId. The event id
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._environment.value}/", f"events/{event_id}/ack"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"events/{event_id}/ack"),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -243,9 +308,17 @@ class AsyncEventsClient:
     async def get_event_token(
         self, *, space_id: typing.Optional[SpaceId] = None, scope: typing.Optional[str] = None
     ) -> EventTokenResponse:
+        """
+        Get a token which can be used to subscribe to events for this space
+
+        Parameters:
+            - space_id: typing.Optional[SpaceId]. The space id
+
+            - scope: typing.Optional[str]. The scope of the event stream (space or environment id)
+        """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._environment.value}/", "subscription"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "subscription"),
             params=remove_none_from_dict({"spaceId": space_id, "scope": scope}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,

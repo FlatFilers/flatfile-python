@@ -12,8 +12,12 @@ from .record_counts import RecordCounts
 from .records_with_links import RecordsWithLinks
 
 
-class RecordsResponseData(SuccessData):
-    records: typing.Optional[RecordsWithLinks]
+class GetRecordsResponseData(SuccessData):
+    """
+    A list of records with optional record counts
+    """
+
+    records: RecordsWithLinks
     counts: typing.Optional[RecordCounts]
     version_id: typing.Optional[VersionId] = pydantic.Field(alias="versionId")
 

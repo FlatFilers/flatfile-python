@@ -6,16 +6,11 @@ import typing
 import pydantic
 
 from ....core.datetime_utils import serialize_datetime
-from ...commons.types.success_data import SuccessData
-from ...commons.types.version_id import VersionId
-from .record_counts import RecordCounts
-from .records_with_links import RecordsWithLinks
+from .get_records_response_data import GetRecordsResponseData
 
 
-class RecordsResponseData(SuccessData):
-    records: typing.Optional[RecordsWithLinks]
-    counts: typing.Optional[RecordCounts]
-    version_id: typing.Optional[VersionId] = pydantic.Field(alias="versionId")
+class GetRecordsResponse(pydantic.BaseModel):
+    data: GetRecordsResponseData
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -27,5 +22,4 @@ class RecordsResponseData(SuccessData):
 
     class Config:
         frozen = True
-        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}
