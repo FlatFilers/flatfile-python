@@ -3,12 +3,15 @@
 import datetime as dt
 import typing
 
+import pydantic
+
 from ....core.datetime_utils import serialize_datetime
-from .base_event import BaseEvent
 
 
-class WorkbookAddedEvent(BaseEvent):
-    payload: typing.Dict[str, typing.Any]
+class EventContextSlugs(pydantic.BaseModel):
+    space: typing.Optional[str] = pydantic.Field(description="The slug of the space")
+    workbook: typing.Optional[str] = pydantic.Field(description="The slug of the workbook")
+    sheet: typing.Optional[str] = pydantic.Field(description="The slug of the sheet")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -20,5 +23,4 @@ class WorkbookAddedEvent(BaseEvent):
 
     class Config:
         frozen = True
-        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

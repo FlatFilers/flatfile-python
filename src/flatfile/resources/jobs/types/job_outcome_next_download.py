@@ -3,12 +3,15 @@
 import datetime as dt
 import typing
 
+import pydantic
+
 from ....core.datetime_utils import serialize_datetime
-from .base_event import BaseEvent
 
 
-class JobDeletedEvent(BaseEvent):
-    payload: typing.Dict[str, typing.Any]
+class JobOutcomeNextDownload(pydantic.BaseModel):
+    url: str
+    label: typing.Optional[str]
+    file_name: typing.Optional[str] = pydantic.Field(alias="fileName")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

@@ -13,10 +13,12 @@ from ...commons.types.event_id import EventId
 from ...commons.types.file_id import FileId
 from ...commons.types.job_id import JobId
 from ...commons.types.sheet_id import SheetId
+from ...commons.types.snapshot_id import SnapshotId
 from ...commons.types.space_id import SpaceId
 from ...commons.types.version_id import VersionId
 from ...commons.types.workbook_id import WorkbookId
 from .action_name import ActionName
+from .event_context_slugs import EventContextSlugs
 from .sheet_slug import SheetSlug
 
 
@@ -25,6 +27,8 @@ class Context(pydantic.BaseModel):
     The context of the event
     """
 
+    namespaces: typing.Optional[typing.List[str]] = pydantic.Field(description="The namespaces of the event")
+    slugs: typing.Optional[EventContextSlugs] = pydantic.Field(description="The slugs of related resources")
     action_name: typing.Optional[ActionName] = pydantic.Field(alias="actionName")
     account_id: AccountId = pydantic.Field(alias="accountId")
     environment_id: EnvironmentId = pydantic.Field(alias="environmentId")
@@ -32,6 +36,7 @@ class Context(pydantic.BaseModel):
     workbook_id: typing.Optional[WorkbookId] = pydantic.Field(alias="workbookId")
     sheet_id: typing.Optional[SheetId] = pydantic.Field(alias="sheetId")
     sheet_slug: typing.Optional[SheetSlug] = pydantic.Field(alias="sheetSlug")
+    snapshot_id: typing.Optional[SnapshotId] = pydantic.Field(alias="snapshotId")
     version_id: typing.Optional[VersionId] = pydantic.Field(alias="versionId")
     job_id: typing.Optional[JobId] = pydantic.Field(alias="jobId")
     file_id: typing.Optional[FileId] = pydantic.Field(alias="fileId")

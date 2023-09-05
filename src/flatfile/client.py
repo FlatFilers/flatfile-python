@@ -19,6 +19,7 @@ from .resources.jobs.client import AsyncJobsClient, JobsClient
 from .resources.records.client import AsyncRecordsClient, RecordsClient
 from .resources.secrets.client import AsyncSecretsClient, SecretsClient
 from .resources.sheets.client import AsyncSheetsClient, SheetsClient
+from .resources.snapshots.client import AsyncSnapshotsClient, SnapshotsClient
 from .resources.spaces.client import AsyncSpacesClient, SpacesClient
 from .resources.users.client import AsyncUsersClient, UsersClient
 from .resources.versions.client import AsyncVersionsClient, VersionsClient
@@ -56,6 +57,7 @@ class Flatfile:
         self.records = RecordsClient(client_wrapper=self._client_wrapper)
         self.secrets = SecretsClient(client_wrapper=self._client_wrapper)
         self.sheets = SheetsClient(client_wrapper=self._client_wrapper)
+        self.snapshots = SnapshotsClient(client_wrapper=self._client_wrapper)
         self.users = UsersClient(client_wrapper=self._client_wrapper)
         self.versions = VersionsClient(client_wrapper=self._client_wrapper)
         self.workbooks = WorkbooksClient(client_wrapper=self._client_wrapper)
@@ -92,6 +94,7 @@ class AsyncFlatfile:
         self.records = AsyncRecordsClient(client_wrapper=self._client_wrapper)
         self.secrets = AsyncSecretsClient(client_wrapper=self._client_wrapper)
         self.sheets = AsyncSheetsClient(client_wrapper=self._client_wrapper)
+        self.snapshots = AsyncSnapshotsClient(client_wrapper=self._client_wrapper)
         self.users = AsyncUsersClient(client_wrapper=self._client_wrapper)
         self.versions = AsyncVersionsClient(client_wrapper=self._client_wrapper)
         self.workbooks = AsyncWorkbooksClient(client_wrapper=self._client_wrapper)

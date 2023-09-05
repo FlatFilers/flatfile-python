@@ -3,11 +3,25 @@
 import datetime as dt
 import typing
 
+import pydantic
+
 from ....core.datetime_utils import serialize_datetime
+from ...commons.types.event_id import EventId
 from .base_event import BaseEvent
 
 
-class ClientInitializedEvent(BaseEvent):
+class GenericEvent(BaseEvent):
+    id: EventId
+    created_at: dt.datetime = pydantic.Field(alias="createdAt", description="Date the event was created")
+    deleted_at: typing.Optional[dt.datetime] = pydantic.Field(
+        alias="deletedAt", description="Date the event was deleted"
+    )
+    acknowledged_at: typing.Optional[dt.datetime] = pydantic.Field(
+        alias="acknowledgedAt", description="Date the event was acknowledged"
+    )
+    acknowledged_by: typing.Optional[str] = pydantic.Field(
+        alias="acknowledgedBy", description="The actor (user or system) who acknowledged the event"
+    )
     payload: typing.Dict[str, typing.Any]
 
     def json(self, **kwargs: typing.Any) -> str:

@@ -6,13 +6,16 @@ import typing
 import pydantic
 
 from ....core.datetime_utils import serialize_datetime
-from .job_operation_type import JobOperationType
-from .job_payload_type import JobPayloadType
+from .job_outcome import JobOutcome
 
 
-class JobPayload(pydantic.BaseModel):
-    type: JobPayloadType
-    operation: JobOperationType
+class JobCompleteDetails(pydantic.BaseModel):
+    """
+    Outcome summary of a job
+    """
+
+    outcome: typing.Optional[JobOutcome]
+    info: typing.Optional[str]
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

@@ -32,8 +32,8 @@ from ..sheets.types.list_sheets_response import ListSheetsResponse
 from ..versions.types.version_response import VersionResponse
 from .types.create_workbook_config import CreateWorkbookConfig
 from .types.list_workbooks_response import ListWorkbooksResponse
-from .types.update_workbook_config import UpdateWorkbookConfig
 from .types.workbook_response import WorkbookResponse
+from .types.workbook_update import WorkbookUpdate
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -145,14 +145,14 @@ class WorkbooksClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update(self, workbook_id: WorkbookId, *, request: UpdateWorkbookConfig) -> WorkbookResponse:
+    def update(self, workbook_id: WorkbookId, *, request: WorkbookUpdate) -> WorkbookResponse:
         """
         Updates a workbook
 
         Parameters:
             - workbook_id: WorkbookId. ID of workbook to update
 
-            - request: UpdateWorkbookConfig.
+            - request: WorkbookUpdate.
         """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
@@ -613,14 +613,14 @@ class AsyncWorkbooksClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update(self, workbook_id: WorkbookId, *, request: UpdateWorkbookConfig) -> WorkbookResponse:
+    async def update(self, workbook_id: WorkbookId, *, request: WorkbookUpdate) -> WorkbookResponse:
         """
         Updates a workbook
 
         Parameters:
             - workbook_id: WorkbookId. ID of workbook to update
 
-            - request: UpdateWorkbookConfig.
+            - request: WorkbookUpdate.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",

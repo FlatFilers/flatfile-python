@@ -3,12 +3,20 @@
 import datetime as dt
 import typing
 
+import pydantic
+
 from ....core.datetime_utils import serialize_datetime
-from .base_event import BaseEvent
+from ...commons.types.sheet_id import SheetId
+from ...commons.types.snapshot_id import SnapshotId
+from .snapshot_summary import SnapshotSummary
 
 
-class UserOnlineEvent(BaseEvent):
-    payload: typing.Dict[str, typing.Any]
+class Snapshot(pydantic.BaseModel):
+    id: SnapshotId
+    sheet_id: SheetId = pydantic.Field(alias="sheetId")
+    label: typing.Optional[str]
+    summary: SnapshotSummary
+    created_at: dt.datetime = pydantic.Field(alias="createdAt")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

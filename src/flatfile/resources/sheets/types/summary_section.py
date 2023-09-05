@@ -3,13 +3,14 @@
 import datetime as dt
 import typing
 
+import pydantic
+
 from ....core.datetime_utils import serialize_datetime
-from .base_event import BaseEvent
-from .records_payload import RecordsPayload
 
 
-class RecordsCreatedEvent(BaseEvent):
-    payload: RecordsPayload
+class SummarySection(pydantic.BaseModel):
+    total: int
+    by_field: typing.Optional[typing.Dict[str, int]] = pydantic.Field(alias="byField")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

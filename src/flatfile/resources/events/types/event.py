@@ -6,227 +6,267 @@ import typing
 
 import typing_extensions
 
-from .action_triggered_event import ActionTriggeredEvent
-from .client_initialized_event import ClientInitializedEvent
-from .file_deleted_event import FileDeletedEvent
-from .job_completed_event import JobCompletedEvent
-from .job_deleted_event import JobDeletedEvent
-from .job_failed_event import JobFailedEvent
-from .job_started_event import JobStartedEvent
-from .job_updated_event import JobUpdatedEvent
-from .job_waiting_event import JobWaitingEvent
-from .records_created_event import RecordsCreatedEvent
-from .records_deleted_event import RecordsDeletedEvent
-from .records_updated_event import RecordsUpdatedEvent
-from .sheet_validated_event import SheetValidatedEvent
-from .space_added_event import SpaceAddedEvent
-from .space_removed_event import SpaceRemovedEvent
-from .upload_completed_event import UploadCompletedEvent
-from .upload_failed_event import UploadFailedEvent
-from .upload_started_event import UploadStartedEvent
-from .user_added_event import UserAddedEvent
-from .user_offline_event import UserOfflineEvent
-from .user_online_event import UserOnlineEvent
-from .user_removed_event import UserRemovedEvent
-from .workbook_added_event import WorkbookAddedEvent
-from .workbook_removed_event import WorkbookRemovedEvent
-from .workbook_updated_event import WorkbookUpdatedEvent
+from .generic_event import GenericEvent
 
 
-class Event_SpaceAdded(SpaceAddedEvent):
-    type: typing_extensions.Literal["space:added"]
+class Event_AgentCreated(GenericEvent):
+    topic: typing_extensions.Literal["agent:created"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_SpaceRemoved(SpaceRemovedEvent):
-    type: typing_extensions.Literal["space:removed"]
+class Event_AgentUpdated(GenericEvent):
+    topic: typing_extensions.Literal["agent:updated"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_WorkbookAdded(WorkbookAddedEvent):
-    type: typing_extensions.Literal["workbook:added"]
+class Event_AgentDeleted(GenericEvent):
+    topic: typing_extensions.Literal["agent:deleted"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_WorkbookUpdated(WorkbookUpdatedEvent):
-    type: typing_extensions.Literal["workbook:updated"]
+class Event_SpaceCreated(GenericEvent):
+    topic: typing_extensions.Literal["space:created"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_WorkbookRemoved(WorkbookRemovedEvent):
-    type: typing_extensions.Literal["workbook:removed"]
+class Event_SpaceUpdated(GenericEvent):
+    topic: typing_extensions.Literal["space:updated"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_UserAdded(UserAddedEvent):
-    type: typing_extensions.Literal["user:added"]
+class Event_SpaceDeleted(GenericEvent):
+    topic: typing_extensions.Literal["space:deleted"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_UserRemoved(UserRemovedEvent):
-    type: typing_extensions.Literal["user:removed"]
+class Event_DocumentCreated(GenericEvent):
+    topic: typing_extensions.Literal["document:created"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_UserOnline(UserOnlineEvent):
-    type: typing_extensions.Literal["user:online"]
+class Event_DocumentUpdated(GenericEvent):
+    topic: typing_extensions.Literal["document:updated"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_UserOffline(UserOfflineEvent):
-    type: typing_extensions.Literal["user:offline"]
+class Event_DocumentDeleted(GenericEvent):
+    topic: typing_extensions.Literal["document:deleted"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_UploadStarted(UploadStartedEvent):
-    type: typing_extensions.Literal["upload:started"]
+class Event_WorkbookCreated(GenericEvent):
+    topic: typing_extensions.Literal["workbook:created"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_UploadFailed(UploadFailedEvent):
-    type: typing_extensions.Literal["upload:failed"]
+class Event_WorkbookUpdated(GenericEvent):
+    topic: typing_extensions.Literal["workbook:updated"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_UploadCompleted(UploadCompletedEvent):
-    type: typing_extensions.Literal["upload:completed"]
+class Event_WorkbookDeleted(GenericEvent):
+    topic: typing_extensions.Literal["workbook:deleted"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_JobStarted(JobStartedEvent):
-    type: typing_extensions.Literal["job:started"]
+class Event_SheetCreated(GenericEvent):
+    topic: typing_extensions.Literal["sheet:created"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_JobWaiting(JobWaitingEvent):
-    type: typing_extensions.Literal["job:waiting"]
+class Event_SheetUpdated(GenericEvent):
+    topic: typing_extensions.Literal["sheet:updated"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_JobUpdated(JobUpdatedEvent):
-    type: typing_extensions.Literal["job:updated"]
+class Event_SheetDeleted(GenericEvent):
+    topic: typing_extensions.Literal["sheet:deleted"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_JobFailed(JobFailedEvent):
-    type: typing_extensions.Literal["job:failed"]
+class Event_SnapshotCreated(GenericEvent):
+    topic: typing_extensions.Literal["snapshot:created"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_JobCompleted(JobCompletedEvent):
-    type: typing_extensions.Literal["job:completed"]
+class Event_RecordsCreated(GenericEvent):
+    topic: typing_extensions.Literal["records:created"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_JobDeleted(JobDeletedEvent):
-    type: typing_extensions.Literal["job:deleted"]
+class Event_RecordsUpdated(GenericEvent):
+    topic: typing_extensions.Literal["records:updated"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_RecordsCreated(RecordsCreatedEvent):
-    type: typing_extensions.Literal["records:created"]
+class Event_RecordsDeleted(GenericEvent):
+    topic: typing_extensions.Literal["records:deleted"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_RecordsUpdated(RecordsUpdatedEvent):
-    type: typing_extensions.Literal["records:updated"]
+class Event_FileCreated(GenericEvent):
+    topic: typing_extensions.Literal["file:created"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_RecordsDeleted(RecordsDeletedEvent):
-    type: typing_extensions.Literal["records:deleted"]
+class Event_FileUpdated(GenericEvent):
+    topic: typing_extensions.Literal["file:updated"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_SheetValidated(SheetValidatedEvent):
-    type: typing_extensions.Literal["sheet:validated"]
+class Event_FileDeleted(GenericEvent):
+    topic: typing_extensions.Literal["file:deleted"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_ActionTriggered(ActionTriggeredEvent):
-    type: typing_extensions.Literal["action:triggered"]
+class Event_JobCreated(GenericEvent):
+    topic: typing_extensions.Literal["job:created"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_FileDeleted(FileDeletedEvent):
-    type: typing_extensions.Literal["file:deleted"]
+class Event_JobUpdated(GenericEvent):
+    topic: typing_extensions.Literal["job:updated"]
 
     class Config:
         frozen = True
         allow_population_by_field_name = True
 
 
-class Event_ClientInitialized(ClientInitializedEvent):
-    type: typing_extensions.Literal["client:init"]
+class Event_JobDeleted(GenericEvent):
+    topic: typing_extensions.Literal["job:deleted"]
+
+    class Config:
+        frozen = True
+        allow_population_by_field_name = True
+
+
+class Event_JobFailed(GenericEvent):
+    topic: typing_extensions.Literal["job:failed"]
+
+    class Config:
+        frozen = True
+        allow_population_by_field_name = True
+
+
+class Event_JobCompleted(GenericEvent):
+    topic: typing_extensions.Literal["job:completed"]
+
+    class Config:
+        frozen = True
+        allow_population_by_field_name = True
+
+
+class Event_JobReady(GenericEvent):
+    topic: typing_extensions.Literal["job:ready"]
+
+    class Config:
+        frozen = True
+        allow_population_by_field_name = True
+
+
+class Event_JobScheduled(GenericEvent):
+    topic: typing_extensions.Literal["job:scheduled"]
+
+    class Config:
+        frozen = True
+        allow_population_by_field_name = True
+
+
+class Event_JobOutcomeAcknowledged(GenericEvent):
+    topic: typing_extensions.Literal["job:outcome-acknowledged"]
+
+    class Config:
+        frozen = True
+        allow_population_by_field_name = True
+
+
+class Event_CommitCreated(GenericEvent):
+    topic: typing_extensions.Literal["commit:created"]
+
+    class Config:
+        frozen = True
+        allow_population_by_field_name = True
+
+
+class Event_CommitUpdated(GenericEvent):
+    topic: typing_extensions.Literal["commit:updated"]
+
+    class Config:
+        frozen = True
+        allow_population_by_field_name = True
+
+
+class Event_LayerCreated(GenericEvent):
+    topic: typing_extensions.Literal["layer:created"]
 
     class Config:
         frozen = True
@@ -234,29 +274,37 @@ class Event_ClientInitialized(ClientInitializedEvent):
 
 
 Event = typing.Union[
-    Event_SpaceAdded,
-    Event_SpaceRemoved,
-    Event_WorkbookAdded,
+    Event_AgentCreated,
+    Event_AgentUpdated,
+    Event_AgentDeleted,
+    Event_SpaceCreated,
+    Event_SpaceUpdated,
+    Event_SpaceDeleted,
+    Event_DocumentCreated,
+    Event_DocumentUpdated,
+    Event_DocumentDeleted,
+    Event_WorkbookCreated,
     Event_WorkbookUpdated,
-    Event_WorkbookRemoved,
-    Event_UserAdded,
-    Event_UserRemoved,
-    Event_UserOnline,
-    Event_UserOffline,
-    Event_UploadStarted,
-    Event_UploadFailed,
-    Event_UploadCompleted,
-    Event_JobStarted,
-    Event_JobWaiting,
-    Event_JobUpdated,
-    Event_JobFailed,
-    Event_JobCompleted,
-    Event_JobDeleted,
+    Event_WorkbookDeleted,
+    Event_SheetCreated,
+    Event_SheetUpdated,
+    Event_SheetDeleted,
+    Event_SnapshotCreated,
     Event_RecordsCreated,
     Event_RecordsUpdated,
     Event_RecordsDeleted,
-    Event_SheetValidated,
-    Event_ActionTriggered,
+    Event_FileCreated,
+    Event_FileUpdated,
     Event_FileDeleted,
-    Event_ClientInitialized,
+    Event_JobCreated,
+    Event_JobUpdated,
+    Event_JobDeleted,
+    Event_JobFailed,
+    Event_JobCompleted,
+    Event_JobReady,
+    Event_JobScheduled,
+    Event_JobOutcomeAcknowledged,
+    Event_CommitCreated,
+    Event_CommitUpdated,
+    Event_LayerCreated,
 ]

@@ -21,6 +21,7 @@ from .search_field import SearchField
 from .search_value import SearchValue
 from .secret_id import SecretId
 from .sheet_id import SheetId
+from .snapshot_id import SnapshotId
 from .sort_direction import SortDirection
 from .sort_field import SortField
 from .space_config_id import SpaceConfigId
@@ -53,6 +54,7 @@ __all__ = [
     "SearchValue",
     "SecretId",
     "SheetId",
+    "SnapshotId",
     "SortDirection",
     "SortField",
     "SpaceConfigId",

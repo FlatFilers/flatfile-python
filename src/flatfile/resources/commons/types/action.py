@@ -15,12 +15,15 @@ class Action(pydantic.BaseModel):
     operation: typing.Optional[str]
     mode: typing.Optional[ActionMode]
     label: str
+    tooltip: typing.Optional[str]
     type: typing.Optional[str]
     description: typing.Optional[str]
     schedule: typing.Optional[ActionSchedule]
     primary: typing.Optional[bool]
     confirm: typing.Optional[bool]
     icon: typing.Optional[str]
+    require_all_valid: typing.Optional[bool] = pydantic.Field(alias="requireAllValid")
+    require_selection: typing.Optional[bool] = pydantic.Field(alias="requireSelection")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -32,4 +35,5 @@ class Action(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

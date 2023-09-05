@@ -6,11 +6,12 @@ import typing
 import pydantic
 
 from ....core.datetime_utils import serialize_datetime
+from .enum_value import EnumValue
 
 
 class CategoryMapping(pydantic.BaseModel):
-    source_value: typing.Optional[str] = pydantic.Field(alias="sourceValue")
-    destination_value: typing.Optional[str] = pydantic.Field(alias="destinationValue")
+    source_value: typing.Optional[EnumValue] = pydantic.Field(alias="sourceValue")
+    destination_value: typing.Optional[EnumValue] = pydantic.Field(alias="destinationValue")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

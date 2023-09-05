@@ -3,13 +3,14 @@
 import datetime as dt
 import typing
 
+import pydantic
+
 from ....core.datetime_utils import serialize_datetime
-from .base_event import BaseEvent
-from .records_payload import RecordsPayload
+from ...property.types.property import Property
 
 
-class RecordsUpdatedEvent(BaseEvent):
-    payload: RecordsPayload
+class FieldConfigResponse(pydantic.BaseModel):
+    data: Property
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -21,5 +22,4 @@ class RecordsUpdatedEvent(BaseEvent):
 
     class Config:
         frozen = True
-        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

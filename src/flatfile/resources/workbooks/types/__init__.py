@@ -2,8 +2,8 @@
 
 from .create_workbook_config import CreateWorkbookConfig
 from .list_workbooks_response import ListWorkbooksResponse
-from .update_workbook_config import UpdateWorkbookConfig
 from .workbook import Workbook
 from .workbook_response import WorkbookResponse
+from .workbook_update import WorkbookUpdate
 
-__all__ = ["CreateWorkbookConfig", "ListWorkbooksResponse", "UpdateWorkbookConfig", "Workbook", "WorkbookResponse"]
+__all__ = ["CreateWorkbookConfig", "ListWorkbooksResponse", "Workbook", "WorkbookResponse", "WorkbookUpdate"]

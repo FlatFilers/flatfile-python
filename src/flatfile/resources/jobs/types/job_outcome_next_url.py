@@ -3,12 +3,14 @@
 import datetime as dt
 import typing
 
+import pydantic
+
 from ....core.datetime_utils import serialize_datetime
-from .base_event import BaseEvent
 
 
-class SpaceAddedEvent(BaseEvent):
-    payload: typing.Dict[str, typing.Any]
+class JobOutcomeNextUrl(pydantic.BaseModel):
+    url: str
+    label: typing.Optional[str]
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -20,5 +22,4 @@ class SpaceAddedEvent(BaseEvent):
 
     class Config:
         frozen = True
-        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

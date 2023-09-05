@@ -6,18 +6,14 @@ import typing
 import pydantic
 
 from ....core.datetime_utils import serialize_datetime
-from ...commons.types.event_id import EventId
 from .context import Context
 from .domain import Domain
 from .event_attributes import EventAttributes
-from .event_topic import EventTopic
 from .origin import Origin
 
 
 class BaseEvent(pydantic.BaseModel):
-    id: EventId
     domain: Domain = pydantic.Field(description="The domain of the event")
-    topic: EventTopic
     context: Context = pydantic.Field(description="The context of the event")
     attributes: typing.Optional[EventAttributes] = pydantic.Field(description="The attributes of the event")
     callback_url: typing.Optional[str] = pydantic.Field(
@@ -25,16 +21,6 @@ class BaseEvent(pydantic.BaseModel):
     )
     data_url: typing.Optional[str] = pydantic.Field(
         alias="dataUrl", description="The url to retrieve the data associated with the event"
-    )
-    created_at: dt.datetime = pydantic.Field(alias="createdAt", description="Date the event was created")
-    deleted_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="deletedAt", description="Date the event was deleted"
-    )
-    acknowledged_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="acknowledgedAt", description="Date the event was acknowledged"
-    )
-    acknowledged_by: typing.Optional[str] = pydantic.Field(
-        alias="acknowledgedBy", description="The actor (user or system) who acknowledged the event"
     )
     target: typing.Optional[str]
     origin: typing.Optional[Origin]

@@ -12,7 +12,7 @@ from .guest_space import GuestSpace
 
 class GuestConfigUpdate(pydantic.BaseModel):
     """
-    Configurations for the guests
+    Properties used to update an existing guest
     """
 
     environment_id: typing.Optional[EnvironmentId] = pydantic.Field(alias="environmentId")

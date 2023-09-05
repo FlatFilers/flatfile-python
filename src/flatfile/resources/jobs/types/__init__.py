@@ -9,6 +9,7 @@ from .driver import Driver
 from .edge import Edge
 from .empty_object import EmptyObject
 from .enum_details import EnumDetails
+from .enum_value import EnumValue
 from .export_job_config import ExportJobConfig
 from .export_options import ExportOptions
 from .file_job_config import FileJobConfig
@@ -16,6 +17,7 @@ from .find_and_replace_job_config import FindAndReplaceJobConfig
 from .job import Job
 from .job_ack_details import JobAckDetails
 from .job_cancel_details import JobCancelDetails
+from .job_complete_details import JobCompleteDetails
 from .job_config import JobConfig
 from .job_destination import JobDestination
 from .job_execution_plan import JobExecutionPlan
@@ -24,6 +26,17 @@ from .job_execution_plan_config_request import JobExecutionPlanConfigRequest
 from .job_execution_plan_request import JobExecutionPlanRequest
 from .job_mode import JobMode
 from .job_outcome import JobOutcome
+from .job_outcome_next import (
+    JobOutcomeNext,
+    JobOutcomeNext_Download,
+    JobOutcomeNext_Id,
+    JobOutcomeNext_Url,
+    JobOutcomeNext_Wait,
+)
+from .job_outcome_next_download import JobOutcomeNextDownload
+from .job_outcome_next_id import JobOutcomeNextId
+from .job_outcome_next_url import JobOutcomeNextUrl
+from .job_outcome_next_wait import JobOutcomeNextWait
 from .job_plan import JobPlan
 from .job_plan_response import JobPlanResponse
 from .job_response import JobResponse
@@ -51,6 +64,7 @@ __all__ = [
     "Edge",
     "EmptyObject",
     "EnumDetails",
+    "EnumValue",
     "ExportJobConfig",
     "ExportOptions",
     "FileJobConfig",
@@ -58,6 +72,7 @@ __all__ = [
     "Job",
     "JobAckDetails",
     "JobCancelDetails",
+    "JobCompleteDetails",
     "JobConfig",
     "JobDestination",
     "JobExecutionPlan",
@@ -66,6 +81,15 @@ __all__ = [
     "JobExecutionPlanRequest",
     "JobMode",
     "JobOutcome",
+    "JobOutcomeNext",
+    "JobOutcomeNextDownload",
+    "JobOutcomeNextId",
+    "JobOutcomeNextUrl",
+    "JobOutcomeNextWait",
+    "JobOutcomeNext_Download",
+    "JobOutcomeNext_Id",
+    "JobOutcomeNext_Url",
+    "JobOutcomeNext_Wait",
     "JobPlan",
     "JobPlanResponse",
     "JobResponse",

@@ -12,19 +12,23 @@ from ...records.types.record_counts import RecordCounts
 from .sheet_config import SheetConfig
 
 
-class Sheet(pydantic.BaseModel):
+class SheetUpdate(pydantic.BaseModel):
     """
-    A place to store tabular data
+    Changes to make to an existing sheet
     """
 
-    id: SheetId
-    workbook_id: WorkbookId = pydantic.Field(alias="workbookId")
-    name: str
-    config: SheetConfig
+    id: typing.Optional[SheetId]
+    workbook_id: typing.Optional[WorkbookId] = pydantic.Field(alias="workbookId")
+    name: typing.Optional[str]
+    config: typing.Optional[SheetConfig]
     count_records: typing.Optional[RecordCounts] = pydantic.Field(alias="countRecords")
     namespace: typing.Optional[str]
-    updated_at: dt.datetime = pydantic.Field(alias="updatedAt", description="Date the sheet was last updated")
-    created_at: dt.datetime = pydantic.Field(alias="createdAt", description="Date the sheet was created")
+    updated_at: typing.Optional[dt.datetime] = pydantic.Field(
+        alias="updatedAt", description="Date the sheet was last updated"
+    )
+    created_at: typing.Optional[dt.datetime] = pydantic.Field(
+        alias="createdAt", description="Date the sheet was created"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

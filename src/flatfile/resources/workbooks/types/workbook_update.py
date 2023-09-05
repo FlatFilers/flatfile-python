@@ -9,20 +9,20 @@ from ....core.datetime_utils import serialize_datetime
 from ...commons.types.action import Action
 from ...commons.types.environment_id import EnvironmentId
 from ...commons.types.space_id import SpaceId
-from ...sheets.types.sheet_config import SheetConfig
+from ...sheets.types.sheet_config_or_update import SheetConfigOrUpdate
 
 
-class UpdateWorkbookConfig(pydantic.BaseModel):
+class WorkbookUpdate(pydantic.BaseModel):
     """
-    Properties used to create a new Workbook
+    The updates to be made to an existing workbook
     """
 
-    name: str
+    name: typing.Optional[str]
     labels: typing.Optional[typing.List[str]]
     space_id: typing.Optional[SpaceId] = pydantic.Field(alias="spaceId")
     environment_id: typing.Optional[EnvironmentId] = pydantic.Field(alias="environmentId")
     namespace: typing.Optional[str]
-    sheets: typing.Optional[typing.List[SheetConfig]]
+    sheets: typing.Optional[typing.List[SheetConfigOrUpdate]]
     actions: typing.Optional[typing.List[Action]]
 
     def json(self, **kwargs: typing.Any) -> str:

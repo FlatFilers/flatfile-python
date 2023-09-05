@@ -5,9 +5,15 @@ import typing
 
 from ....core.datetime_utils import serialize_datetime
 from .base_event import BaseEvent
+from .event_topic import EventTopic
 
 
-class UploadStartedEvent(BaseEvent):
+class CreateEventConfig(BaseEvent):
+    """
+    Properties used to create a new event
+    """
+
+    topic: EventTopic
     payload: typing.Dict[str, typing.Any]
 
     def json(self, **kwargs: typing.Any) -> str:

@@ -19,10 +19,10 @@ from ..commons.types.success import Success
 from ..commons.types.workbook_id import WorkbookId
 from .types.job_ack_details import JobAckDetails
 from .types.job_cancel_details import JobCancelDetails
+from .types.job_complete_details import JobCompleteDetails
 from .types.job_config import JobConfig
 from .types.job_execution_plan_config_request import JobExecutionPlanConfigRequest
 from .types.job_execution_plan_request import JobExecutionPlanRequest
-from .types.job_outcome import JobOutcome
 from .types.job_plan_response import JobPlanResponse
 from .types.job_response import JobResponse
 from .types.job_update import JobUpdate
@@ -303,14 +303,14 @@ class JobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def complete(self, job_id: JobId, *, request: typing.Optional[JobOutcome] = None) -> JobResponse:
+    def complete(self, job_id: JobId, *, request: typing.Optional[JobCompleteDetails] = None) -> JobResponse:
         """
         Complete a job and return the job
 
         Parameters:
             - job_id: JobId. ID of job to return
 
-            - request: typing.Optional[JobOutcome].
+            - request: typing.Optional[JobCompleteDetails].
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -327,14 +327,14 @@ class JobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def fail(self, job_id: JobId, *, request: typing.Optional[JobOutcome] = None) -> JobResponse:
+    def fail(self, job_id: JobId, *, request: typing.Optional[JobCompleteDetails] = None) -> JobResponse:
         """
         Fail a job and return the job
 
         Parameters:
             - job_id: JobId. ID of job to return
 
-            - request: typing.Optional[JobOutcome].
+            - request: typing.Optional[JobCompleteDetails].
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -649,14 +649,14 @@ class AsyncJobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def complete(self, job_id: JobId, *, request: typing.Optional[JobOutcome] = None) -> JobResponse:
+    async def complete(self, job_id: JobId, *, request: typing.Optional[JobCompleteDetails] = None) -> JobResponse:
         """
         Complete a job and return the job
 
         Parameters:
             - job_id: JobId. ID of job to return
 
-            - request: typing.Optional[JobOutcome].
+            - request: typing.Optional[JobCompleteDetails].
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
@@ -673,14 +673,14 @@ class AsyncJobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def fail(self, job_id: JobId, *, request: typing.Optional[JobOutcome] = None) -> JobResponse:
+    async def fail(self, job_id: JobId, *, request: typing.Optional[JobCompleteDetails] = None) -> JobResponse:
         """
         Fail a job and return the job
 
         Parameters:
             - job_id: JobId. ID of job to return
 
-            - request: typing.Optional[JobOutcome].
+            - request: typing.Optional[JobCompleteDetails].
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",

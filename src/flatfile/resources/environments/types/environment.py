@@ -20,6 +20,8 @@ class Environment(pydantic.BaseModel):
     )
     guest_authentication: typing.List[GuestAuthenticationEnum] = pydantic.Field(alias="guestAuthentication")
     features: typing.Dict[str, typing.Any]
+    metadata: typing.Dict[str, typing.Any]
+    translations_path: typing.Optional[str] = pydantic.Field(alias="translationsPath")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

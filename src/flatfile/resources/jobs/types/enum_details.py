@@ -7,6 +7,7 @@ import pydantic
 
 from ....core.datetime_utils import serialize_datetime
 from .category_mapping import CategoryMapping
+from .enum_value import EnumValue
 
 
 class EnumDetails(pydantic.BaseModel):
@@ -15,8 +16,8 @@ class EnumDetails(pydantic.BaseModel):
     """
 
     mapping: typing.Optional[typing.List[CategoryMapping]]
-    unused_source_values: typing.Optional[typing.List[str]] = pydantic.Field(alias="unusedSourceValues")
-    unused_destination_values: typing.Optional[typing.List[str]] = pydantic.Field(alias="unusedDestinationValues")
+    unused_source_values: typing.Optional[typing.List[EnumValue]] = pydantic.Field(alias="unusedSourceValues")
+    unused_destination_values: typing.Optional[typing.List[EnumValue]] = pydantic.Field(alias="unusedDestinationValues")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

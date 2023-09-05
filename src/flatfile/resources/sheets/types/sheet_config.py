@@ -20,6 +20,7 @@ class SheetConfig(pydantic.BaseModel):
     description: typing.Optional[str]
     slug: typing.Optional[str]
     readonly: typing.Optional[bool]
+    allow_additional_fields: typing.Optional[bool] = pydantic.Field(alias="allowAdditionalFields")
     access: typing.Optional[typing.List[SheetAccess]]
     fields: typing.List[Property]
     actions: typing.Optional[typing.List[Action]]
@@ -34,4 +35,5 @@ class SheetConfig(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}
