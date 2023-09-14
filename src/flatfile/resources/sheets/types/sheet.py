@@ -20,7 +20,7 @@ class Sheet(pydantic.BaseModel):
     id: SheetId
     workbook_id: WorkbookId = pydantic.Field(alias="workbookId")
     name: str
-    config: SheetConfig
+    config: typing.Any
     count_records: typing.Optional[RecordCounts] = pydantic.Field(alias="countRecords")
     namespace: typing.Optional[str]
     updated_at: dt.datetime = pydantic.Field(alias="updatedAt", description="Date the sheet was last updated")
