@@ -9,6 +9,10 @@ T_Result = typing.TypeVar("T_Result")
 class Domain(str, enum.Enum):
     """
     The domain of the event
+    ---
+    from flatfile import Domain
+
+    Domain.JOB
     """
 
     FILE = "file"

@@ -9,6 +9,10 @@ T_Result = typing.TypeVar("T_Result")
 class SortDirection(str, enum.Enum):
     """
     Sort direction - asc (ascending) or desc (descending)
+    ---
+    from flatfile import SortDirection
+
+    SortDirection.ASC
     """
 
     ASC = "asc"

@@ -3,14 +3,20 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from .driver import Driver
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class FileJobConfig(pydantic.BaseModel):
     driver: Driver = pydantic.Field(description="The driver to use for extracting data from the file")
+    options: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(
+        description="The options to use for extracting data from the file"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -22,4 +28,5 @@ class FileJobConfig(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
         json_encoders = {dt.datetime: serialize_datetime}

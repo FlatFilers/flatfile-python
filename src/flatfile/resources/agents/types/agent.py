@@ -9,6 +9,17 @@ from .agent_config import AgentConfig
 
 
 class Agent(AgentConfig):
+    """
+    from flatfile import Agent, Compiler, EventTopic
+
+    Agent(
+        id="123",
+        topics=[EventTopic.FILE_CREATED],
+        compiler=Compiler.JS,
+        source="module.exports = { routeEvent: async (...args) => { console.log(args) } }",
+    )
+    """
+
     id: AgentId
 
     def json(self, **kwargs: typing.Any) -> str:
@@ -21,5 +32,6 @@ class Agent(AgentConfig):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

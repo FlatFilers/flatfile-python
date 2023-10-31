@@ -4,8 +4,6 @@ import typing
 import urllib.parse
 from json.decoder import JSONDecodeError
 
-import pydantic
-
 from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
@@ -14,11 +12,16 @@ from ..commons.types.guest_id import GuestId
 from ..commons.types.space_id import SpaceId
 from ..commons.types.success import Success
 from .types.create_guest_response import CreateGuestResponse
-from .types.guest import Guest
 from .types.guest_config import GuestConfig
 from .types.guest_config_update import GuestConfigUpdate
+from .types.guest_response import GuestResponse
 from .types.invite import Invite
 from .types.list_guests_response import ListGuestsResponse
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -74,7 +77,7 @@ class GuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get(self, guest_id: GuestId) -> Guest:
+    def get(self, guest_id: GuestId) -> GuestResponse:
         """
         Returns a single guest
 
@@ -88,7 +91,7 @@ class GuestsClient:
             timeout=60,
         )
         if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(Guest, _response.json())  # type: ignore
+            return pydantic.parse_obj_as(GuestResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
@@ -116,7 +119,7 @@ class GuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update(self, guest_id: GuestId, *, request: GuestConfigUpdate) -> Guest:
+    def update(self, guest_id: GuestId, *, request: GuestConfigUpdate) -> GuestResponse:
         """
         Updates a single guest, for example to change name or email
 
@@ -133,7 +136,7 @@ class GuestsClient:
             timeout=60,
         )
         if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(Guest, _response.json())  # type: ignore
+            return pydantic.parse_obj_as(GuestResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
@@ -213,7 +216,7 @@ class AsyncGuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get(self, guest_id: GuestId) -> Guest:
+    async def get(self, guest_id: GuestId) -> GuestResponse:
         """
         Returns a single guest
 
@@ -227,7 +230,7 @@ class AsyncGuestsClient:
             timeout=60,
         )
         if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(Guest, _response.json())  # type: ignore
+            return pydantic.parse_obj_as(GuestResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
@@ -255,7 +258,7 @@ class AsyncGuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update(self, guest_id: GuestId, *, request: GuestConfigUpdate) -> Guest:
+    async def update(self, guest_id: GuestId, *, request: GuestConfigUpdate) -> GuestResponse:
         """
         Updates a single guest, for example to change name or email
 
@@ -272,7 +275,7 @@ class AsyncGuestsClient:
             timeout=60,
         )
         if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(Guest, _response.json())  # type: ignore
+            return pydantic.parse_obj_as(GuestResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:

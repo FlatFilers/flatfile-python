@@ -3,21 +3,34 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.event_id import EventId
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class AgentLog(pydantic.BaseModel):
     """
     A log of an agent execution
+    ---
+    from flatfile import AgentLog
+
+    AgentLog(
+        event_id="us_evt_9cuesESa7W9cuesE",
+        success=True,
+        created_at="2022-09-18T00:19:57.007Z",
+        completed_at="2022-09-18T00:20:04.007Z",
+        log="SUCCESS",
+    )
     """
 
     event_id: EventId = pydantic.Field(alias="eventId")
     success: bool = pydantic.Field(description="Whether the agent execution was successful")
-    created_at: dt.datetime = pydantic.Field(alias="createdAt")
-    completed_at: dt.datetime = pydantic.Field(alias="completedAt")
+    created_at: str = pydantic.Field(alias="createdAt")
+    completed_at: str = pydantic.Field(alias="completedAt")
     log: typing.Optional[str] = pydantic.Field(description="The log of the agent execution")
 
     def json(self, **kwargs: typing.Any) -> str:
@@ -30,5 +43,6 @@ class AgentLog(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

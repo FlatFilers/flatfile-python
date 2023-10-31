@@ -3,13 +3,16 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.sheet_id import SheetId
 from ...commons.types.workbook_id import WorkbookId
 from ...records.types.record_counts import RecordCounts
 from .sheet_config import SheetConfig
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class Sheet(pydantic.BaseModel):
@@ -23,8 +26,10 @@ class Sheet(pydantic.BaseModel):
     config: SheetConfig
     count_records: typing.Optional[RecordCounts] = pydantic.Field(alias="countRecords")
     namespace: typing.Optional[str]
+    locked_by: typing.Optional[str] = pydantic.Field(alias="lockedBy")
     updated_at: dt.datetime = pydantic.Field(alias="updatedAt", description="Date the sheet was last updated")
     created_at: dt.datetime = pydantic.Field(alias="createdAt", description="Date the sheet was created")
+    locked_at: typing.Optional[dt.datetime] = pydantic.Field(alias="lockedAt")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -36,5 +41,6 @@ class Sheet(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

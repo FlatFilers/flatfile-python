@@ -3,13 +3,16 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.success_data import SuccessData
 from ...commons.types.version_id import VersionId
 from .record_counts import RecordCounts
 from .records_with_links import RecordsWithLinks
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class GetRecordsResponseData(SuccessData):
@@ -31,5 +34,6 @@ class GetRecordsResponseData(SuccessData):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

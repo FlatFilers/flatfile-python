@@ -3,11 +3,14 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.event_id import EventId
 from .base_event import BaseEvent
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class GenericEvent(BaseEvent):
@@ -34,5 +37,6 @@ class GenericEvent(BaseEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

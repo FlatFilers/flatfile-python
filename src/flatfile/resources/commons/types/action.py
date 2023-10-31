@@ -3,11 +3,15 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from .action_mode import ActionMode
 from .action_schedule import ActionSchedule
+from .input_form import InputForm
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class Action(pydantic.BaseModel):
@@ -24,6 +28,7 @@ class Action(pydantic.BaseModel):
     icon: typing.Optional[str]
     require_all_valid: typing.Optional[bool] = pydantic.Field(alias="requireAllValid")
     require_selection: typing.Optional[bool] = pydantic.Field(alias="requireSelection")
+    input_form: typing.Optional[InputForm] = pydantic.Field(alias="inputForm")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -35,5 +40,6 @@ class Action(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

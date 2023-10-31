@@ -9,6 +9,10 @@ T_Result = typing.TypeVar("T_Result")
 class Compiler(str, enum.Enum):
     """
     The compiler of the agent
+    ---
+    from flatfile import Compiler
+
+    Compiler.JS
     """
 
     JS = "js"

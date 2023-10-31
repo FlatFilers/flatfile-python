@@ -3,8 +3,6 @@
 import urllib.parse
 from json.decoder import JSONDecodeError
 
-import pydantic
-
 from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.remove_none_from_dict import remove_none_from_dict
@@ -15,6 +13,11 @@ from ..commons.types.errors import Errors
 from ..commons.types.success import Success
 from .types.api_key_type import ApiKeyType
 from .types.api_keys_response import ApiKeysResponse
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class AuthClient:

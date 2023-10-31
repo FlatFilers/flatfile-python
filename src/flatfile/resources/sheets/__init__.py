@@ -9,13 +9,9 @@ from .types import (
     SheetAccess,
     SheetConfig,
     SheetConfigOrUpdate,
+    SheetConfigUpdate,
     SheetResponse,
     SheetUpdate,
-    Snapshot,
-    SnapshotResponse,
-    SnapshotSummary,
-    SnapshotsResponse,
-    SummarySection,
 )
 
 __all__ = [
@@ -27,11 +23,7 @@ __all__ = [
     "SheetAccess",
     "SheetConfig",
     "SheetConfigOrUpdate",
+    "SheetConfigUpdate",
     "SheetResponse",
     "SheetUpdate",
-    "Snapshot",
-    "SnapshotResponse",
-    "SnapshotSummary",
-    "SnapshotsResponse",
-    "SummarySection",
 ]

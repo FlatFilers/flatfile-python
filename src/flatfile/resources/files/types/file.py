@@ -3,8 +3,6 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.action import Action
 from ...commons.types.file_id import FileId
@@ -13,6 +11,11 @@ from ...commons.types.space_id import SpaceId
 from ...commons.types.workbook_id import WorkbookId
 from .mode import Mode
 from .model_file_status_enum import ModelFileStatusEnum
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class File(pydantic.BaseModel):
@@ -49,5 +52,6 @@ class File(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

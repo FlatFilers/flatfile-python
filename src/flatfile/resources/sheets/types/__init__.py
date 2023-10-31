@@ -8,13 +8,9 @@ from .sheet import Sheet
 from .sheet_access import SheetAccess
 from .sheet_config import SheetConfig
 from .sheet_config_or_update import SheetConfigOrUpdate
+from .sheet_config_update import SheetConfigUpdate
 from .sheet_response import SheetResponse
 from .sheet_update import SheetUpdate
-from .snapshot import Snapshot
-from .snapshot_response import SnapshotResponse
-from .snapshot_summary import SnapshotSummary
-from .snapshots_response import SnapshotsResponse
-from .summary_section import SummarySection
 
 __all__ = [
     "FieldConfigResponse",
@@ -25,11 +21,7 @@ __all__ = [
     "SheetAccess",
     "SheetConfig",
     "SheetConfigOrUpdate",
+    "SheetConfigUpdate",
     "SheetResponse",
     "SheetUpdate",
-    "Snapshot",
-    "SnapshotResponse",
-    "SnapshotSummary",
-    "SnapshotsResponse",
-    "SummarySection",
 ]

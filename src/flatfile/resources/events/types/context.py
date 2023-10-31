@@ -3,8 +3,6 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.account_id import AccountId
 from ...commons.types.document_id import DocumentId
@@ -20,6 +18,11 @@ from ...commons.types.workbook_id import WorkbookId
 from .action_name import ActionName
 from .event_context_slugs import EventContextSlugs
 from .sheet_slug import SheetSlug
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class Context(pydantic.BaseModel):
@@ -54,5 +57,6 @@ class Context(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

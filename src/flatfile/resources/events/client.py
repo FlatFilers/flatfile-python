@@ -5,8 +5,6 @@ import typing
 import urllib.parse
 from json.decoder import JSONDecodeError
 
-import pydantic
-
 from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.datetime_utils import serialize_datetime
@@ -23,6 +21,11 @@ from ..spaces.types.event_token_response import EventTokenResponse
 from .types.create_event_config import CreateEventConfig
 from .types.event_response import EventResponse
 from .types.list_all_events_response import ListAllEventsResponse
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)

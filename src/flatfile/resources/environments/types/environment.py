@@ -3,15 +3,33 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.account_id import AccountId
 from ...commons.types.environment_id import EnvironmentId
 from .guest_authentication_enum import GuestAuthenticationEnum
 
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
+
 
 class Environment(pydantic.BaseModel):
+    """
+    from flatfile import Environment, GuestAuthenticationEnum
+
+    Environment(
+        id="us_env_hVXkXs0b",
+        account_id="us_acc_uj6s91wc",
+        name="dev",
+        is_prod=False,
+        guest_authentication=[GuestAuthenticationEnum.MAGIC_LINK],
+        features={},
+        metadata={},
+        namespaces=["default"],
+    )
+    """
+
     id: EnvironmentId
     account_id: AccountId = pydantic.Field(alias="accountId")
     name: str = pydantic.Field(description="The name of the environment")
@@ -22,6 +40,8 @@ class Environment(pydantic.BaseModel):
     features: typing.Dict[str, typing.Any]
     metadata: typing.Dict[str, typing.Any]
     translations_path: typing.Optional[str] = pydantic.Field(alias="translationsPath")
+    namespaces: typing.Optional[typing.List[str]]
+    language_override: typing.Optional[str] = pydantic.Field(alias="languageOverride")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -33,5 +53,6 @@ class Environment(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

@@ -15,6 +15,7 @@ class JobSubject_Resource(ResourceJobSubject):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -23,6 +24,7 @@ class JobSubject_Collection(CollectionJobSubject):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 

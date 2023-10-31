@@ -3,14 +3,23 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
-from .snapshot import Snapshot
+from .input_config import InputConfig
+from .input_constraint import InputConstraint
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
-class SnapshotsResponse(pydantic.BaseModel):
-    data: typing.List[Snapshot]
+class InputField(pydantic.BaseModel):
+    key: str
+    label: str
+    description: typing.Optional[str]
+    type: str
+    config: typing.Optional[InputConfig]
+    constraints: typing.Optional[typing.List[InputConstraint]]
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -22,4 +31,5 @@ class SnapshotsResponse(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
         json_encoders = {dt.datetime: serialize_datetime}

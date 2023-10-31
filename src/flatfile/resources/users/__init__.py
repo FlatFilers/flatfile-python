@@ -2,6 +2,7 @@
 
 from .types import (
     ApiToken,
+    ApiTokenResponse,
     ExchangeTokenData,
     ExchangeTokenResponse,
     ListApiTokensResponse,
@@ -13,6 +14,7 @@ from .types import (
 
 __all__ = [
     "ApiToken",
+    "ApiTokenResponse",
     "ExchangeTokenData",
     "ExchangeTokenResponse",
     "ListApiTokensResponse",

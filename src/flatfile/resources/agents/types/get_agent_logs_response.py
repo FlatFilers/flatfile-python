@@ -3,16 +3,40 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.pagination import Pagination
 from .agent_log import AgentLog
 
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
+
 
 class GetAgentLogsResponse(pydantic.BaseModel):
+    """
+    from flatfile import AgentLog, GetAgentLogsResponse, Pagination
+
+    GetAgentLogsResponse(
+        pagination=Pagination(
+            current_page=3,
+            page_count=50,
+            total_count=100,
+        ),
+        data=[
+            AgentLog(
+                event_id="us_evt_9cuesESa7W9cuesE",
+                success=True,
+                created_at="2022-09-18T00:19:57.007Z",
+                completed_at="2022-09-18T00:20:04.007Z",
+                log="SUCCESS",
+            )
+        ],
+    )
+    """
+
     pagination: typing.Optional[Pagination]
-    data: typing.List[AgentLog]
+    data: typing.Optional[typing.List[AgentLog]]
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -24,4 +48,5 @@ class GetAgentLogsResponse(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
         json_encoders = {dt.datetime: serialize_datetime}

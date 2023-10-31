@@ -4,8 +4,6 @@ import typing
 import urllib.parse
 from json.decoder import JSONDecodeError
 
-import pydantic
-
 from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
@@ -34,6 +32,11 @@ from .types.create_workbook_config import CreateWorkbookConfig
 from .types.list_workbooks_response import ListWorkbooksResponse
 from .types.workbook_response import WorkbookResponse
 from .types.workbook_update import WorkbookUpdate
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -415,7 +418,7 @@ class WorkbooksClient:
         workbook_id: WorkbookId,
         sheet_id: SheetId,
         *,
-        ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]],
+        ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]] = None,
     ) -> Success:
         """
         Deletes records from a workbook sheet
@@ -425,7 +428,7 @@ class WorkbooksClient:
 
             - sheet_id: SheetId. ID of sheet
 
-            - ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+            - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
@@ -883,7 +886,7 @@ class AsyncWorkbooksClient:
         workbook_id: WorkbookId,
         sheet_id: SheetId,
         *,
-        ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]],
+        ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]] = None,
     ) -> Success:
         """
         Deletes records from a workbook sheet
@@ -893,7 +896,7 @@ class AsyncWorkbooksClient:
 
             - sheet_id: SheetId. ID of sheet
 
-            - ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+            - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",

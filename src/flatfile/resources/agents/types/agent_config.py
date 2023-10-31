@@ -3,16 +3,27 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from ...events.types.event_topic import EventTopic
 from .compiler import Compiler
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class AgentConfig(pydantic.BaseModel):
     """
     Properties used to create a new agent
+    ---
+    from flatfile import AgentConfig, Compiler, EventTopic
+
+    AgentConfig(
+        topics=[EventTopic.FILE_CREATED],
+        compiler=Compiler.JS,
+        source="module.exports = { routeEvent: async (...args) => { console.log(args) } }",
+    )
     """
 
     topics: typing.Optional[typing.List[EventTopic]] = pydantic.Field(
@@ -31,4 +42,5 @@ class AgentConfig(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
         json_encoders = {dt.datetime: serialize_datetime}

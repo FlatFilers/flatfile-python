@@ -4,10 +4,14 @@ from __future__ import annotations
 
 import typing
 
-import pydantic
 import typing_extensions
 
 from .unique_constraint import UniqueConstraint
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class Constraint_Required(pydantic.BaseModel):
@@ -15,6 +19,7 @@ class Constraint_Required(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
 
 
 class Constraint_Unique(UniqueConstraint):
@@ -22,6 +27,7 @@ class Constraint_Unique(UniqueConstraint):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -30,6 +36,7 @@ class Constraint_Computed(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
 
 
 Constraint = typing.Union[Constraint_Required, Constraint_Unique, Constraint_Computed]

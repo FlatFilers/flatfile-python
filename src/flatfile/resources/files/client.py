@@ -4,8 +4,6 @@ import typing
 import urllib.parse
 from json.decoder import JSONDecodeError
 
-import pydantic
-
 from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
@@ -23,6 +21,11 @@ from .types.file_response import FileResponse
 from .types.list_files_response import ListFilesResponse
 from .types.mode import Mode
 from .types.model_file_status_enum import ModelFileStatusEnum
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -68,7 +71,13 @@ class FilesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def upload(
-        self, *, space_id: SpaceId, environment_id: EnvironmentId, mode: typing.Optional[Mode] = None, file: typing.IO
+        self,
+        *,
+        space_id: SpaceId,
+        environment_id: EnvironmentId,
+        mode: typing.Optional[Mode] = None,
+        file: typing.IO,
+        actions: typing.Optional[typing.List[Action]] = None,
     ) -> FileResponse:
         """
         Parameters:
@@ -79,11 +88,15 @@ class FilesClient:
             - mode: typing.Optional[Mode].
 
             - file: typing.IO.
+
+            - actions: typing.Optional[typing.List[Action]].
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "files"),
-            data=jsonable_encoder({"spaceId": space_id, "environmentId": environment_id, "mode": mode}),
+            data=jsonable_encoder(
+                {"spaceId": space_id, "environmentId": environment_id, "mode": mode, "actions": actions}
+            ),
             files={"file": file},
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -267,7 +280,13 @@ class AsyncFilesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def upload(
-        self, *, space_id: SpaceId, environment_id: EnvironmentId, mode: typing.Optional[Mode] = None, file: typing.IO
+        self,
+        *,
+        space_id: SpaceId,
+        environment_id: EnvironmentId,
+        mode: typing.Optional[Mode] = None,
+        file: typing.IO,
+        actions: typing.Optional[typing.List[Action]] = None,
     ) -> FileResponse:
         """
         Parameters:
@@ -278,11 +297,15 @@ class AsyncFilesClient:
             - mode: typing.Optional[Mode].
 
             - file: typing.IO.
+
+            - actions: typing.Optional[typing.List[Action]].
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "files"),
-            data=jsonable_encoder({"spaceId": space_id, "environmentId": environment_id, "mode": mode}),
+            data=jsonable_encoder(
+                {"spaceId": space_id, "environmentId": environment_id, "mode": mode, "actions": actions}
+            ),
             files={"file": file},
             headers=self._client_wrapper.get_headers(),
             timeout=60,

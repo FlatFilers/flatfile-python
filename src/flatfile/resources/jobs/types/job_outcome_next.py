@@ -17,6 +17,7 @@ class JobOutcomeNext_Id(JobOutcomeNextId):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -25,6 +26,7 @@ class JobOutcomeNext_Url(JobOutcomeNextUrl):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -33,6 +35,7 @@ class JobOutcomeNext_Download(JobOutcomeNextDownload):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -41,6 +44,7 @@ class JobOutcomeNext_Wait(JobOutcomeNextWait):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 

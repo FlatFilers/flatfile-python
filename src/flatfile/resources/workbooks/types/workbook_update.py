@@ -3,13 +3,16 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.action import Action
 from ...commons.types.environment_id import EnvironmentId
 from ...commons.types.space_id import SpaceId
 from ...sheets.types.sheet_config_or_update import SheetConfigOrUpdate
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class WorkbookUpdate(pydantic.BaseModel):
@@ -24,6 +27,7 @@ class WorkbookUpdate(pydantic.BaseModel):
     namespace: typing.Optional[str]
     sheets: typing.Optional[typing.List[SheetConfigOrUpdate]]
     actions: typing.Optional[typing.List[Action]]
+    metadata: typing.Optional[typing.Any] = pydantic.Field(description="Metadata for the workbook")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -35,5 +39,6 @@ class WorkbookUpdate(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

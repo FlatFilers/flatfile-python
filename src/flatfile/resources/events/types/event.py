@@ -14,6 +14,7 @@ class Event_AgentCreated(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -22,6 +23,7 @@ class Event_AgentUpdated(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -30,6 +32,7 @@ class Event_AgentDeleted(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -38,6 +41,7 @@ class Event_SpaceCreated(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -46,6 +50,7 @@ class Event_SpaceUpdated(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -54,6 +59,7 @@ class Event_SpaceDeleted(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -62,6 +68,7 @@ class Event_DocumentCreated(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -70,6 +77,7 @@ class Event_DocumentUpdated(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -78,6 +86,7 @@ class Event_DocumentDeleted(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -86,6 +95,7 @@ class Event_WorkbookCreated(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -94,6 +104,7 @@ class Event_WorkbookUpdated(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -102,6 +113,7 @@ class Event_WorkbookDeleted(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -110,6 +122,7 @@ class Event_SheetCreated(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -118,6 +131,7 @@ class Event_SheetUpdated(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -126,6 +140,7 @@ class Event_SheetDeleted(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -134,6 +149,7 @@ class Event_SnapshotCreated(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -142,6 +158,7 @@ class Event_RecordsCreated(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -150,6 +167,7 @@ class Event_RecordsUpdated(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -158,6 +176,7 @@ class Event_RecordsDeleted(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -166,6 +185,7 @@ class Event_FileCreated(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -174,6 +194,7 @@ class Event_FileUpdated(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -182,6 +203,7 @@ class Event_FileDeleted(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -190,6 +212,7 @@ class Event_JobCreated(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -198,6 +221,7 @@ class Event_JobUpdated(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -206,6 +230,7 @@ class Event_JobDeleted(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -214,6 +239,7 @@ class Event_JobFailed(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -222,6 +248,7 @@ class Event_JobCompleted(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -230,6 +257,7 @@ class Event_JobReady(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -238,6 +266,7 @@ class Event_JobScheduled(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -246,6 +275,7 @@ class Event_JobOutcomeAcknowledged(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -254,6 +284,7 @@ class Event_CommitCreated(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -262,6 +293,16 @@ class Event_CommitUpdated(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+class Event_CommitCompleted(GenericEvent):
+    topic: typing_extensions.Literal["commit:completed"]
+
+    class Config:
+        frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -270,6 +311,7 @@ class Event_LayerCreated(GenericEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
 
 
@@ -306,5 +348,6 @@ Event = typing.Union[
     Event_JobOutcomeAcknowledged,
     Event_CommitCreated,
     Event_CommitUpdated,
+    Event_CommitCompleted,
     Event_LayerCreated,
 ]

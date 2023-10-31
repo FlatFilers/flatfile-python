@@ -3,13 +3,16 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from .context import Context
 from .domain import Domain
 from .event_attributes import EventAttributes
 from .origin import Origin
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class BaseEvent(pydantic.BaseModel):
@@ -36,5 +39,6 @@ class BaseEvent(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

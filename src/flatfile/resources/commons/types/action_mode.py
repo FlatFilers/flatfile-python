@@ -9,9 +9,17 @@ T_Result = typing.TypeVar("T_Result")
 class ActionMode(str, enum.Enum):
     FOREGROUND = "foreground"
     BACKGROUND = "background"
+    TOOLBAR_BLOCKING = "toolbarBlocking"
 
-    def visit(self, foreground: typing.Callable[[], T_Result], background: typing.Callable[[], T_Result]) -> T_Result:
+    def visit(
+        self,
+        foreground: typing.Callable[[], T_Result],
+        background: typing.Callable[[], T_Result],
+        toolbar_blocking: typing.Callable[[], T_Result],
+    ) -> T_Result:
         if self is ActionMode.FOREGROUND:
             return foreground()
         if self is ActionMode.BACKGROUND:
             return background()
+        if self is ActionMode.TOOLBAR_BLOCKING:
+            return toolbar_blocking()

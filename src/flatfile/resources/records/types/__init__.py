@@ -3,9 +3,15 @@
 from .cell_value import CellValue
 from .cell_value_union import CellValueUnion
 from .cell_value_with_links import CellValueWithLinks
+from .diff_data import DiffData
+from .diff_record import DiffRecord
+from .diff_records import DiffRecords
+from .diff_records_response import DiffRecordsResponse
+from .diff_value import DiffValue
 from .get_records_response import GetRecordsResponse
 from .get_records_response_data import GetRecordsResponseData
 from .record import Record
+from .record_base import RecordBase
 from .record_counts import RecordCounts
 from .record_data import RecordData
 from .record_data_with_links import RecordDataWithLinks
@@ -22,9 +28,15 @@ __all__ = [
     "CellValue",
     "CellValueUnion",
     "CellValueWithLinks",
+    "DiffData",
+    "DiffRecord",
+    "DiffRecords",
+    "DiffRecordsResponse",
+    "DiffValue",
     "GetRecordsResponse",
     "GetRecordsResponseData",
     "Record",
+    "RecordBase",
     "RecordCounts",
     "RecordData",
     "RecordDataWithLinks",

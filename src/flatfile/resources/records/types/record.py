@@ -3,26 +3,17 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
-from ...commons.types.record_id import RecordId
-from ...commons.types.version_id import VersionId
+from .record_base import RecordBase
 from .record_data import RecordData
-from .validation_message import ValidationMessage
 
 
-class Record(pydantic.BaseModel):
+class Record(RecordBase):
     """
     A single row of data in a Sheet
     """
 
-    version_id: typing.Optional[VersionId] = pydantic.Field(alias="versionId")
-    id: RecordId
     values: RecordData
-    valid: typing.Optional[bool]
-    messages: typing.Optional[typing.List[ValidationMessage]]
-    metadata: typing.Optional[typing.Dict[str, typing.Any]]
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -34,5 +25,6 @@ class Record(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

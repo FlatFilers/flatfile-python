@@ -3,13 +3,16 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.environment_id import EnvironmentId
 from ...commons.types.space_id import SpaceId
 from .secret_name import SecretName
 from .secret_value import SecretValue
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class WriteSecret(pydantic.BaseModel):
@@ -32,5 +35,6 @@ class WriteSecret(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

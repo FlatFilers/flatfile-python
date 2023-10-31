@@ -3,11 +3,14 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from ...environments.types.guest_authentication_enum import GuestAuthenticationEnum
 from .internal_space_config_base import InternalSpaceConfigBase
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class SpaceConfig(InternalSpaceConfigBase):
@@ -31,5 +34,6 @@ class SpaceConfig(InternalSpaceConfigBase):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

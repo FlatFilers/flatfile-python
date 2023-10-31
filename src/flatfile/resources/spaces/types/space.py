@@ -3,14 +3,17 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.space_id import SpaceId
 from ...commons.types.user_id import UserId
 from ...environments.types.guest_authentication_enum import GuestAuthenticationEnum
 from .internal_space_config_base import InternalSpaceConfigBase
 from .space_size import SpaceSize
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class Space(InternalSpaceConfigBase):
@@ -29,9 +32,6 @@ class Space(InternalSpaceConfigBase):
     )
     created_at: dt.datetime = pydantic.Field(alias="createdAt", description="Date when space was created")
     updated_at: dt.datetime = pydantic.Field(alias="updatedAt", description="Date when space was updated")
-    archived_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="archivedAt", description="Date when space was archived"
-    )
     guest_link: typing.Optional[str] = pydantic.Field(alias="guestLink", description="Guest link to the space")
     name: str = pydantic.Field(description="The name of the space")
     display_order: typing.Optional[int] = pydantic.Field(alias="displayOrder", description="The display order")
@@ -51,5 +51,6 @@ class Space(InternalSpaceConfigBase):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

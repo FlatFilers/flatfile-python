@@ -3,13 +3,16 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.account_id import AccountId
 from ...commons.types.environment_id import EnvironmentId
 from .api_key_operation import ApiKeyOperation
 from .api_key_type import ApiKeyType
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class ApiKey(pydantic.BaseModel):
@@ -38,5 +41,6 @@ class ApiKey(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

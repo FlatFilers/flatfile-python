@@ -4,12 +4,11 @@ import typing
 import urllib.parse
 from json.decoder import JSONDecodeError
 
-import pydantic
-
 from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
+from ..commits.types.list_commits_response import ListCommitsResponse
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.errors import Errors
@@ -29,8 +28,11 @@ from .types.field_config_response import FieldConfigResponse
 from .types.list_sheets_response import ListSheetsResponse
 from .types.record_counts_response import RecordCountsResponse
 from .types.sheet_response import SheetResponse
-from .types.snapshot_response import SnapshotResponse
-from .types.snapshots_response import SnapshotsResponse
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -145,7 +147,7 @@ class SheetsClient:
         filter_field: typing.Optional[FilterField] = None,
         search_value: typing.Optional[SearchValue] = None,
         search_field: typing.Optional[SearchField] = None,
-        ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]],
+        ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]] = None,
     ) -> typing.Iterator[bytes]:
         """
         Returns records from a sheet in a workbook as a csv file
@@ -169,7 +171,7 @@ class SheetsClient:
 
             - search_field: typing.Optional[SearchField].
 
-            - ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+            - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
 
         """
         with self._client_wrapper.httpx_client.stream(
@@ -263,62 +265,6 @@ class SheetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def create_snapshot(self, sheet_id: SheetId, *, label: typing.Optional[str] = OMIT) -> SnapshotResponse:
-        """
-        Creates a snapshot of a sheet
-
-        Parameters:
-            - sheet_id: SheetId. ID of sheet
-
-            - label: typing.Optional[str]. Label for the snapshot
-        """
-        _request: typing.Dict[str, typing.Any] = {}
-        if label is not OMIT:
-            _request["label"] = label
-        _response = self._client_wrapper.httpx_client.request(
-            "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/snapshots"),
-            json=jsonable_encoder(_request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
-        )
-        if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(SnapshotResponse, _response.json())  # type: ignore
-        if _response.status_code == 400:
-            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
-        if _response.status_code == 404:
-            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
-        try:
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def list_snapshots(self, sheet_id: SheetId) -> SnapshotsResponse:
-        """
-        List all snapshots of a sheet
-
-        Parameters:
-            - sheet_id: SheetId. ID of sheet
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/snapshots"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
-        )
-        if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(SnapshotsResponse, _response.json())  # type: ignore
-        if _response.status_code == 400:
-            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
-        if _response.status_code == 404:
-            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
-        try:
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
     def add_field(self, sheet_id: SheetId, *, request: Property) -> FieldConfigResponse:
         """
         Adds a new field to a sheet
@@ -341,6 +287,30 @@ class SheetsClient:
             raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         if _response.status_code == 404:
             raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def get_sheet_commits(self, sheet_id: SheetId, *, completed: typing.Optional[bool] = None) -> ListCommitsResponse:
+        """
+        Returns the commit versions for a sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - completed: typing.Optional[bool]. If true, only return commits that have been completed. If false, only return commits that have not been completed. If not provided, return all commits.
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/commits"),
+            params=remove_none_from_dict({"completed": completed}),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(ListCommitsResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
@@ -457,7 +427,7 @@ class AsyncSheetsClient:
         filter_field: typing.Optional[FilterField] = None,
         search_value: typing.Optional[SearchValue] = None,
         search_field: typing.Optional[SearchField] = None,
-        ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]],
+        ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]] = None,
     ) -> typing.AsyncIterator[bytes]:
         """
         Returns records from a sheet in a workbook as a csv file
@@ -481,7 +451,7 @@ class AsyncSheetsClient:
 
             - search_field: typing.Optional[SearchField].
 
-            - ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+            - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
 
         """
         async with self._client_wrapper.httpx_client.stream(
@@ -575,62 +545,6 @@ class AsyncSheetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def create_snapshot(self, sheet_id: SheetId, *, label: typing.Optional[str] = OMIT) -> SnapshotResponse:
-        """
-        Creates a snapshot of a sheet
-
-        Parameters:
-            - sheet_id: SheetId. ID of sheet
-
-            - label: typing.Optional[str]. Label for the snapshot
-        """
-        _request: typing.Dict[str, typing.Any] = {}
-        if label is not OMIT:
-            _request["label"] = label
-        _response = await self._client_wrapper.httpx_client.request(
-            "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/snapshots"),
-            json=jsonable_encoder(_request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
-        )
-        if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(SnapshotResponse, _response.json())  # type: ignore
-        if _response.status_code == 400:
-            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
-        if _response.status_code == 404:
-            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
-        try:
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def list_snapshots(self, sheet_id: SheetId) -> SnapshotsResponse:
-        """
-        List all snapshots of a sheet
-
-        Parameters:
-            - sheet_id: SheetId. ID of sheet
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/snapshots"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
-        )
-        if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(SnapshotsResponse, _response.json())  # type: ignore
-        if _response.status_code == 400:
-            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
-        if _response.status_code == 404:
-            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
-        try:
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
     async def add_field(self, sheet_id: SheetId, *, request: Property) -> FieldConfigResponse:
         """
         Adds a new field to a sheet
@@ -653,6 +567,32 @@ class AsyncSheetsClient:
             raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         if _response.status_code == 404:
             raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def get_sheet_commits(
+        self, sheet_id: SheetId, *, completed: typing.Optional[bool] = None
+    ) -> ListCommitsResponse:
+        """
+        Returns the commit versions for a sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - completed: typing.Optional[bool]. If true, only return commits that have been completed. If false, only return commits that have not been completed. If not provided, return all commits.
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/commits"),
+            params=remove_none_from_dict({"completed": completed}),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(ListCommitsResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:

@@ -5,7 +5,12 @@ from .agent_config import AgentConfig
 from .agent_log import AgentLog
 from .agent_response import AgentResponse
 from .compiler import Compiler
+from .detailed_agent_log import DetailedAgentLog
+from .execution import Execution
 from .get_agent_logs_response import GetAgentLogsResponse
+from .get_detailed_agent_log_response import GetDetailedAgentLogResponse
+from .get_detailed_agent_logs_response import GetDetailedAgentLogsResponse
+from .get_executions_response import GetExecutionsResponse
 from .list_agents_response import ListAgentsResponse
 
 __all__ = [
@@ -14,6 +19,11 @@ __all__ = [
     "AgentLog",
     "AgentResponse",
     "Compiler",
+    "DetailedAgentLog",
+    "Execution",
     "GetAgentLogsResponse",
+    "GetDetailedAgentLogResponse",
+    "GetDetailedAgentLogsResponse",
+    "GetExecutionsResponse",
     "ListAgentsResponse",
 ]

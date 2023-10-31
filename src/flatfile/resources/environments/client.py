@@ -4,8 +4,6 @@ import typing
 import urllib.parse
 from json.decoder import JSONDecodeError
 
-import pydantic
-
 from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
@@ -21,6 +19,11 @@ from .types.environment_config_create import EnvironmentConfigCreate
 from .types.environment_config_update import EnvironmentConfigUpdate
 from .types.environment_response import EnvironmentResponse
 from .types.list_environments_response import ListEnvironmentsResponse
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -40,6 +43,14 @@ class EnvironmentsClient:
             - page_size: typing.Optional[int]. Number of environments to return in a page (default 10)
 
             - page_number: typing.Optional[int]. Based on pageSize, which page of environments to return
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.list()
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -62,6 +73,23 @@ class EnvironmentsClient:
 
         Parameters:
             - request: EnvironmentConfigCreate.
+        ---
+        from flatfile import EnvironmentConfigCreate, GuestAuthenticationEnum
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.create(
+            request=EnvironmentConfigCreate(
+                name="dev",
+                is_prod=False,
+                guest_authentication=[GuestAuthenticationEnum.MAGIC_LINK],
+                metadata={"key": "value"},
+                namespaces=["default"],
+            ),
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -110,6 +138,16 @@ class EnvironmentsClient:
 
         Parameters:
             - environment_id: str. ID of the environment to return. To fetch the current environment, pass `current`
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.get(
+            environment_id="us_env_hVXkXs0b",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -137,6 +175,24 @@ class EnvironmentsClient:
             - environment_id: str. ID of the environment to update
 
             - request: EnvironmentConfigUpdate.
+        ---
+        from flatfile import EnvironmentConfigUpdate, GuestAuthenticationEnum
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.update(
+            environment_id="us_env_hVXkXs0b",
+            request=EnvironmentConfigUpdate(
+                name="dev",
+                is_prod=False,
+                guest_authentication=[GuestAuthenticationEnum.MAGIC_LINK],
+                metadata={"key": "value"},
+                namespaces=["default"],
+            ),
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
@@ -193,6 +249,14 @@ class AsyncEnvironmentsClient:
             - page_size: typing.Optional[int]. Number of environments to return in a page (default 10)
 
             - page_number: typing.Optional[int]. Based on pageSize, which page of environments to return
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.list()
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -215,6 +279,23 @@ class AsyncEnvironmentsClient:
 
         Parameters:
             - request: EnvironmentConfigCreate.
+        ---
+        from flatfile import EnvironmentConfigCreate, GuestAuthenticationEnum
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.create(
+            request=EnvironmentConfigCreate(
+                name="dev",
+                is_prod=False,
+                guest_authentication=[GuestAuthenticationEnum.MAGIC_LINK],
+                metadata={"key": "value"},
+                namespaces=["default"],
+            ),
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
@@ -263,6 +344,16 @@ class AsyncEnvironmentsClient:
 
         Parameters:
             - environment_id: str. ID of the environment to return. To fetch the current environment, pass `current`
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.get(
+            environment_id="us_env_hVXkXs0b",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -290,6 +381,24 @@ class AsyncEnvironmentsClient:
             - environment_id: str. ID of the environment to update
 
             - request: EnvironmentConfigUpdate.
+        ---
+        from flatfile import EnvironmentConfigUpdate, GuestAuthenticationEnum
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.update(
+            environment_id="us_env_hVXkXs0b",
+            request=EnvironmentConfigUpdate(
+                name="dev",
+                is_prod=False,
+                guest_authentication=[GuestAuthenticationEnum.MAGIC_LINK],
+                metadata={"key": "value"},
+                namespaces=["default"],
+            ),
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",

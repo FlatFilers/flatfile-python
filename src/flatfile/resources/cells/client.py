@@ -4,8 +4,6 @@ import typing
 import urllib.parse
 from json.decoder import JSONDecodeError
 
-import pydantic
-
 from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.remove_none_from_dict import remove_none_from_dict
@@ -14,6 +12,11 @@ from ..commons.types.sheet_id import SheetId
 from ..commons.types.sort_direction import SortDirection
 from ..commons.types.sort_field import SortField
 from .types.cells_response import CellsResponse
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class CellsClient:

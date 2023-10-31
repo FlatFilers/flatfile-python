@@ -3,15 +3,28 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from .guest_authentication_enum import GuestAuthenticationEnum
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class EnvironmentConfigCreate(pydantic.BaseModel):
     """
     Properties used to create a new environment
+    ---
+    from flatfile import EnvironmentConfigCreate, GuestAuthenticationEnum
+
+    EnvironmentConfigCreate(
+        name="dev",
+        is_prod=False,
+        guest_authentication=[GuestAuthenticationEnum.MAGIC_LINK],
+        metadata={"key": "value"},
+        namespaces=["default"],
+    )
     """
 
     name: str = pydantic.Field(description="The name of the environment")
@@ -22,7 +35,9 @@ class EnvironmentConfigCreate(pydantic.BaseModel):
         alias="guestAuthentication"
     )
     metadata: typing.Optional[typing.Dict[str, typing.Any]]
-    translation_path: typing.Optional[str] = pydantic.Field(alias="translationPath")
+    translations_path: typing.Optional[str] = pydantic.Field(alias="translationsPath")
+    namespaces: typing.Optional[typing.List[str]]
+    language_override: typing.Optional[str] = pydantic.Field(alias="languageOverride")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -34,5 +49,6 @@ class EnvironmentConfigCreate(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

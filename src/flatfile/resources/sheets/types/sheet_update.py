@@ -3,13 +3,16 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.sheet_id import SheetId
 from ...commons.types.workbook_id import WorkbookId
 from ...records.types.record_counts import RecordCounts
 from .sheet_config import SheetConfig
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class SheetUpdate(pydantic.BaseModel):
@@ -19,7 +22,6 @@ class SheetUpdate(pydantic.BaseModel):
 
     id: typing.Optional[SheetId]
     workbook_id: typing.Optional[WorkbookId] = pydantic.Field(alias="workbookId")
-    name: typing.Optional[str]
     config: typing.Optional[SheetConfig]
     count_records: typing.Optional[RecordCounts] = pydantic.Field(alias="countRecords")
     namespace: typing.Optional[str]
@@ -40,5 +42,6 @@ class SheetUpdate(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

@@ -4,18 +4,22 @@ import typing
 import urllib.parse
 from json.decoder import JSONDecodeError
 
-import pydantic
-
 from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
 from ..commons.types.user_id import UserId
+from .types.api_token_response import ApiTokenResponse
 from .types.exchange_token_response import ExchangeTokenResponse
 from .types.list_api_tokens_response import ListApiTokensResponse
 from .types.list_users_response import ListUsersResponse
 from .types.user_config import UserConfig
 from .types.user_response import UserResponse
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -125,7 +129,7 @@ class UsersClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def create_api_token(self, user_id: UserId, *, tenant_id: str) -> None:
+    def create_api_token(self, user_id: UserId, *, tenant_id: str) -> ApiTokenResponse:
         """
         Creates an api token for authenticating against Flatfile APIs.
 
@@ -142,7 +146,7 @@ class UsersClient:
             timeout=60,
         )
         if 200 <= _response.status_code < 300:
-            return
+            return pydantic.parse_obj_as(ApiTokenResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
@@ -293,7 +297,7 @@ class AsyncUsersClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def create_api_token(self, user_id: UserId, *, tenant_id: str) -> None:
+    async def create_api_token(self, user_id: UserId, *, tenant_id: str) -> ApiTokenResponse:
         """
         Creates an api token for authenticating against Flatfile APIs.
 
@@ -310,7 +314,7 @@ class AsyncUsersClient:
             timeout=60,
         )
         if 200 <= _response.status_code < 300:
-            return
+            return pydantic.parse_obj_as(ApiTokenResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:

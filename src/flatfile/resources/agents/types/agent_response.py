@@ -3,14 +3,30 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from .agent import Agent
 
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
+
 
 class AgentResponse(pydantic.BaseModel):
-    data: Agent
+    """
+    from flatfile import Agent, AgentResponse, Compiler, EventTopic
+
+    AgentResponse(
+        data=Agent(
+            id="123",
+            topics=[EventTopic.FILE_CREATED],
+            compiler=Compiler.JS,
+            source="module.exports = { routeEvent: async (...args) => { console.log(args) } }",
+        ),
+    )
+    """
+
+    data: typing.Optional[Agent]
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -22,4 +38,5 @@ class AgentResponse(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
         json_encoders = {dt.datetime: serialize_datetime}

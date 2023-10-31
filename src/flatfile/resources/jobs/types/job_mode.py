@@ -13,9 +13,17 @@ class JobMode(str, enum.Enum):
 
     FOREGROUND = "foreground"
     BACKGROUND = "background"
+    TOOLBAR_BLOCKING = "toolbarBlocking"
 
-    def visit(self, foreground: typing.Callable[[], T_Result], background: typing.Callable[[], T_Result]) -> T_Result:
+    def visit(
+        self,
+        foreground: typing.Callable[[], T_Result],
+        background: typing.Callable[[], T_Result],
+        toolbar_blocking: typing.Callable[[], T_Result],
+    ) -> T_Result:
         if self is JobMode.FOREGROUND:
             return foreground()
         if self is JobMode.BACKGROUND:
             return background()
+        if self is JobMode.TOOLBAR_BLOCKING:
+            return toolbar_blocking()

@@ -7,6 +7,11 @@ from ....core.datetime_utils import serialize_datetime
 from .base_event import BaseEvent
 from .event_topic import EventTopic
 
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
+
 
 class CreateEventConfig(BaseEvent):
     """
@@ -15,6 +20,9 @@ class CreateEventConfig(BaseEvent):
 
     topic: EventTopic
     payload: typing.Dict[str, typing.Any]
+    deleted_at: typing.Optional[dt.datetime] = pydantic.Field(
+        alias="deletedAt", description="Date the event was deleted"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -26,5 +34,6 @@ class CreateEventConfig(BaseEvent):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

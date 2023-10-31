@@ -3,14 +3,17 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.action import Action
 from ...commons.types.environment_id import EnvironmentId
 from ...commons.types.space_config_id import SpaceConfigId
 from ...commons.types.workbook_id import WorkbookId
 from .space_access import SpaceAccess
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class InternalSpaceConfigBase(pydantic.BaseModel):
@@ -23,6 +26,11 @@ class InternalSpaceConfigBase(pydantic.BaseModel):
     auto_configure: typing.Optional[bool] = pydantic.Field(alias="autoConfigure")
     namespace: typing.Optional[str]
     labels: typing.Optional[typing.List[str]]
+    translations_path: typing.Optional[str] = pydantic.Field(alias="translationsPath")
+    language_override: typing.Optional[str] = pydantic.Field(alias="languageOverride")
+    archived_at: typing.Optional[dt.datetime] = pydantic.Field(
+        alias="archivedAt", description="Date when space was archived"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -34,5 +42,6 @@ class InternalSpaceConfigBase(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

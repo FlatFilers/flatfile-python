@@ -3,13 +3,16 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.document_id import DocumentId
 from ...commons.types.environment_id import EnvironmentId
 from ...commons.types.space_id import SpaceId
 from .document_config import DocumentConfig
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class Document(DocumentConfig):
@@ -20,6 +23,8 @@ class Document(DocumentConfig):
     id: DocumentId
     space_id: typing.Optional[SpaceId] = pydantic.Field(alias="spaceId")
     environment_id: typing.Optional[EnvironmentId] = pydantic.Field(alias="environmentId")
+    created_at: dt.datetime = pydantic.Field(alias="createdAt", description="Date the document was created")
+    updated_at: dt.datetime = pydantic.Field(alias="updatedAt", description="Date the document was last updated")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -31,5 +36,6 @@ class Document(DocumentConfig):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

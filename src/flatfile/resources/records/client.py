@@ -4,8 +4,6 @@ import typing
 import urllib.parse
 from json.decoder import JSONDecodeError
 
-import pydantic
-
 from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
@@ -31,6 +29,11 @@ from .types.record_data import RecordData
 from .types.records import Records
 from .types.records_response import RecordsResponse
 
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
+
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
 
@@ -51,10 +54,11 @@ class RecordsClient:
         filter_field: typing.Optional[FilterField] = None,
         search_value: typing.Optional[SearchValue] = None,
         search_field: typing.Optional[SearchField] = None,
-        ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]],
+        ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]] = None,
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
         include_counts: typing.Optional[bool] = None,
+        include_length: typing.Optional[bool] = None,
         include_links: typing.Optional[bool] = None,
         include_messages: typing.Optional[bool] = None,
         for_: typing.Optional[EventId] = None,
@@ -82,13 +86,15 @@ class RecordsClient:
 
             - search_field: typing.Optional[SearchField].
 
-            - ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records. Maximum of 100 allowed.
+            - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records. Maximum of 100 allowed.
 
             - page_size: typing.Optional[int]. Number of records to return in a page (default 1000 if pageNumber included)
 
             - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
 
-            - include_counts: typing.Optional[bool]. Include counts for the total records, valid records and records with errors
+            - include_counts: typing.Optional[bool]. **DEPRECATED** Use GET /sheets/:sheetId/counts
+
+            - include_length: typing.Optional[bool]. The length of the record result set, returned as counts.total
 
             - include_links: typing.Optional[bool]. If true, linked records will be included in the results. Defaults to false.
 
@@ -115,6 +121,7 @@ class RecordsClient:
                     "pageSize": page_size,
                     "pageNumber": page_number,
                     "includeCounts": include_counts,
+                    "includeLength": include_length,
                     "includeLinks": include_links,
                     "includeMessages": include_messages,
                     "for": for_,
@@ -193,7 +200,7 @@ class RecordsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def delete(
-        self, sheet_id: SheetId, *, ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]
+        self, sheet_id: SheetId, *, ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]] = None
     ) -> Success:
         """
         Deletes records from a workbook sheet
@@ -201,7 +208,7 @@ class RecordsClient:
         Parameters:
             - sheet_id: SheetId. ID of sheet
 
-            - ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+            - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
 
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -284,7 +291,7 @@ class RecordsClient:
         filter_field: typing.Optional[FilterField] = None,
         search_value: typing.Optional[SearchValue] = None,
         search_field: typing.Optional[SearchField] = None,
-        ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]],
+        ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]] = None,
         find: typing.Optional[CellValueUnion] = OMIT,
         replace: typing.Optional[CellValueUnion] = OMIT,
         field_key: str,
@@ -303,7 +310,7 @@ class RecordsClient:
 
             - search_field: typing.Optional[SearchField].
 
-            - ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+            - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
 
             - find: typing.Optional[CellValueUnion]. A value to find for a given field in a sheet. Wrap the value in "" for exact match
 
@@ -357,10 +364,11 @@ class AsyncRecordsClient:
         filter_field: typing.Optional[FilterField] = None,
         search_value: typing.Optional[SearchValue] = None,
         search_field: typing.Optional[SearchField] = None,
-        ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]],
+        ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]] = None,
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
         include_counts: typing.Optional[bool] = None,
+        include_length: typing.Optional[bool] = None,
         include_links: typing.Optional[bool] = None,
         include_messages: typing.Optional[bool] = None,
         for_: typing.Optional[EventId] = None,
@@ -388,13 +396,15 @@ class AsyncRecordsClient:
 
             - search_field: typing.Optional[SearchField].
 
-            - ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records. Maximum of 100 allowed.
+            - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records. Maximum of 100 allowed.
 
             - page_size: typing.Optional[int]. Number of records to return in a page (default 1000 if pageNumber included)
 
             - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
 
-            - include_counts: typing.Optional[bool]. Include counts for the total records, valid records and records with errors
+            - include_counts: typing.Optional[bool]. **DEPRECATED** Use GET /sheets/:sheetId/counts
+
+            - include_length: typing.Optional[bool]. The length of the record result set, returned as counts.total
 
             - include_links: typing.Optional[bool]. If true, linked records will be included in the results. Defaults to false.
 
@@ -421,6 +431,7 @@ class AsyncRecordsClient:
                     "pageSize": page_size,
                     "pageNumber": page_number,
                     "includeCounts": include_counts,
+                    "includeLength": include_length,
                     "includeLinks": include_links,
                     "includeMessages": include_messages,
                     "for": for_,
@@ -499,7 +510,7 @@ class AsyncRecordsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def delete(
-        self, sheet_id: SheetId, *, ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]
+        self, sheet_id: SheetId, *, ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]] = None
     ) -> Success:
         """
         Deletes records from a workbook sheet
@@ -507,7 +518,7 @@ class AsyncRecordsClient:
         Parameters:
             - sheet_id: SheetId. ID of sheet
 
-            - ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+            - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
 
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -590,7 +601,7 @@ class AsyncRecordsClient:
         filter_field: typing.Optional[FilterField] = None,
         search_value: typing.Optional[SearchValue] = None,
         search_field: typing.Optional[SearchField] = None,
-        ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]],
+        ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]] = None,
         find: typing.Optional[CellValueUnion] = OMIT,
         replace: typing.Optional[CellValueUnion] = OMIT,
         field_key: str,
@@ -609,7 +620,7 @@ class AsyncRecordsClient:
 
             - search_field: typing.Optional[SearchField].
 
-            - ids: typing.Union[typing.Optional[RecordId], typing.List[RecordId]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+            - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
 
             - find: typing.Optional[CellValueUnion]. A value to find for a given field in a sheet. Wrap the value in "" for exact match
 

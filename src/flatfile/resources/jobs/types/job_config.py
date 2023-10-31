@@ -3,8 +3,6 @@
 import datetime as dt
 import typing
 
-import pydantic
-
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.file_id import FileId
 from .job_destination import JobDestination
@@ -15,6 +13,11 @@ from .job_subject import JobSubject
 from .job_type import JobType
 from .job_update_config import JobUpdateConfig
 from .trigger import Trigger
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class JobConfig(pydantic.BaseModel):
@@ -52,5 +55,6 @@ class JobConfig(pydantic.BaseModel):
 
     class Config:
         frozen = True
+        smart_union = True
         allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

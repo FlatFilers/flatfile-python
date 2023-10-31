@@ -9,6 +9,10 @@ T_Result = typing.TypeVar("T_Result")
 class EventTopic(str, enum.Enum):
     """
     The topic of the event
+    ---
+    from flatfile import EventTopic
+
+    EventTopic.FILE_CREATED
     """
 
     AGENT_CREATED = "agent:created"
@@ -26,6 +30,7 @@ class EventTopic(str, enum.Enum):
     SHEET_CREATED = "sheet:created"
     SHEET_UPDATED = "sheet:updated"
     SHEET_DELETED = "sheet:deleted"
+    SNAPSHOT_CREATED = "snapshot:created"
     RECORDS_CREATED = "records:created"
     RECORDS_UPDATED = "records:updated"
     RECORDS_DELETED = "records:deleted"
@@ -42,6 +47,7 @@ class EventTopic(str, enum.Enum):
     JOB_FAILED = "job:failed"
     COMMIT_CREATED = "commit:created"
     COMMIT_UPDATED = "commit:updated"
+    COMMIT_COMPLETED = "commit:completed"
     LAYER_CREATED = "layer:created"
 
     def visit(
@@ -61,6 +67,7 @@ class EventTopic(str, enum.Enum):
         sheet_created: typing.Callable[[], T_Result],
         sheet_updated: typing.Callable[[], T_Result],
         sheet_deleted: typing.Callable[[], T_Result],
+        snapshot_created: typing.Callable[[], T_Result],
         records_created: typing.Callable[[], T_Result],
         records_updated: typing.Callable[[], T_Result],
         records_deleted: typing.Callable[[], T_Result],
@@ -77,6 +84,7 @@ class EventTopic(str, enum.Enum):
         job_failed: typing.Callable[[], T_Result],
         commit_created: typing.Callable[[], T_Result],
         commit_updated: typing.Callable[[], T_Result],
+        commit_completed: typing.Callable[[], T_Result],
         layer_created: typing.Callable[[], T_Result],
     ) -> T_Result:
         if self is EventTopic.AGENT_CREATED:
@@ -109,6 +117,8 @@ class EventTopic(str, enum.Enum):
             return sheet_updated()
         if self is EventTopic.SHEET_DELETED:
             return sheet_deleted()
+        if self is EventTopic.SNAPSHOT_CREATED:
+            return snapshot_created()
         if self is EventTopic.RECORDS_CREATED:
             return records_created()
         if self is EventTopic.RECORDS_UPDATED:
@@ -141,5 +151,7 @@ class EventTopic(str, enum.Enum):
             return commit_created()
         if self is EventTopic.COMMIT_UPDATED:
             return commit_updated()
+        if self is EventTopic.COMMIT_COMPLETED:
+            return commit_completed()
         if self is EventTopic.LAYER_CREATED:
             return layer_created()
