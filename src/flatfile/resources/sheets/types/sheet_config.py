@@ -24,6 +24,7 @@ class SheetConfig(pydantic.BaseModel):
     slug: typing.Optional[str]
     readonly: typing.Optional[bool]
     allow_additional_fields: typing.Optional[bool] = pydantic.Field(alias="allowAdditionalFields")
+    mapping_confidence_threshold: typing.Optional[float] = pydantic.Field(alias="mappingConfidenceThreshold")
     access: typing.Optional[typing.List[SheetAccess]]
     fields: typing.List[Property]
     actions: typing.Optional[typing.List[Action]]

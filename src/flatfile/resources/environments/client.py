@@ -146,7 +146,7 @@ class EnvironmentsClient:
             token="YOUR_TOKEN",
         )
         client.get(
-            environment_id="us_env_hVXkXs0b",
+            environment_id="us_env_YOUR_ID",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -184,7 +184,7 @@ class EnvironmentsClient:
             token="YOUR_TOKEN",
         )
         client.update(
-            environment_id="us_env_hVXkXs0b",
+            environment_id="us_env_YOUR_ID",
             request=EnvironmentConfigUpdate(
                 name="dev",
                 is_prod=False,
@@ -352,7 +352,7 @@ class AsyncEnvironmentsClient:
             token="YOUR_TOKEN",
         )
         await client.get(
-            environment_id="us_env_hVXkXs0b",
+            environment_id="us_env_YOUR_ID",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -390,7 +390,7 @@ class AsyncEnvironmentsClient:
             token="YOUR_TOKEN",
         )
         await client.update(
-            environment_id="us_env_hVXkXs0b",
+            environment_id="us_env_YOUR_ID",
             request=EnvironmentConfigUpdate(
                 name="dev",
                 is_prod=False,

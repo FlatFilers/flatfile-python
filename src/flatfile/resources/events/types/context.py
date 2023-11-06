@@ -41,6 +41,7 @@ class Context(pydantic.BaseModel):
     sheet_slug: typing.Optional[SheetSlug] = pydantic.Field(alias="sheetSlug")
     snapshot_id: typing.Optional[SnapshotId] = pydantic.Field(alias="snapshotId")
     version_id: typing.Optional[VersionId] = pydantic.Field(alias="versionId")
+    commit_id: typing.Optional[VersionId] = pydantic.Field(alias="commitId")
     job_id: typing.Optional[JobId] = pydantic.Field(alias="jobId")
     file_id: typing.Optional[FileId] = pydantic.Field(alias="fileId")
     document_id: typing.Optional[DocumentId] = pydantic.Field(alias="documentId")

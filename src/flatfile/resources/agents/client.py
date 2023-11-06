@@ -14,8 +14,11 @@ from ..commons.types.agent_id import AgentId
 from ..commons.types.environment_id import EnvironmentId
 from ..commons.types.errors import Errors
 from ..commons.types.event_id import EventId
+from ..commons.types.page_number import PageNumber
+from ..commons.types.page_size import PageSize
 from ..commons.types.space_id import SpaceId
 from ..commons.types.success import Success
+from ..commons.types.success_query_parameter import SuccessQueryParameter
 from .types.agent_config import AgentConfig
 from .types.agent_response import AgentResponse
 from .types.get_agent_logs_response import GetAgentLogsResponse
@@ -49,7 +52,7 @@ class AgentsClient:
             token="YOUR_TOKEN",
         )
         client.list(
-            environment_id="us_env_hVXkXs0b",
+            environment_id="us_env_YOUR_ID",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -82,7 +85,7 @@ class AgentsClient:
             token="YOUR_TOKEN",
         )
         client.create(
-            environment_id="us_env_hVXkXs0b",
+            environment_id="us_env_YOUR_ID",
             request=AgentConfig(
                 topics=[EventTopic.FILE_CREATED],
                 compiler=Compiler.JS,
@@ -122,8 +125,8 @@ class AgentsClient:
             token="YOUR_TOKEN",
         )
         client.get(
-            agent_id="us_ag_qGZbKwDW",
-            environment_id="us_env_hVXkXs0b",
+            agent_id="us_ag_YOUR_ID",
+            environment_id="us_env_YOUR_ID",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -159,8 +162,8 @@ class AgentsClient:
             token="YOUR_TOKEN",
         )
         client.get_agent_logs(
-            agent_id="us_ag_qGZbKwDW",
-            environment_id="us_env_hVXkXs0b",
+            agent_id="us_ag_YOUR_ID",
+            environment_id="us_env_YOUR_ID",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -188,10 +191,21 @@ class AgentsClient:
             - event_id: EventId.
 
             - environment_id: EnvironmentId.
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.get_agent_log(
+            event_id="commons.EventId",
+            environment_id="us_env_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/logs/{event_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/log/{event_id}"),
             params=remove_none_from_dict({"environmentId": environment_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -212,22 +226,36 @@ class AgentsClient:
         self,
         *,
         environment_id: EnvironmentId,
-        space_id: SpaceId,
-        success: typing.Optional[bool] = None,
-        page_size: typing.Optional[int] = None,
-        page_number: typing.Optional[int] = None,
+        space_id: typing.Optional[SpaceId] = None,
+        success: typing.Optional[SuccessQueryParameter] = None,
+        page_size: typing.Optional[PageSize] = None,
+        page_number: typing.Optional[PageNumber] = None,
     ) -> GetDetailedAgentLogsResponse:
         """
         Parameters:
             - environment_id: EnvironmentId.
 
-            - space_id: SpaceId.
+            - space_id: typing.Optional[SpaceId].
 
-            - success: typing.Optional[bool].
+            - success: typing.Optional[SuccessQueryParameter].
 
-            - page_size: typing.Optional[int]. Number of logs to return in a page (default 20)
+            - page_size: typing.Optional[PageSize].
 
-            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+            - page_number: typing.Optional[PageNumber].
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.get_environment_agent_logs(
+            environment_id="us_env_YOUR_ID",
+            space_id="us_sp_YOUR_ID",
+            success=True,
+            page_size=20,
+            page_number=1,
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -260,22 +288,36 @@ class AgentsClient:
         self,
         *,
         environment_id: EnvironmentId,
-        space_id: SpaceId,
-        success: typing.Optional[bool] = None,
-        page_size: typing.Optional[int] = None,
-        page_number: typing.Optional[int] = None,
+        space_id: typing.Optional[SpaceId] = None,
+        success: typing.Optional[SuccessQueryParameter] = None,
+        page_size: typing.Optional[PageSize] = None,
+        page_number: typing.Optional[PageNumber] = None,
     ) -> GetExecutionsResponse:
         """
         Parameters:
             - environment_id: EnvironmentId.
 
-            - space_id: SpaceId.
+            - space_id: typing.Optional[SpaceId].
 
-            - success: typing.Optional[bool].
+            - success: typing.Optional[SuccessQueryParameter].
 
-            - page_size: typing.Optional[int]. Number of logs to return in a page (default 20)
+            - page_size: typing.Optional[PageSize].
 
-            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+            - page_number: typing.Optional[PageNumber].
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.get_environment_agent_executions(
+            environment_id="us_env_YOUR_ID",
+            space_id="us_sp_YOUR_ID",
+            success=True,
+            page_size=20,
+            page_number=1,
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -304,16 +346,30 @@ class AgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete(self, agent_id: AgentId) -> Success:
+    def delete(self, agent_id: AgentId, *, environment_id: EnvironmentId) -> Success:
         """
         Deletes a single agent
 
         Parameters:
             - agent_id: AgentId.
+
+            - environment_id: EnvironmentId.
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.delete(
+            agent_id="us_ag_YOUR_ID",
+            environment_id="us_env_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}"),
+            params=remove_none_from_dict({"environmentId": environment_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -346,7 +402,7 @@ class AsyncAgentsClient:
             token="YOUR_TOKEN",
         )
         await client.list(
-            environment_id="us_env_hVXkXs0b",
+            environment_id="us_env_YOUR_ID",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -379,7 +435,7 @@ class AsyncAgentsClient:
             token="YOUR_TOKEN",
         )
         await client.create(
-            environment_id="us_env_hVXkXs0b",
+            environment_id="us_env_YOUR_ID",
             request=AgentConfig(
                 topics=[EventTopic.FILE_CREATED],
                 compiler=Compiler.JS,
@@ -419,8 +475,8 @@ class AsyncAgentsClient:
             token="YOUR_TOKEN",
         )
         await client.get(
-            agent_id="us_ag_qGZbKwDW",
-            environment_id="us_env_hVXkXs0b",
+            agent_id="us_ag_YOUR_ID",
+            environment_id="us_env_YOUR_ID",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -456,8 +512,8 @@ class AsyncAgentsClient:
             token="YOUR_TOKEN",
         )
         await client.get_agent_logs(
-            agent_id="us_ag_qGZbKwDW",
-            environment_id="us_env_hVXkXs0b",
+            agent_id="us_ag_YOUR_ID",
+            environment_id="us_env_YOUR_ID",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -485,10 +541,21 @@ class AsyncAgentsClient:
             - event_id: EventId.
 
             - environment_id: EnvironmentId.
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.get_agent_log(
+            event_id="commons.EventId",
+            environment_id="us_env_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/logs/{event_id}"),
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/log/{event_id}"),
             params=remove_none_from_dict({"environmentId": environment_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
@@ -509,22 +576,36 @@ class AsyncAgentsClient:
         self,
         *,
         environment_id: EnvironmentId,
-        space_id: SpaceId,
-        success: typing.Optional[bool] = None,
-        page_size: typing.Optional[int] = None,
-        page_number: typing.Optional[int] = None,
+        space_id: typing.Optional[SpaceId] = None,
+        success: typing.Optional[SuccessQueryParameter] = None,
+        page_size: typing.Optional[PageSize] = None,
+        page_number: typing.Optional[PageNumber] = None,
     ) -> GetDetailedAgentLogsResponse:
         """
         Parameters:
             - environment_id: EnvironmentId.
 
-            - space_id: SpaceId.
+            - space_id: typing.Optional[SpaceId].
 
-            - success: typing.Optional[bool].
+            - success: typing.Optional[SuccessQueryParameter].
 
-            - page_size: typing.Optional[int]. Number of logs to return in a page (default 20)
+            - page_size: typing.Optional[PageSize].
 
-            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+            - page_number: typing.Optional[PageNumber].
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.get_environment_agent_logs(
+            environment_id="us_env_YOUR_ID",
+            space_id="us_sp_YOUR_ID",
+            success=True,
+            page_size=20,
+            page_number=1,
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -557,22 +638,36 @@ class AsyncAgentsClient:
         self,
         *,
         environment_id: EnvironmentId,
-        space_id: SpaceId,
-        success: typing.Optional[bool] = None,
-        page_size: typing.Optional[int] = None,
-        page_number: typing.Optional[int] = None,
+        space_id: typing.Optional[SpaceId] = None,
+        success: typing.Optional[SuccessQueryParameter] = None,
+        page_size: typing.Optional[PageSize] = None,
+        page_number: typing.Optional[PageNumber] = None,
     ) -> GetExecutionsResponse:
         """
         Parameters:
             - environment_id: EnvironmentId.
 
-            - space_id: SpaceId.
+            - space_id: typing.Optional[SpaceId].
 
-            - success: typing.Optional[bool].
+            - success: typing.Optional[SuccessQueryParameter].
 
-            - page_size: typing.Optional[int]. Number of logs to return in a page (default 20)
+            - page_size: typing.Optional[PageSize].
 
-            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+            - page_number: typing.Optional[PageNumber].
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.get_environment_agent_executions(
+            environment_id="us_env_YOUR_ID",
+            space_id="us_sp_YOUR_ID",
+            success=True,
+            page_size=20,
+            page_number=1,
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -601,16 +696,30 @@ class AsyncAgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete(self, agent_id: AgentId) -> Success:
+    async def delete(self, agent_id: AgentId, *, environment_id: EnvironmentId) -> Success:
         """
         Deletes a single agent
 
         Parameters:
             - agent_id: AgentId.
+
+            - environment_id: EnvironmentId.
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.delete(
+            agent_id="us_ag_YOUR_ID",
+            environment_id="us_env_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}"),
+            params=remove_none_from_dict({"environmentId": environment_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )

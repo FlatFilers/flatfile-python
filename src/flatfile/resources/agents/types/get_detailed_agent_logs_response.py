@@ -27,7 +27,7 @@ class GetDetailedAgentLogsResponse(pydantic.BaseModel):
         ),
         data=[
             DetailedAgentLog(
-                event_id="us_evt_9cuesESa7W9cuesE",
+                event_id="us_evt_YOUR_ID",
                 success=True,
                 created_at=datetime.datetime.fromisoformat(
                     "2022-09-18 00:19:57.007000+00:00",

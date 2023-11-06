@@ -19,8 +19,8 @@ class Environment(pydantic.BaseModel):
     from flatfile import Environment, GuestAuthenticationEnum
 
     Environment(
-        id="us_env_hVXkXs0b",
-        account_id="us_acc_uj6s91wc",
+        id="us_env_YOUR_ID",
+        account_id="us_acc_YOUR_ID",
         name="dev",
         is_prod=False,
         guest_authentication=[GuestAuthenticationEnum.MAGIC_LINK],

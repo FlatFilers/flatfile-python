@@ -4,6 +4,7 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
+from .action_constraint import ActionConstraint
 from .action_mode import ActionMode
 from .action_schedule import ActionSchedule
 from .input_form import InputForm
@@ -29,6 +30,7 @@ class Action(pydantic.BaseModel):
     require_all_valid: typing.Optional[bool] = pydantic.Field(alias="requireAllValid")
     require_selection: typing.Optional[bool] = pydantic.Field(alias="requireSelection")
     input_form: typing.Optional[InputForm] = pydantic.Field(alias="inputForm")
+    constraints: typing.Optional[typing.List[ActionConstraint]]
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
