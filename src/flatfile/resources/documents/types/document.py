@@ -18,6 +18,34 @@ except ImportError:
 class Document(DocumentConfig):
     """
     A document (markdown components) belong to a space
+    ---
+    import datetime
+
+    from flatfile import Action, ActionMode, Document
+
+    Document(
+        id="us_dc_YOUR_ID",
+        space_id="us_sp_YOUR_ID",
+        environment_id="us_env_YOUR_ID",
+        title="My Document 1",
+        body="My information",
+        treatments=[],
+        actions=[
+            Action(
+                operation="submitAction",
+                mode=ActionMode.FOREGROUND,
+                label="Submit",
+                description="Submit data to webhook.site",
+                primary=True,
+            )
+        ],
+        created_at=datetime.datetime.fromisoformat(
+            "2022-09-18 00:19:57.007000+00:00",
+        ),
+        updated_at=datetime.datetime.fromisoformat(
+            "2022-09-18 00:19:57.007000+00:00",
+        ),
+    )
     """
 
     id: DocumentId

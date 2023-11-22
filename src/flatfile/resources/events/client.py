@@ -66,6 +66,14 @@ class EventsClient:
             - page_number: typing.Optional[int]. Based on pageSize, which page of results to return
 
             - include_acknowledged: typing.Optional[bool]. Include acknowledged events
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.list()
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -97,6 +105,28 @@ class EventsClient:
         """
         Parameters:
             - request: CreateEventConfig.
+        ---
+        from flatfile import Context, CreateEventConfig, Domain, EventTopic
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.create(
+            request=CreateEventConfig(
+                topic=EventTopic.WORKBOOK_UPDATED,
+                payload={"recordsAdded": 100},
+                domain=Domain.WORKBOOK,
+                context=Context(
+                    account_id="us_acc_YOUR_ID",
+                    actor_id="us_key_SOME_KEY",
+                    environment_id="us_env_YOUR_ID",
+                    space_id="us_sp_YOUR_ID",
+                    workbook_id="us_wb_YOUR_ID",
+                ),
+            ),
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -121,6 +151,16 @@ class EventsClient:
         """
         Parameters:
             - event_id: EventId. The event id
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.get(
+            event_id="us_evt_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -164,7 +204,17 @@ class EventsClient:
         Parameters:
             - space_id: typing.Optional[SpaceId]. The space id
 
-            - scope: typing.Optional[str]. The scope of the event stream (space or environment id)
+            - scope: typing.Optional[str]. The resource ID of the event stream (space or environment id)
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.get_event_token(
+            space_id="us_sp_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -221,6 +271,14 @@ class AsyncEventsClient:
             - page_number: typing.Optional[int]. Based on pageSize, which page of results to return
 
             - include_acknowledged: typing.Optional[bool]. Include acknowledged events
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.list()
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -252,6 +310,28 @@ class AsyncEventsClient:
         """
         Parameters:
             - request: CreateEventConfig.
+        ---
+        from flatfile import Context, CreateEventConfig, Domain, EventTopic
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.create(
+            request=CreateEventConfig(
+                topic=EventTopic.WORKBOOK_UPDATED,
+                payload={"recordsAdded": 100},
+                domain=Domain.WORKBOOK,
+                context=Context(
+                    account_id="us_acc_YOUR_ID",
+                    actor_id="us_key_SOME_KEY",
+                    environment_id="us_env_YOUR_ID",
+                    space_id="us_sp_YOUR_ID",
+                    workbook_id="us_wb_YOUR_ID",
+                ),
+            ),
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
@@ -276,6 +356,16 @@ class AsyncEventsClient:
         """
         Parameters:
             - event_id: EventId. The event id
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.get(
+            event_id="us_evt_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -319,7 +409,17 @@ class AsyncEventsClient:
         Parameters:
             - space_id: typing.Optional[SpaceId]. The space id
 
-            - scope: typing.Optional[str]. The scope of the event stream (space or environment id)
+            - scope: typing.Optional[str]. The resource ID of the event stream (space or environment id)
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.get_event_token(
+            space_id="us_sp_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",

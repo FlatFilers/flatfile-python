@@ -22,6 +22,7 @@ class BaseProperty(pydantic.BaseModel):
         description="Useful for any contextual metadata regarding the schema. Store any valid json here."
     )
     treatments: typing.Optional[typing.List[str]]
+    alternative_names: typing.Optional[typing.List[str]] = pydantic.Field(alias="alternativeNames")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -34,4 +35,5 @@ class BaseProperty(pydantic.BaseModel):
     class Config:
         frozen = True
         smart_union = True
+        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

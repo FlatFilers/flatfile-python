@@ -19,6 +19,7 @@ from .resources.guests.client import AsyncGuestsClient, GuestsClient
 from .resources.jobs.client import AsyncJobsClient, JobsClient
 from .resources.mapping.client import AsyncMappingClient, MappingClient
 from .resources.records.client import AsyncRecordsClient, RecordsClient
+from .resources.roles.client import AsyncRolesClient, RolesClient
 from .resources.secrets.client import AsyncSecretsClient, SecretsClient
 from .resources.sheets.client import AsyncSheetsClient, SheetsClient
 from .resources.snapshots.client import AsyncSnapshotsClient, SnapshotsClient
@@ -56,6 +57,7 @@ class Flatfile:
         self.jobs = JobsClient(client_wrapper=self._client_wrapper)
         self.mapping = MappingClient(client_wrapper=self._client_wrapper)
         self.records = RecordsClient(client_wrapper=self._client_wrapper)
+        self.roles = RolesClient(client_wrapper=self._client_wrapper)
         self.secrets = SecretsClient(client_wrapper=self._client_wrapper)
         self.sheets = SheetsClient(client_wrapper=self._client_wrapper)
         self.snapshots = SnapshotsClient(client_wrapper=self._client_wrapper)
@@ -93,6 +95,7 @@ class AsyncFlatfile:
         self.jobs = AsyncJobsClient(client_wrapper=self._client_wrapper)
         self.mapping = AsyncMappingClient(client_wrapper=self._client_wrapper)
         self.records = AsyncRecordsClient(client_wrapper=self._client_wrapper)
+        self.roles = AsyncRolesClient(client_wrapper=self._client_wrapper)
         self.secrets = AsyncSecretsClient(client_wrapper=self._client_wrapper)
         self.sheets = AsyncSheetsClient(client_wrapper=self._client_wrapper)
         self.snapshots = AsyncSnapshotsClient(client_wrapper=self._client_wrapper)

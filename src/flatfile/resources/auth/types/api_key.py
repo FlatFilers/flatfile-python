@@ -6,8 +6,10 @@ import typing
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.account_id import AccountId
 from ...commons.types.environment_id import EnvironmentId
+from .api_key_id import ApiKeyId
 from .api_key_operation import ApiKeyOperation
 from .api_key_type import ApiKeyType
+from .raw_key import RawKey
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -18,10 +20,31 @@ except ImportError:
 class ApiKey(pydantic.BaseModel):
     """
     API Key used for authenticating against our APIs
+    ---
+    import datetime
+
+    from flatfile import ApiKey, ApiKeyOperation, ApiKeyType
+
+    ApiKey(
+        id="us_key_YOUR_ID",
+        raw_key="pk_YOUR_RAW_API_KEY",
+        type=ApiKeyType.PUBLISHABLE,
+        environment_id="us_env_YOUR_ID",
+        account_id="us_acc_YOUR_ID",
+        operations=[
+            ApiKeyOperation(
+                path="/v1/spaces",
+                method="POST",
+            )
+        ],
+        created_at=datetime.datetime.fromisoformat(
+            "2017-07-21 17:32:28+00:00",
+        ),
+    )
     """
 
-    id: str
-    raw_key: typing.Optional[str] = pydantic.Field(alias="rawKey")
+    id: ApiKeyId
+    raw_key: typing.Optional[RawKey] = pydantic.Field(alias="rawKey")
     type: ApiKeyType
     environment_id: typing.Optional[EnvironmentId] = pydantic.Field(alias="environmentId")
     account_id: typing.Optional[AccountId] = pydantic.Field(alias="accountId")

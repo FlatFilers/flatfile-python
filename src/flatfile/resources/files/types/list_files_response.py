@@ -14,6 +14,46 @@ except ImportError:
 
 
 class ListFilesResponse(pydantic.BaseModel):
+    """
+    import datetime
+
+    from flatfile import (
+        File,
+        ListFilesResponse,
+        Mode,
+        ModelFileStatusEnum,
+        Pagination,
+    )
+
+    ListFilesResponse(
+        data=[
+            File(
+                id="us_fl_YOUR_ID",
+                name="Test File",
+                ext="png",
+                mimetype="image/png",
+                encoding="7bit",
+                status=ModelFileStatusEnum.PARTIAL,
+                mode=Mode.IMPORT,
+                size=81953,
+                bytes_received=81593,
+                created_at=datetime.datetime.fromisoformat(
+                    "2023-11-15 19:31:33.015000+00:00",
+                ),
+                updated_at=datetime.datetime.fromisoformat(
+                    "2023-11-15 19:31:33.015000+00:00",
+                ),
+                space_id="us_sp_YOUR_ID",
+            )
+        ],
+        pagination=Pagination(
+            current_page=3,
+            page_count=50,
+            total_count=100,
+        ),
+    )
+    """
+
     pagination: typing.Optional[Pagination]
     data: typing.List[File]
 

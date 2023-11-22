@@ -20,7 +20,7 @@ class AgentConfig(pydantic.BaseModel):
     from flatfile import AgentConfig, Compiler, EventTopic
 
     AgentConfig(
-        topics=[EventTopic.FILE_CREATED],
+        topics=[EventTopic.WORKBOOK_UPDATED],
         compiler=Compiler.JS,
         source="module.exports = { routeEvent: async (...args) => { console.log(args) } }",
     )

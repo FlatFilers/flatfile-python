@@ -20,7 +20,7 @@ class ListAgentsResponse(pydantic.BaseModel):
         data=[
             Agent(
                 id="us_ag_YOUR_ID",
-                topics=[EventTopic.FILE_CREATED],
+                topics=[EventTopic.WORKBOOK_UPDATED],
                 compiler=Compiler.JS,
                 source="module.exports = { routeEvent: async (...args) => { console.log(args) } }",
             )

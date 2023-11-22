@@ -12,7 +12,9 @@ except ImportError:
 
 
 class ArrayableProperty(pydantic.BaseModel):
-    is_array: typing.Optional[bool] = pydantic.Field(description="Will allow multiple values and store as an array")
+    is_array: typing.Optional[bool] = pydantic.Field(
+        alias="isArray", description="Will allow multiple values and store as an array"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -25,4 +27,5 @@ class ArrayableProperty(pydantic.BaseModel):
     class Config:
         frozen = True
         smart_union = True
+        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

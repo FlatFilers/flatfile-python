@@ -7,6 +7,7 @@ from .empty_object import EmptyObject
 from .export_job_config import ExportJobConfig
 from .file_job_config import FileJobConfig
 from .find_and_replace_job_config import FindAndReplaceJobConfig
+from .mapping_program_job_config import MappingProgramJobConfig
 from .mutate_job_config import MutateJobConfig
 from .pipeline_job_config import PipelineJobConfig
 
@@ -17,5 +18,6 @@ JobUpdateConfig = typing.Union[
     ExportJobConfig,
     MutateJobConfig,
     FindAndReplaceJobConfig,
+    MappingProgramJobConfig,
     EmptyObject,
 ]

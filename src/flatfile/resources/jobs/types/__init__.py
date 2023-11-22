@@ -30,23 +30,30 @@ from .job_outcome_next import (
     JobOutcomeNext,
     JobOutcomeNext_Download,
     JobOutcomeNext_Id,
+    JobOutcomeNext_Snapshot,
     JobOutcomeNext_Url,
     JobOutcomeNext_Wait,
 )
 from .job_outcome_next_download import JobOutcomeNextDownload
 from .job_outcome_next_id import JobOutcomeNextId
+from .job_outcome_next_snapshot import JobOutcomeNextSnapshot
 from .job_outcome_next_url import JobOutcomeNextUrl
 from .job_outcome_next_wait import JobOutcomeNextWait
+from .job_part_execution import JobPartExecution
+from .job_parts import JobParts
+from .job_parts_array import JobPartsArray
 from .job_plan import JobPlan
 from .job_plan_response import JobPlanResponse
 from .job_response import JobResponse
 from .job_source import JobSource
+from .job_split_details import JobSplitDetails
 from .job_status import JobStatus
 from .job_subject import JobSubject, JobSubject_Collection, JobSubject_Resource
 from .job_type import JobType
 from .job_update import JobUpdate
 from .job_update_config import JobUpdateConfig
 from .list_jobs_response import ListJobsResponse
+from .mapping_program_job_config import MappingProgramJobConfig
 from .metadata import Metadata
 from .mutate_job_config import MutateJobConfig
 from .pipeline_job_config import PipelineJobConfig
@@ -84,16 +91,22 @@ __all__ = [
     "JobOutcomeNext",
     "JobOutcomeNextDownload",
     "JobOutcomeNextId",
+    "JobOutcomeNextSnapshot",
     "JobOutcomeNextUrl",
     "JobOutcomeNextWait",
     "JobOutcomeNext_Download",
     "JobOutcomeNext_Id",
+    "JobOutcomeNext_Snapshot",
     "JobOutcomeNext_Url",
     "JobOutcomeNext_Wait",
+    "JobPartExecution",
+    "JobParts",
+    "JobPartsArray",
     "JobPlan",
     "JobPlanResponse",
     "JobResponse",
     "JobSource",
+    "JobSplitDetails",
     "JobStatus",
     "JobSubject",
     "JobSubject_Collection",
@@ -102,6 +115,7 @@ __all__ = [
     "JobUpdate",
     "JobUpdateConfig",
     "ListJobsResponse",
+    "MappingProgramJobConfig",
     "Metadata",
     "MutateJobConfig",
     "PipelineJobConfig",

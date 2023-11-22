@@ -13,6 +13,33 @@ except ImportError:
 
 
 class FileResponse(pydantic.BaseModel):
+    """
+    import datetime
+
+    from flatfile import File, FileResponse, Mode, ModelFileStatusEnum
+
+    FileResponse(
+        data=File(
+            id="us_fl_YOUR_ID",
+            name="Test File",
+            ext="png",
+            mimetype="image/png",
+            encoding="7bit",
+            status=ModelFileStatusEnum.PARTIAL,
+            mode=Mode.IMPORT,
+            size=81953,
+            bytes_received=81593,
+            created_at=datetime.datetime.fromisoformat(
+                "2023-11-15 19:31:33.015000+00:00",
+            ),
+            updated_at=datetime.datetime.fromisoformat(
+                "2023-11-15 19:31:33.015000+00:00",
+            ),
+            space_id="us_sp_YOUR_ID",
+        ),
+    )
+    """
+
     data: File
 
     def json(self, **kwargs: typing.Any) -> str:

@@ -13,6 +13,47 @@ except ImportError:
 
 
 class ListAllEventsResponse(pydantic.BaseModel):
+    """
+    import datetime
+
+    from flatfile import (
+        Context,
+        Domain,
+        Event_WorkbookUpdated,
+        GenericEvent,
+        ListAllEventsResponse,
+        Origin,
+    )
+
+    ListAllEventsResponse(
+        data=[
+            Event_WorkbookUpdated(
+                value=GenericEvent(
+                    id="us_evt_YOUR_ID",
+                    created_at=datetime.datetime.fromisoformat(
+                        "2023-11-07 20:46:04.300000+00:00",
+                    ),
+                    payload={"recordsAdded": 100},
+                    domain=Domain.WORKBOOK,
+                    context=Context(
+                        account_id="us_acc_YOUR_ID",
+                        actor_id="us_key_SOME_KEY",
+                        environment_id="us_env_YOUR_ID",
+                        space_id="us_sp_YOUR_ID",
+                        workbook_id="us_wb_YOUR_ID",
+                    ),
+                    callback_url="",
+                    data_url="",
+                    namespaces=["workbook"],
+                    origin=Origin(
+                        id="us_wb_YOUR_ID",
+                    ),
+                )
+            )
+        ],
+    )
+    """
+
     data: typing.List[Event]
 
     def json(self, **kwargs: typing.Any) -> str:

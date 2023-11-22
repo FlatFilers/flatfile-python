@@ -24,6 +24,9 @@ class EnumPropertyOption(pydantic.BaseModel):
     value: typing.Any = pydantic.Field(
         description="The value or ID of this option. This value will be sent in egress.  The type is a string | integer | boolean."
     )
+    alternative_names: typing.Optional[typing.List[str]] = pydantic.Field(
+        alias="alternativeNames", description="Alternative names to match this enum option to"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -36,4 +39,5 @@ class EnumPropertyOption(pydantic.BaseModel):
     class Config:
         frozen = True
         smart_union = True
+        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

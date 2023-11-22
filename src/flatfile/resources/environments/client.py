@@ -112,6 +112,16 @@ class EnvironmentsClient:
 
         Parameters:
             - environment_id: EnvironmentId. ID of environment to return
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.get_environment_event_token(
+            environment_id="us_env_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -318,6 +328,16 @@ class AsyncEnvironmentsClient:
 
         Parameters:
             - environment_id: EnvironmentId. ID of environment to return
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.get_environment_event_token(
+            environment_id="us_env_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",

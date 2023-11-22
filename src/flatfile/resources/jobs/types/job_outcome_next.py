@@ -8,6 +8,7 @@ import typing_extensions
 
 from .job_outcome_next_download import JobOutcomeNextDownload
 from .job_outcome_next_id import JobOutcomeNextId
+from .job_outcome_next_snapshot import JobOutcomeNextSnapshot
 from .job_outcome_next_url import JobOutcomeNextUrl
 from .job_outcome_next_wait import JobOutcomeNextWait
 
@@ -48,4 +49,15 @@ class JobOutcomeNext_Wait(JobOutcomeNextWait):
         allow_population_by_field_name = True
 
 
-JobOutcomeNext = typing.Union[JobOutcomeNext_Id, JobOutcomeNext_Url, JobOutcomeNext_Download, JobOutcomeNext_Wait]
+class JobOutcomeNext_Snapshot(JobOutcomeNextSnapshot):
+    type: typing_extensions.Literal["snapshot"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+JobOutcomeNext = typing.Union[
+    JobOutcomeNext_Id, JobOutcomeNext_Url, JobOutcomeNext_Download, JobOutcomeNext_Wait, JobOutcomeNext_Snapshot
+]

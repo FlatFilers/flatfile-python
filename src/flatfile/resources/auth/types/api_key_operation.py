@@ -12,6 +12,15 @@ except ImportError:
 
 
 class ApiKeyOperation(pydantic.BaseModel):
+    """
+    from flatfile import ApiKeyOperation
+
+    ApiKeyOperation(
+        path="/v1/spaces",
+        method="POST",
+    )
+    """
+
     path: str
     method: str
 

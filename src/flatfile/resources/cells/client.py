@@ -8,10 +8,17 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.remove_none_from_dict import remove_none_from_dict
 from ..commons.types.filter import Filter
+from ..commons.types.filter_field import FilterField
+from ..commons.types.page_number import PageNumber
+from ..commons.types.page_size import PageSize
+from ..commons.types.search_value import SearchValue
 from ..commons.types.sheet_id import SheetId
 from ..commons.types.sort_direction import SortDirection
 from ..commons.types.sort_field import SortField
 from .types.cells_response import CellsResponse
+from .types.distinct import Distinct
+from .types.field_key import FieldKey
+from .types.include_counts import IncludeCounts
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -27,16 +34,16 @@ class CellsClient:
         self,
         sheet_id: SheetId,
         *,
-        field_key: str,
+        field_key: typing.Optional[FieldKey] = None,
         sort_field: typing.Optional[SortField] = None,
         sort_direction: typing.Optional[SortDirection] = None,
         filter: typing.Optional[Filter] = None,
-        filter_field: typing.Optional[str] = None,
-        page_size: typing.Optional[int] = None,
-        page_number: typing.Optional[int] = None,
-        distinct: typing.Optional[bool] = None,
-        include_counts: typing.Optional[bool] = None,
-        search_value: typing.Optional[str] = None,
+        filter_field: typing.Optional[FilterField] = None,
+        page_size: typing.Optional[PageSize] = None,
+        page_number: typing.Optional[PageNumber] = None,
+        distinct: typing.Optional[Distinct] = None,
+        include_counts: typing.Optional[IncludeCounts] = None,
+        search_value: typing.Optional[SearchValue] = None,
     ) -> CellsResponse:
         """
         Returns record cell values grouped by all fields in the sheet
@@ -44,25 +51,40 @@ class CellsClient:
         Parameters:
             - sheet_id: SheetId. ID of sheet
 
-            - field_key: str. Returns results from the given field only. Otherwise all field cells are returned
+            - field_key: typing.Optional[FieldKey].
 
             - sort_field: typing.Optional[SortField].
 
             - sort_direction: typing.Optional[SortDirection].
 
-            - filter: typing.Optional[Filter]. Options to filter records
+            - filter: typing.Optional[Filter].
 
-            - filter_field: typing.Optional[str]. Name of field by which to filter records
+            - filter_field: typing.Optional[FilterField]. Name of field by which to filter records
 
-            - page_size: typing.Optional[int]. Number of records to return in a page (default 1000 if pageNumber included)
+            - page_size: typing.Optional[PageSize]. Number of records to return in a page (default 1000 if pageNumber included)
 
-            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+            - page_number: typing.Optional[PageNumber]. Based on pageSize, which page of records to return
 
-            - distinct: typing.Optional[bool]. When true, excludes duplicate values
+            - distinct: typing.Optional[Distinct].
 
-            - include_counts: typing.Optional[bool]. When both distinct and includeCounts are true, the count of distinct field values will be returned
+            - include_counts: typing.Optional[IncludeCounts].
 
-            - search_value: typing.Optional[str]. A value to find for a given field in a sheet. Wrap the value in "" for exact match
+            - search_value: typing.Optional[SearchValue]. A value to find for a given field in a sheet. Wrap the value in "" for exact match
+        ---
+        from flatfile import Filter, SortDirection
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.get_values(
+            sheet_id="us_sh_YOUR_ID",
+            field_key="firstName",
+            sort_field="firstName",
+            sort_direction=SortDirection.ASC,
+            filter=Filter.VALID,
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -101,16 +123,16 @@ class AsyncCellsClient:
         self,
         sheet_id: SheetId,
         *,
-        field_key: str,
+        field_key: typing.Optional[FieldKey] = None,
         sort_field: typing.Optional[SortField] = None,
         sort_direction: typing.Optional[SortDirection] = None,
         filter: typing.Optional[Filter] = None,
-        filter_field: typing.Optional[str] = None,
-        page_size: typing.Optional[int] = None,
-        page_number: typing.Optional[int] = None,
-        distinct: typing.Optional[bool] = None,
-        include_counts: typing.Optional[bool] = None,
-        search_value: typing.Optional[str] = None,
+        filter_field: typing.Optional[FilterField] = None,
+        page_size: typing.Optional[PageSize] = None,
+        page_number: typing.Optional[PageNumber] = None,
+        distinct: typing.Optional[Distinct] = None,
+        include_counts: typing.Optional[IncludeCounts] = None,
+        search_value: typing.Optional[SearchValue] = None,
     ) -> CellsResponse:
         """
         Returns record cell values grouped by all fields in the sheet
@@ -118,25 +140,40 @@ class AsyncCellsClient:
         Parameters:
             - sheet_id: SheetId. ID of sheet
 
-            - field_key: str. Returns results from the given field only. Otherwise all field cells are returned
+            - field_key: typing.Optional[FieldKey].
 
             - sort_field: typing.Optional[SortField].
 
             - sort_direction: typing.Optional[SortDirection].
 
-            - filter: typing.Optional[Filter]. Options to filter records
+            - filter: typing.Optional[Filter].
 
-            - filter_field: typing.Optional[str]. Name of field by which to filter records
+            - filter_field: typing.Optional[FilterField]. Name of field by which to filter records
 
-            - page_size: typing.Optional[int]. Number of records to return in a page (default 1000 if pageNumber included)
+            - page_size: typing.Optional[PageSize]. Number of records to return in a page (default 1000 if pageNumber included)
 
-            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+            - page_number: typing.Optional[PageNumber]. Based on pageSize, which page of records to return
 
-            - distinct: typing.Optional[bool]. When true, excludes duplicate values
+            - distinct: typing.Optional[Distinct].
 
-            - include_counts: typing.Optional[bool]. When both distinct and includeCounts are true, the count of distinct field values will be returned
+            - include_counts: typing.Optional[IncludeCounts].
 
-            - search_value: typing.Optional[str]. A value to find for a given field in a sheet. Wrap the value in "" for exact match
+            - search_value: typing.Optional[SearchValue]. A value to find for a given field in a sheet. Wrap the value in "" for exact match
+        ---
+        from flatfile import Filter, SortDirection
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.get_values(
+            sheet_id="us_sh_YOUR_ID",
+            field_key="firstName",
+            sort_field="firstName",
+            sort_direction=SortDirection.ASC,
+            filter=Filter.VALID,
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",

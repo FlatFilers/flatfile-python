@@ -36,6 +36,16 @@ class DocumentsClient:
 
         Parameters:
             - space_id: SpaceId. ID of space to return
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.list(
+            space_id="us_sp_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -63,6 +73,30 @@ class DocumentsClient:
             - space_id: SpaceId. ID of space to return
 
             - request: DocumentConfig.
+        ---
+        from flatfile import Action, ActionMode, DocumentConfig
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.create(
+            space_id="us_sp_YOUR_ID",
+            request=DocumentConfig(
+                title="My Document 1",
+                body="My information",
+                actions=[
+                    Action(
+                        operation="submitAction",
+                        mode=ActionMode.FOREGROUND,
+                        label="Submit",
+                        description="Submit data to webhook.site",
+                        primary=True,
+                    )
+                ],
+            ),
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -91,6 +125,17 @@ class DocumentsClient:
             - space_id: SpaceId. ID of space to return
 
             - document_id: DocumentId. ID of document to return
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.get(
+            space_id="us_sp_YOUR_ID",
+            document_id="us_dc_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -122,6 +167,22 @@ class DocumentsClient:
             - document_id: DocumentId. ID of document to return
 
             - request: DocumentConfig.
+        ---
+        from flatfile import DocumentConfig
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.update(
+            space_id="us_sp_YOUR_ID",
+            document_id="us_dc_YOUR_ID",
+            request=DocumentConfig(
+                title="Updated Title",
+                body="Updated My information",
+            ),
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
@@ -184,6 +245,16 @@ class AsyncDocumentsClient:
 
         Parameters:
             - space_id: SpaceId. ID of space to return
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.list(
+            space_id="us_sp_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -211,6 +282,30 @@ class AsyncDocumentsClient:
             - space_id: SpaceId. ID of space to return
 
             - request: DocumentConfig.
+        ---
+        from flatfile import Action, ActionMode, DocumentConfig
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.create(
+            space_id="us_sp_YOUR_ID",
+            request=DocumentConfig(
+                title="My Document 1",
+                body="My information",
+                actions=[
+                    Action(
+                        operation="submitAction",
+                        mode=ActionMode.FOREGROUND,
+                        label="Submit",
+                        description="Submit data to webhook.site",
+                        primary=True,
+                    )
+                ],
+            ),
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
@@ -239,6 +334,17 @@ class AsyncDocumentsClient:
             - space_id: SpaceId. ID of space to return
 
             - document_id: DocumentId. ID of document to return
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.get(
+            space_id="us_sp_YOUR_ID",
+            document_id="us_dc_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -270,6 +376,22 @@ class AsyncDocumentsClient:
             - document_id: DocumentId. ID of document to return
 
             - request: DocumentConfig.
+        ---
+        from flatfile import DocumentConfig
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.update(
+            space_id="us_sp_YOUR_ID",
+            document_id="us_dc_YOUR_ID",
+            request=DocumentConfig(
+                title="Updated Title",
+                body="Updated My information",
+            ),
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",

@@ -28,6 +28,16 @@ class CommitsClient:
 
         Parameters:
             - commit_id: VersionId. ID of the commit version to return
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.get(
+            commit_id="us_vr_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -108,6 +118,16 @@ class AsyncCommitsClient:
 
         Parameters:
             - commit_id: VersionId. ID of the commit version to return
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.get(
+            commit_id="us_vr_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",

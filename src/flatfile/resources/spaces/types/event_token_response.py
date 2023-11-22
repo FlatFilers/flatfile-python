@@ -13,6 +13,19 @@ except ImportError:
 
 
 class EventTokenResponse(pydantic.BaseModel):
+    """
+    from flatfile import EventToken, EventTokenResponse
+
+    EventTokenResponse(
+        data=EventToken(
+            account_id="us_acc_YOUR_ID",
+            subscribe_key="sub-c-TOKEN",
+            ttl=15,
+            token="LONG-TOKEN",
+        ),
+    )
+    """
+
     data: EventToken
 
     def json(self, **kwargs: typing.Any) -> str:

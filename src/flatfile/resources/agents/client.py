@@ -87,7 +87,7 @@ class AgentsClient:
         client.create(
             environment_id="us_env_YOUR_ID",
             request=AgentConfig(
-                topics=[EventTopic.FILE_CREATED],
+                topics=[EventTopic.WORKBOOK_UPDATED],
                 compiler=Compiler.JS,
                 source="module.exports = { routeEvent: async (...args) => { console.log(args) } }",
             ),
@@ -437,7 +437,7 @@ class AsyncAgentsClient:
         await client.create(
             environment_id="us_env_YOUR_ID",
             request=AgentConfig(
-                topics=[EventTopic.FILE_CREATED],
+                topics=[EventTopic.WORKBOOK_UPDATED],
                 compiler=Compiler.JS,
                 source="module.exports = { routeEvent: async (...args) => { console.log(args) } }",
             ),

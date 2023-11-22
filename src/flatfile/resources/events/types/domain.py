@@ -12,7 +12,7 @@ class Domain(str, enum.Enum):
     ---
     from flatfile import Domain
 
-    Domain.JOB
+    Domain.WORKBOOK
     """
 
     FILE = "file"

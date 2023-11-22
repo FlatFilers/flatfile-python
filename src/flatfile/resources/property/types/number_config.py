@@ -20,7 +20,7 @@ class NumberConfig(pydantic.BaseModel):
     )
     """
 
-    decimal_places: int = pydantic.Field(description="Number of decimal places to round data to")
+    decimal_places: int = pydantic.Field(alias="decimalPlaces", description="Number of decimal places to round data to")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -33,4 +33,5 @@ class NumberConfig(pydantic.BaseModel):
     class Config:
         frozen = True
         smart_union = True
+        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

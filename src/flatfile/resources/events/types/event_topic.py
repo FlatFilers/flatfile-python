@@ -12,7 +12,7 @@ class EventTopic(str, enum.Enum):
     ---
     from flatfile import EventTopic
 
-    EventTopic.FILE_CREATED
+    EventTopic.WORKBOOK_UPDATED
     """
 
     AGENT_CREATED = "agent:created"
@@ -44,6 +44,7 @@ class EventTopic(str, enum.Enum):
     JOB_READY = "job:ready"
     JOB_SCHEDULED = "job:scheduled"
     JOB_OUTCOME_ACKNOWLEDGED = "job:outcome-acknowledged"
+    JOB_PARTS_COMPLETED = "job:parts-completed"
     JOB_FAILED = "job:failed"
     COMMIT_CREATED = "commit:created"
     COMMIT_UPDATED = "commit:updated"
@@ -81,6 +82,7 @@ class EventTopic(str, enum.Enum):
         job_ready: typing.Callable[[], T_Result],
         job_scheduled: typing.Callable[[], T_Result],
         job_outcome_acknowledged: typing.Callable[[], T_Result],
+        job_parts_completed: typing.Callable[[], T_Result],
         job_failed: typing.Callable[[], T_Result],
         commit_created: typing.Callable[[], T_Result],
         commit_updated: typing.Callable[[], T_Result],
@@ -145,6 +147,8 @@ class EventTopic(str, enum.Enum):
             return job_scheduled()
         if self is EventTopic.JOB_OUTCOME_ACKNOWLEDGED:
             return job_outcome_acknowledged()
+        if self is EventTopic.JOB_PARTS_COMPLETED:
+            return job_parts_completed()
         if self is EventTopic.JOB_FAILED:
             return job_failed()
         if self is EventTopic.COMMIT_CREATED:

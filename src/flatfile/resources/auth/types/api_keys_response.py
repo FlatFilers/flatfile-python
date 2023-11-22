@@ -13,6 +13,33 @@ except ImportError:
 
 
 class ApiKeysResponse(pydantic.BaseModel):
+    """
+    import datetime
+
+    from flatfile import ApiKey, ApiKeyOperation, ApiKeysResponse, ApiKeyType
+
+    ApiKeysResponse(
+        data=[
+            ApiKey(
+                id="us_key_YOUR_ID",
+                raw_key="pk_YOUR_RAW_API_KEY",
+                type=ApiKeyType.PUBLISHABLE,
+                environment_id="us_env_YOUR_ID",
+                account_id="us_acc_YOUR_ID",
+                operations=[
+                    ApiKeyOperation(
+                        path="/v1/spaces",
+                        method="POST",
+                    )
+                ],
+                created_at=datetime.datetime.fromisoformat(
+                    "2017-07-21 17:32:28+00:00",
+                ),
+            )
+        ],
+    )
+    """
+
     data: typing.List[ApiKey]
 
     def json(self, **kwargs: typing.Any) -> str:

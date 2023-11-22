@@ -28,6 +28,16 @@ except ImportError:
 class Context(pydantic.BaseModel):
     """
     The context of the event
+    ---
+    from flatfile import Context
+
+    Context(
+        account_id="us_acc_YOUR_ID",
+        actor_id="us_key_SOME_KEY",
+        environment_id="us_env_YOUR_ID",
+        space_id="us_sp_YOUR_ID",
+        workbook_id="us_wb_YOUR_ID",
+    )
     """
 
     namespaces: typing.Optional[typing.List[str]] = pydantic.Field(description="The namespaces of the event")

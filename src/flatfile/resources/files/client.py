@@ -52,6 +52,14 @@ class FilesClient:
             - page_number: typing.Optional[int]. Based on pageSize, which page of jobs to return
 
             - mode: typing.Optional[Mode]. The storage mode of file to fetch, defaults to "import"
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.list()
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -115,6 +123,16 @@ class FilesClient:
         """
         Parameters:
             - file_id: str.
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.get(
+            file_id="us_fl_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -182,6 +200,17 @@ class FilesClient:
             - status: typing.Optional[ModelFileStatusEnum]. Status of the file
 
             - actions: typing.Optional[typing.List[Action]]. The actions attached to the file
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.update(
+            file_id="us_fl_YOUR_ID",
+            name="NewFileName",
+        )
         """
         _request: typing.Dict[str, typing.Any] = {}
         if workbook_id is not OMIT:
@@ -261,6 +290,14 @@ class AsyncFilesClient:
             - page_number: typing.Optional[int]. Based on pageSize, which page of jobs to return
 
             - mode: typing.Optional[Mode]. The storage mode of file to fetch, defaults to "import"
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.list()
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -324,6 +361,16 @@ class AsyncFilesClient:
         """
         Parameters:
             - file_id: str.
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.get(
+            file_id="us_fl_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -391,6 +438,17 @@ class AsyncFilesClient:
             - status: typing.Optional[ModelFileStatusEnum]. Status of the file
 
             - actions: typing.Optional[typing.List[Action]]. The actions attached to the file
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.update(
+            file_id="us_fl_YOUR_ID",
+            name="NewFileName",
+        )
         """
         _request: typing.Dict[str, typing.Any] = {}
         if workbook_id is not OMIT:

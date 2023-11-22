@@ -15,13 +15,22 @@ except ImportError:
 class EventToken(pydantic.BaseModel):
     """
     Properties used to allow users to connect to the event bus
+    ---
+    from flatfile import EventToken
+
+    EventToken(
+        account_id="us_acc_YOUR_ID",
+        subscribe_key="sub-c-TOKEN",
+        ttl=15,
+        token="LONG-TOKEN",
+    )
     """
 
     account_id: typing.Optional[AccountId] = pydantic.Field(alias="accountId")
     subscribe_key: typing.Optional[str] = pydantic.Field(
         alias="subscribeKey", description="The id of the event bus to subscribe to"
     )
-    ttl: typing.Optional[float] = pydantic.Field(description="Time to live in minutes")
+    ttl: typing.Optional[int] = pydantic.Field(description="Time to live in minutes")
     token: typing.Optional[str]
 
     def json(self, **kwargs: typing.Any) -> str:

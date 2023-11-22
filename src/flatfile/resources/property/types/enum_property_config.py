@@ -14,7 +14,7 @@ except ImportError:
 
 class EnumPropertyConfig(pydantic.BaseModel):
     allow_custom: typing.Optional[bool] = pydantic.Field(
-        description="Permit the user to create new options for this specific field."
+        alias="allowCustom", description="Permit the user to create new options for this specific field."
     )
     options: typing.List[EnumPropertyOption]
 
@@ -29,4 +29,5 @@ class EnumPropertyConfig(pydantic.BaseModel):
     class Config:
         frozen = True
         smart_union = True
+        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

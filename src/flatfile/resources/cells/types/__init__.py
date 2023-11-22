@@ -3,5 +3,8 @@
 from .cell_value_with_counts import CellValueWithCounts
 from .cells_response import CellsResponse
 from .cells_response_data import CellsResponseData
+from .distinct import Distinct
+from .field_key import FieldKey
+from .include_counts import IncludeCounts
 
-__all__ = ["CellValueWithCounts", "CellsResponse", "CellsResponseData"]
+__all__ = ["CellValueWithCounts", "CellsResponse", "CellsResponseData", "Distinct", "FieldKey", "IncludeCounts"]

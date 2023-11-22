@@ -16,6 +16,21 @@ except ImportError:
 class CreateEventConfig(BaseEvent):
     """
     Properties used to create a new event
+    ---
+    from flatfile import Context, CreateEventConfig, Domain, EventTopic
+
+    CreateEventConfig(
+        topic=EventTopic.WORKBOOK_UPDATED,
+        payload={"recordsAdded": 100},
+        domain=Domain.WORKBOOK,
+        context=Context(
+            account_id="us_acc_YOUR_ID",
+            actor_id="us_key_SOME_KEY",
+            environment_id="us_env_YOUR_ID",
+            space_id="us_sp_YOUR_ID",
+            workbook_id="us_wb_YOUR_ID",
+        ),
+    )
     """
 
     topic: EventTopic

@@ -169,6 +169,32 @@ class SpacesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def bulk_delete(self, *, ids: typing.Union[SpaceId, typing.List[SpaceId]]) -> Success:
+        """
+        Delete multiple spaces by id
+
+        Parameters:
+            - ids: typing.Union[SpaceId, typing.List[SpaceId]]. List of ids for the spaces to be deleted
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "DELETE",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "spaces"),
+            params=remove_none_from_dict({"ids": ids}),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     def update(self, space_id: SpaceId, *, request: SpaceConfig) -> SpaceResponse:
         """
         Update a space, to change the name for example
@@ -348,6 +374,32 @@ class AsyncSpacesClient:
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}"),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def bulk_delete(self, *, ids: typing.Union[SpaceId, typing.List[SpaceId]]) -> Success:
+        """
+        Delete multiple spaces by id
+
+        Parameters:
+            - ids: typing.Union[SpaceId, typing.List[SpaceId]]. List of ids for the spaces to be deleted
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "DELETE",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "spaces"),
+            params=remove_none_from_dict({"ids": ids}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )

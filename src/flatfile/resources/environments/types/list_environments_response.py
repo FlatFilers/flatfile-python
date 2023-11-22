@@ -14,6 +14,29 @@ except ImportError:
 
 
 class ListEnvironmentsResponse(pydantic.BaseModel):
+    """
+    from flatfile import (
+        Environment,
+        GuestAuthenticationEnum,
+        ListEnvironmentsResponse,
+    )
+
+    ListEnvironmentsResponse(
+        data=[
+            Environment(
+                id="us_env_YOUR_ID",
+                account_id="us_acc_YOUR_ID",
+                name="dev",
+                is_prod=False,
+                guest_authentication=[GuestAuthenticationEnum.MAGIC_LINK],
+                features={},
+                metadata={},
+                namespaces=["default"],
+            )
+        ],
+    )
+    """
+
     data: typing.List[Environment]
     pagination: typing.Optional[Pagination]
 

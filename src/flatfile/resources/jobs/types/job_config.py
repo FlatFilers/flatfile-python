@@ -5,8 +5,10 @@ import typing
 
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.file_id import FileId
+from ...commons.types.job_id import JobId
 from .job_destination import JobDestination
 from .job_mode import JobMode
+from .job_part_execution import JobPartExecution
 from .job_source import JobSource
 from .job_status import JobStatus
 from .job_subject import JobSubject
@@ -44,6 +46,14 @@ class JobConfig(pydantic.BaseModel):
     managed: typing.Optional[bool] = pydantic.Field(
         description="Indicates if Flatfile is managing the control flow of this job or if it is being manually tracked."
     )
+    part: typing.Optional[int] = pydantic.Field(description="The part number of this job")
+    part_data: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(
+        alias="partData", description="The data for this part of the job"
+    )
+    part_execution: typing.Optional[JobPartExecution] = pydantic.Field(
+        alias="partExecution", description="The execution mode for this part of the job"
+    )
+    parent_id: typing.Optional[JobId] = pydantic.Field(alias="parentId", description="The id of the parent job")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

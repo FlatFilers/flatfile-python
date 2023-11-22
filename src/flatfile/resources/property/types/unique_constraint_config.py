@@ -12,8 +12,12 @@ except ImportError:
 
 
 class UniqueConstraintConfig(pydantic.BaseModel):
-    case_sensitive: typing.Optional[bool] = pydantic.Field(description="Ignore casing when determining uniqueness")
-    ignore_empty: typing.Optional[bool] = pydantic.Field(description="Do not flag empty values as duplicate")
+    case_sensitive: typing.Optional[bool] = pydantic.Field(
+        alias="caseSensitive", description="Ignore casing when determining uniqueness"
+    )
+    ignore_empty: typing.Optional[bool] = pydantic.Field(
+        alias="ignoreEmpty", description="Do not flag empty values as duplicate"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -26,4 +30,5 @@ class UniqueConstraintConfig(pydantic.BaseModel):
     class Config:
         frozen = True
         smart_union = True
+        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

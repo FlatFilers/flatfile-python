@@ -16,6 +16,18 @@ except ImportError:
 
 
 class Action(pydantic.BaseModel):
+    """
+    from flatfile import Action, ActionMode
+
+    Action(
+        operation="submitAction",
+        mode=ActionMode.FOREGROUND,
+        label="Submit",
+        description="Submit data to webhook.site",
+        primary=True,
+    )
+    """
+
     slug: typing.Optional[str]
     operation: typing.Optional[str]
     mode: typing.Optional[ActionMode]

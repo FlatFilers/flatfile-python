@@ -4,6 +4,7 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
+from .data_retention_policy_enum import DataRetentionPolicyEnum
 from .guest_authentication_enum import GuestAuthenticationEnum
 
 try:
@@ -38,6 +39,7 @@ class EnvironmentConfigCreate(pydantic.BaseModel):
     translations_path: typing.Optional[str] = pydantic.Field(alias="translationsPath")
     namespaces: typing.Optional[typing.List[str]]
     language_override: typing.Optional[str] = pydantic.Field(alias="languageOverride")
+    data_retention_policy: typing.Optional[DataRetentionPolicyEnum] = pydantic.Field(alias="dataRetentionPolicy")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

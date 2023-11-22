@@ -9,6 +9,10 @@ T_Result = typing.TypeVar("T_Result")
 class GuestAuthenticationEnum(str, enum.Enum):
     """
     The type of authentication to use for guests
+    ---
+    from flatfile import GuestAuthenticationEnum
+
+    GuestAuthenticationEnum.MAGIC_LINK
     """
 
     SHARED_LINK = "shared_link"

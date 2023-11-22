@@ -13,6 +13,24 @@ except ImportError:
 
 
 class DocumentConfig(pydantic.BaseModel):
+    """
+    from flatfile import Action, ActionMode, DocumentConfig
+
+    DocumentConfig(
+        title="My Document 1",
+        body="My information",
+        actions=[
+            Action(
+                operation="submitAction",
+                mode=ActionMode.FOREGROUND,
+                label="Submit",
+                description="Submit data to webhook.site",
+                primary=True,
+            )
+        ],
+    )
+    """
+
     title: str
     body: str
     treatments: typing.Optional[typing.List[str]]
