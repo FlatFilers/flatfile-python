@@ -1,8 +1,7 @@
 # FlatFile Python Library
 
 [![pypi](https://img.shields.io/pypi/v/flatfile.svg)](https://pypi.python.org/pypi/flatfile)
-[![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-SDK%20generated%20by%20Fern-brightgreen)](https://github.com/fern-api/fern)
-
+[![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-SDK%20generated%20by%20Fern-brightgreen)](https://buildwithfern.com/?utm_source=flatfilers/flatfile-python/readme)
 ## Installation
 
 Add this dependency to your project's build file:
