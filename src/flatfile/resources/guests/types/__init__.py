@@ -6,6 +6,8 @@ from .guest_config import GuestConfig
 from .guest_config_update import GuestConfigUpdate
 from .guest_response import GuestResponse
 from .guest_space import GuestSpace
+from .guest_token import GuestToken
+from .guest_token_response import GuestTokenResponse
 from .guest_workbook import GuestWorkbook
 from .invite import Invite
 from .list_guests_response import ListGuestsResponse
@@ -17,6 +19,8 @@ __all__ = [
     "GuestConfigUpdate",
     "GuestResponse",
     "GuestSpace",
+    "GuestToken",
+    "GuestTokenResponse",
     "GuestWorkbook",
     "Invite",
     "ListGuestsResponse",

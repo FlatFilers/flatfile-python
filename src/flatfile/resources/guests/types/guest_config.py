@@ -16,6 +16,29 @@ except ImportError:
 class GuestConfig(pydantic.BaseModel):
     """
     Configurations for the guests
+    ---
+    import datetime
+
+    from flatfile import GuestConfig, GuestSpace, GuestWorkbook
+
+    GuestConfig(
+        environment_id="us_env_YOUR_ID",
+        email="email@example.com",
+        name="Your Name",
+        spaces=[
+            GuestSpace(
+                id="us_sp_YOUR_ID",
+                workbooks=[
+                    GuestWorkbook(
+                        id="us_wb_YOUR_ID",
+                    )
+                ],
+                last_accessed=datetime.datetime.fromisoformat(
+                    "2023-10-30 16:59:45.735000+00:00",
+                ),
+            )
+        ],
+    )
     """
 
     environment_id: EnvironmentId = pydantic.Field(alias="environmentId")

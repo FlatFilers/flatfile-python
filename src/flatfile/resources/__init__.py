@@ -173,6 +173,8 @@ from .guests import (
     GuestConfigUpdate,
     GuestResponse,
     GuestSpace,
+    GuestToken,
+    GuestTokenResponse,
     GuestWorkbook,
     Invite,
     ListGuestsResponse,
@@ -307,7 +309,6 @@ from .records import (
 from .roles import ActorIdUnion, AssignRoleResponse, AssignRoleResponseData, ResourceIdUnion
 from .secrets import Secret, SecretName, SecretValue, SecretsResponse, WriteSecret
 from .sheets import (
-    FieldConfigResponse,
     ListSheetsResponse,
     RecordCountsResponse,
     RecordCountsResponseData,
@@ -495,7 +496,6 @@ __all__ = [
     "Execution",
     "ExportJobConfig",
     "ExportOptions",
-    "FieldConfigResponse",
     "FieldKey",
     "File",
     "FileId",
@@ -519,6 +519,8 @@ __all__ = [
     "GuestId",
     "GuestResponse",
     "GuestSpace",
+    "GuestToken",
+    "GuestTokenResponse",
     "GuestWorkbook",
     "IncludeCounts",
     "InputConfig",

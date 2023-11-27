@@ -116,7 +116,7 @@ class EventsClient:
         client.create(
             request=CreateEventConfig(
                 topic=EventTopic.WORKBOOK_UPDATED,
-                payload={"recordsAdded": 100},
+                payload={"recordsAdded": {"unknown": 100, "type": "unknown"}},
                 domain=Domain.WORKBOOK,
                 context=Context(
                     account_id="us_acc_YOUR_ID",
@@ -196,15 +196,15 @@ class EventsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def get_event_token(
-        self, *, space_id: typing.Optional[SpaceId] = None, scope: typing.Optional[str] = None
+        self, *, scope: typing.Optional[str] = None, space_id: typing.Optional[SpaceId] = None
     ) -> EventTokenResponse:
         """
         Get a token which can be used to subscribe to events for this space
 
         Parameters:
-            - space_id: typing.Optional[SpaceId]. The space id
-
             - scope: typing.Optional[str]. The resource ID of the event stream (space or environment id)
+
+            - space_id: typing.Optional[SpaceId]. The space ID of the event stream
         ---
         from flatfile.client import Flatfile
 
@@ -212,14 +212,12 @@ class EventsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.get_event_token(
-            space_id="us_sp_YOUR_ID",
-        )
+        client.get_event_token()
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "subscription"),
-            params=remove_none_from_dict({"spaceId": space_id, "scope": scope}),
+            params=remove_none_from_dict({"scope": scope, "spaceId": space_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )
@@ -321,7 +319,7 @@ class AsyncEventsClient:
         await client.create(
             request=CreateEventConfig(
                 topic=EventTopic.WORKBOOK_UPDATED,
-                payload={"recordsAdded": 100},
+                payload={"recordsAdded": {"unknown": 100, "type": "unknown"}},
                 domain=Domain.WORKBOOK,
                 context=Context(
                     account_id="us_acc_YOUR_ID",
@@ -401,15 +399,15 @@ class AsyncEventsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def get_event_token(
-        self, *, space_id: typing.Optional[SpaceId] = None, scope: typing.Optional[str] = None
+        self, *, scope: typing.Optional[str] = None, space_id: typing.Optional[SpaceId] = None
     ) -> EventTokenResponse:
         """
         Get a token which can be used to subscribe to events for this space
 
         Parameters:
-            - space_id: typing.Optional[SpaceId]. The space id
-
             - scope: typing.Optional[str]. The resource ID of the event stream (space or environment id)
+
+            - space_id: typing.Optional[SpaceId]. The space ID of the event stream
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -417,14 +415,12 @@ class AsyncEventsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.get_event_token(
-            space_id="us_sp_YOUR_ID",
-        )
+        await client.get_event_token()
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "subscription"),
-            params=remove_none_from_dict({"spaceId": space_id, "scope": scope}),
+            params=remove_none_from_dict({"scope": scope, "spaceId": space_id}),
             headers=self._client_wrapper.get_headers(),
             timeout=60,
         )

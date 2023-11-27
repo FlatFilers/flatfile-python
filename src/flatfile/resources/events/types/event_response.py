@@ -32,7 +32,7 @@ class EventResponse(pydantic.BaseModel):
                 created_at=datetime.datetime.fromisoformat(
                     "2023-11-07 20:46:04.300000+00:00",
                 ),
-                payload={"recordsAdded": 100},
+                payload={"recordsAdded": {"unknown": 100, "type": "unknown"}},
                 domain=Domain.WORKBOOK,
                 context=Context(
                     account_id="us_acc_YOUR_ID",

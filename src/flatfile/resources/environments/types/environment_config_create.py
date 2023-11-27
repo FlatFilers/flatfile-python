@@ -23,7 +23,7 @@ class EnvironmentConfigCreate(pydantic.BaseModel):
         name="dev",
         is_prod=False,
         guest_authentication=[GuestAuthenticationEnum.MAGIC_LINK],
-        metadata={"key": "value"},
+        metadata={"key": {"unknown": "value", "type": "unknown"}},
         namespaces=["default"],
     )
     """

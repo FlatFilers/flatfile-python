@@ -16,6 +16,13 @@ except ImportError:
 class GuestConfigUpdate(pydantic.BaseModel):
     """
     Properties used to update an existing guest
+    ---
+    from flatfile import GuestConfigUpdate
+
+    GuestConfigUpdate(
+        email="updated@example.com",
+        name="Your Name Updated",
+    )
     """
 
     environment_id: typing.Optional[EnvironmentId] = pydantic.Field(alias="environmentId")

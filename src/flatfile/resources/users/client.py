@@ -13,7 +13,6 @@ from .types.api_token_response import ApiTokenResponse
 from .types.exchange_token_response import ExchangeTokenResponse
 from .types.list_api_tokens_response import ListApiTokensResponse
 from .types.list_users_response import ListUsersResponse
-from .types.user_config import UserConfig
 from .types.user_response import UserResponse
 
 try:
@@ -45,28 +44,6 @@ class UsersClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListUsersResponse, _response.json())  # type: ignore
-        try:
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def create(self, *, request: UserConfig) -> UserResponse:
-        """
-        A user is a privileged user that logs in with a username and password.
-
-        Parameters:
-            - request: UserConfig.
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "users"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
-        )
-        if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(UserResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
@@ -213,28 +190,6 @@ class AsyncUsersClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListUsersResponse, _response.json())  # type: ignore
-        try:
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def create(self, *, request: UserConfig) -> UserResponse:
-        """
-        A user is a privileged user that logs in with a username and password.
-
-        Parameters:
-            - request: UserConfig.
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "users"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
-        )
-        if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(UserResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:

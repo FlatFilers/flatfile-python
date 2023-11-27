@@ -14,6 +14,24 @@ except ImportError:
 
 
 class GuestSpace(pydantic.BaseModel):
+    """
+    import datetime
+
+    from flatfile import GuestSpace, GuestWorkbook
+
+    GuestSpace(
+        id="us_sp_YOUR_ID",
+        workbooks=[
+            GuestWorkbook(
+                id="us_wb_YOUR_ID",
+            )
+        ],
+        last_accessed=datetime.datetime.fromisoformat(
+            "2023-10-30 16:59:45.735000+00:00",
+        ),
+    )
+    """
+
     id: SpaceId
     workbooks: typing.Optional[typing.List[GuestWorkbook]]
     last_accessed: typing.Optional[dt.datetime] = pydantic.Field(alias="lastAccessed")

@@ -4,8 +4,7 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
-from ...commons.types.guest_id import GuestId
-from ...commons.types.space_id import SpaceId
+from .guest_token import GuestToken
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -13,24 +12,19 @@ except ImportError:
     import pydantic  # type: ignore
 
 
-class Invite(pydantic.BaseModel):
+class GuestTokenResponse(pydantic.BaseModel):
     """
-    from flatfile import Invite
+    from flatfile import GuestToken, GuestTokenResponse
 
-    Invite(
-        guest_id="us_g_YOUR_ID",
-        space_id="us_sp_YOUR_ID",
-        from_name="Your Name",
-        message="Hello, I would like to invite you to my space.",
+    GuestTokenResponse(
+        data=GuestToken(
+            token="eyJ0_SECRET_TOKEN",
+            valid=True,
+        ),
     )
     """
 
-    guest_id: GuestId = pydantic.Field(alias="guestId")
-    space_id: SpaceId = pydantic.Field(alias="spaceId")
-    from_name: typing.Optional[str] = pydantic.Field(
-        alias="fromName", description="The name of the person or company sending the invitation"
-    )
-    message: typing.Optional[str] = pydantic.Field(description="Message to send with the invite")
+    data: GuestToken
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -43,5 +37,4 @@ class Invite(pydantic.BaseModel):
     class Config:
         frozen = True
         smart_union = True
-        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

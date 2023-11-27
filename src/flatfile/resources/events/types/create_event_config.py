@@ -21,7 +21,7 @@ class CreateEventConfig(BaseEvent):
 
     CreateEventConfig(
         topic=EventTopic.WORKBOOK_UPDATED,
-        payload={"recordsAdded": 100},
+        payload={"recordsAdded": {"unknown": 100, "type": "unknown"}},
         domain=Domain.WORKBOOK,
         context=Context(
             account_id="us_acc_YOUR_ID",

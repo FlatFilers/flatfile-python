@@ -13,6 +13,14 @@ except ImportError:
 
 
 class GuestWorkbook(pydantic.BaseModel):
+    """
+    from flatfile import GuestWorkbook
+
+    GuestWorkbook(
+        id="us_wb_YOUR_ID",
+    )
+    """
+
     id: WorkbookId
 
     def json(self, **kwargs: typing.Any) -> str:

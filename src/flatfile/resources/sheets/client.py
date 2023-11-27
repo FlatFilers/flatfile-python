@@ -6,7 +6,6 @@ from json.decoder import JSONDecodeError
 
 from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
-from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
 from ..commits.types.list_commits_response import ListCommitsResponse
 from ..commons.errors.bad_request_error import BadRequestError
@@ -23,8 +22,6 @@ from ..commons.types.sort_field import SortField
 from ..commons.types.success import Success
 from ..commons.types.version_id import VersionId
 from ..commons.types.workbook_id import WorkbookId
-from ..property.types.property import Property
-from .types.field_config_response import FieldConfigResponse
 from .types.list_sheets_response import ListSheetsResponse
 from .types.record_counts_response import RecordCountsResponse
 from .types.sheet_response import SheetResponse
@@ -33,9 +30,6 @@ try:
     import pydantic.v1 as pydantic  # type: ignore
 except ImportError:
     import pydantic  # type: ignore
-
-# this is used as the default value for optional parameters
-OMIT = typing.cast(typing.Any, ...)
 
 
 class SheetsClient:
@@ -259,34 +253,6 @@ class SheetsClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(RecordCountsResponse, _response.json())  # type: ignore
-        try:
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def add_field(self, sheet_id: SheetId, *, request: Property) -> FieldConfigResponse:
-        """
-        Adds a new field to a sheet
-
-        Parameters:
-            - sheet_id: SheetId. ID of sheet
-
-            - request: Property.
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/fields"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
-        )
-        if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(FieldConfigResponse, _response.json())  # type: ignore
-        if _response.status_code == 400:
-            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
-        if _response.status_code == 404:
-            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
@@ -539,34 +505,6 @@ class AsyncSheetsClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(RecordCountsResponse, _response.json())  # type: ignore
-        try:
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def add_field(self, sheet_id: SheetId, *, request: Property) -> FieldConfigResponse:
-        """
-        Adds a new field to a sheet
-
-        Parameters:
-            - sheet_id: SheetId. ID of sheet
-
-            - request: Property.
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/fields"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
-        )
-        if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(FieldConfigResponse, _response.json())  # type: ignore
-        if _response.status_code == 400:
-            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
-        if _response.status_code == 404:
-            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
