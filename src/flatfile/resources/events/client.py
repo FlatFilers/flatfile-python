@@ -73,7 +73,7 @@ class EventsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.list()
+        client.events.list()
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -113,10 +113,10 @@ class EventsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.create(
+        client.events.create(
             request=CreateEventConfig(
                 topic=EventTopic.WORKBOOK_UPDATED,
-                payload={"recordsAdded": {"unknown": 100, "type": "unknown"}},
+                payload={"recordsAdded": 100},
                 domain=Domain.WORKBOOK,
                 context=Context(
                     account_id="us_acc_YOUR_ID",
@@ -158,7 +158,7 @@ class EventsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.get(
+        client.events.get(
             event_id="us_evt_YOUR_ID",
         )
         """
@@ -212,7 +212,7 @@ class EventsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.get_event_token()
+        client.events.get_event_token()
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -276,7 +276,7 @@ class AsyncEventsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.list()
+        await client.events.list()
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -316,10 +316,10 @@ class AsyncEventsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.create(
+        await client.events.create(
             request=CreateEventConfig(
                 topic=EventTopic.WORKBOOK_UPDATED,
-                payload={"recordsAdded": {"unknown": 100, "type": "unknown"}},
+                payload={"recordsAdded": 100},
                 domain=Domain.WORKBOOK,
                 context=Context(
                     account_id="us_acc_YOUR_ID",
@@ -361,7 +361,7 @@ class AsyncEventsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.get(
+        await client.events.get(
             event_id="us_evt_YOUR_ID",
         )
         """
@@ -415,7 +415,7 @@ class AsyncEventsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.get_event_token()
+        await client.events.get_event_token()
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",

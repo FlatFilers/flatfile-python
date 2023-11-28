@@ -14,12 +14,16 @@ class JobType(str, enum.Enum):
     FILE = "file"
     WORKBOOK = "workbook"
     SHEET = "sheet"
+    SPACE = "space"
+    DOCUMENT = "document"
 
     def visit(
         self,
         file: typing.Callable[[], T_Result],
         workbook: typing.Callable[[], T_Result],
         sheet: typing.Callable[[], T_Result],
+        space: typing.Callable[[], T_Result],
+        document: typing.Callable[[], T_Result],
     ) -> T_Result:
         if self is JobType.FILE:
             return file()
@@ -27,3 +31,7 @@ class JobType(str, enum.Enum):
             return workbook()
         if self is JobType.SHEET:
             return sheet()
+        if self is JobType.SPACE:
+            return space()
+        if self is JobType.DOCUMENT:
+            return document()

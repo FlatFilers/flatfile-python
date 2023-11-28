@@ -11,22 +11,32 @@ class JobStatus(str, enum.Enum):
     the status of the job
     """
 
+    CREATED = "created"
     PLANNING = "planning"
+    SCHEDULED = "scheduled"
     READY = "ready"
     EXECUTING = "executing"
     COMPLETE = "complete"
     FAILED = "failed"
+    CANCELED = "canceled"
 
     def visit(
         self,
+        created: typing.Callable[[], T_Result],
         planning: typing.Callable[[], T_Result],
+        scheduled: typing.Callable[[], T_Result],
         ready: typing.Callable[[], T_Result],
         executing: typing.Callable[[], T_Result],
         complete: typing.Callable[[], T_Result],
         failed: typing.Callable[[], T_Result],
+        canceled: typing.Callable[[], T_Result],
     ) -> T_Result:
+        if self is JobStatus.CREATED:
+            return created()
         if self is JobStatus.PLANNING:
             return planning()
+        if self is JobStatus.SCHEDULED:
+            return scheduled()
         if self is JobStatus.READY:
             return ready()
         if self is JobStatus.EXECUTING:
@@ -35,3 +45,5 @@ class JobStatus(str, enum.Enum):
             return complete()
         if self is JobStatus.FAILED:
             return failed()
+        if self is JobStatus.CANCELED:
+            return canceled()

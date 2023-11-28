@@ -4,10 +4,7 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
-from ...commons.types.environment_id import EnvironmentId
-from ...commons.types.space_id import SpaceId
-from .secret_name import SecretName
-from .secret_value import SecretValue
+from .data_retention_policy import DataRetentionPolicy
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -15,24 +12,33 @@ except ImportError:
     import pydantic  # type: ignore
 
 
-class WriteSecret(pydantic.BaseModel):
+class DataRetentionPolicyResponse(pydantic.BaseModel):
     """
-    The properties required to write to a secret. Value is the only mutable property. Name, environmentId, spaceId (optional) are used for finding the secret.
-    ---
-    from flatfile import WriteSecret
+    import datetime
 
-    WriteSecret(
-        name="My Secret",
-        value="Sup3r$ecret\/alue!",
-        environment_id="us_env_YOUR_ID",
-        space_id="us_sp_YOUR_ID",
+    from flatfile import (
+        DataRetentionPolicy,
+        DataRetentionPolicyEnum,
+        DataRetentionPolicyResponse,
+    )
+
+    DataRetentionPolicyResponse(
+        data=DataRetentionPolicy(
+            id="us_drp_YOUR_ID",
+            environment_id="us_env_YOUR_ID",
+            created_at=datetime.datetime.fromisoformat(
+                "2023-11-15 19:31:33.015000+00:00",
+            ),
+            updated_at=datetime.datetime.fromisoformat(
+                "2023-11-15 19:31:33.015000+00:00",
+            ),
+            type=DataRetentionPolicyEnum.LAST_ACTIVITY,
+            period=5,
+        ),
     )
     """
 
-    name: SecretName
-    value: SecretValue
-    environment_id: EnvironmentId = pydantic.Field(alias="environmentId")
-    space_id: typing.Optional[SpaceId] = pydantic.Field(alias="spaceId")
+    data: DataRetentionPolicy
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -45,5 +51,4 @@ class WriteSecret(pydantic.BaseModel):
     class Config:
         frozen = True
         smart_union = True
-        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

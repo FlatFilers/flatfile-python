@@ -8,6 +8,7 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
+from ..commits.types.list_commits_response import ListCommitsResponse
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.errors import Errors
@@ -162,6 +163,32 @@ class WorkbooksClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def get_workbook_commits(
+        self, workbook_id: WorkbookId, *, completed: typing.Optional[bool] = None
+    ) -> ListCommitsResponse:
+        """
+        Returns the commits for a workbook
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook
+
+            - completed: typing.Optional[bool]. If true, only return commits that have been completed. If false, only return commits that have not been completed. If not provided, return all commits.
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/commits"),
+            params=remove_none_from_dict({"completed": completed}),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(ListCommitsResponse, _response.json())  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
 
 class AsyncWorkbooksClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
@@ -291,6 +318,32 @@ class AsyncWorkbooksClient:
             raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         if _response.status_code == 404:
             raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def get_workbook_commits(
+        self, workbook_id: WorkbookId, *, completed: typing.Optional[bool] = None
+    ) -> ListCommitsResponse:
+        """
+        Returns the commits for a workbook
+
+        Parameters:
+            - workbook_id: WorkbookId. ID of workbook
+
+            - completed: typing.Optional[bool]. If true, only return commits that have been completed. If false, only return commits that have not been completed. If not provided, return all commits.
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/commits"),
+            params=remove_none_from_dict({"completed": completed}),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(ListCommitsResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:

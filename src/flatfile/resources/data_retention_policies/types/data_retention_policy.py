@@ -4,10 +4,9 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
+from ...commons.types.data_retention_policy_id import DataRetentionPolicyId
 from ...commons.types.environment_id import EnvironmentId
-from ...commons.types.space_id import SpaceId
-from .secret_name import SecretName
-from .secret_value import SecretValue
+from .data_retention_policy_config import DataRetentionPolicyConfig
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -15,24 +14,32 @@ except ImportError:
     import pydantic  # type: ignore
 
 
-class WriteSecret(pydantic.BaseModel):
+class DataRetentionPolicy(DataRetentionPolicyConfig):
     """
-    The properties required to write to a secret. Value is the only mutable property. Name, environmentId, spaceId (optional) are used for finding the secret.
+    A data retention policy belonging to an environment
     ---
-    from flatfile import WriteSecret
+    import datetime
 
-    WriteSecret(
-        name="My Secret",
-        value="Sup3r$ecret\/alue!",
+    from flatfile import DataRetentionPolicy, DataRetentionPolicyEnum
+
+    DataRetentionPolicy(
+        id="us_drp_YOUR_ID",
         environment_id="us_env_YOUR_ID",
-        space_id="us_sp_YOUR_ID",
+        created_at=datetime.datetime.fromisoformat(
+            "2023-11-15 19:31:33.015000+00:00",
+        ),
+        updated_at=datetime.datetime.fromisoformat(
+            "2023-11-15 19:31:33.015000+00:00",
+        ),
+        type=DataRetentionPolicyEnum.LAST_ACTIVITY,
+        period=5,
     )
     """
 
-    name: SecretName
-    value: SecretValue
+    id: DataRetentionPolicyId
     environment_id: EnvironmentId = pydantic.Field(alias="environmentId")
-    space_id: typing.Optional[SpaceId] = pydantic.Field(alias="spaceId")
+    created_at: dt.datetime = pydantic.Field(alias="createdAt", description="Date the policy was created")
+    updated_at: dt.datetime = pydantic.Field(alias="updatedAt", description="Date the policy was last updated")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

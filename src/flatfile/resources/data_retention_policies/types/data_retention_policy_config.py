@@ -4,26 +4,26 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
-from ...commons.types.secret_id import SecretId
-from .write_secret import WriteSecret
+from .data_retention_policy_enum import DataRetentionPolicyEnum
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
-class Secret(WriteSecret):
+class DataRetentionPolicyConfig(pydantic.BaseModel):
     """
-    The value of a secret
-    ---
-    from flatfile import Secret
+    from flatfile import DataRetentionPolicyConfig, DataRetentionPolicyEnum
 
-    Secret(
-        id="us_sec_YOUR_ID",
-        name="My Secret",
-        value="Sup3r$ecret\/alue!",
-        environment_id="us_env_YOUR_ID",
-        space_id="us_sp_YOUR_ID",
+    DataRetentionPolicyConfig(
+        type=DataRetentionPolicyEnum.LAST_ACTIVITY,
+        period=5,
     )
     """
 
-    id: SecretId
+    type: DataRetentionPolicyEnum
+    period: int
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -36,5 +36,4 @@ class Secret(WriteSecret):
     class Config:
         frozen = True
         smart_union = True
-        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

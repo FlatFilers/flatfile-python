@@ -38,6 +38,16 @@ class SecretsClient:
             - environment_id: EnvironmentId.
 
             - space_id: typing.Optional[SpaceId].
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.secrets.list(
+            environment_id="us_env_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -64,6 +74,22 @@ class SecretsClient:
 
         Parameters:
             - request: WriteSecret.
+        ---
+        from flatfile import WriteSecret
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.secrets.upsert(
+            request=WriteSecret(
+                name="My Secret",
+                value="Sup3r$ecret\/alue!",
+                environment_id="us_env_YOUR_ID",
+                space_id="us_sp_YOUR_ID",
+            ),
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -90,6 +116,16 @@ class SecretsClient:
 
         Parameters:
             - secret_id: SecretId.
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.secrets.delete(
+            secret_id="us_sec_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
@@ -124,6 +160,16 @@ class AsyncSecretsClient:
             - environment_id: EnvironmentId.
 
             - space_id: typing.Optional[SpaceId].
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.secrets.list(
+            environment_id="us_env_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -150,6 +196,22 @@ class AsyncSecretsClient:
 
         Parameters:
             - request: WriteSecret.
+        ---
+        from flatfile import WriteSecret
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.secrets.upsert(
+            request=WriteSecret(
+                name="My Secret",
+                value="Sup3r$ecret\/alue!",
+                environment_id="us_env_YOUR_ID",
+                space_id="us_sp_YOUR_ID",
+            ),
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
@@ -176,6 +238,16 @@ class AsyncSecretsClient:
 
         Parameters:
             - secret_id: SecretId.
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.secrets.delete(
+            secret_id="us_sec_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",

@@ -13,6 +13,22 @@ except ImportError:
 
 
 class SecretsResponse(pydantic.BaseModel):
+    """
+    from flatfile import Secret, SecretsResponse
+
+    SecretsResponse(
+        data=[
+            Secret(
+                id="us_sec_YOUR_ID",
+                name="My Secret",
+                value="Sup3r$ecret\/alue!",
+                environment_id="us_env_YOUR_ID",
+                space_id="us_sp_YOUR_ID",
+            )
+        ],
+    )
+    """
+
     data: typing.List[Secret]
 
     def json(self, **kwargs: typing.Any) -> str:

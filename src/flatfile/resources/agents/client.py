@@ -51,7 +51,7 @@ class AgentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.list(
+        client.agents.list(
             environment_id="us_env_YOUR_ID",
         )
         """
@@ -84,7 +84,7 @@ class AgentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.create(
+        client.agents.create(
             environment_id="us_env_YOUR_ID",
             request=AgentConfig(
                 topics=[EventTopic.WORKBOOK_UPDATED],
@@ -124,7 +124,7 @@ class AgentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.get(
+        client.agents.get(
             agent_id="us_ag_YOUR_ID",
             environment_id="us_env_YOUR_ID",
         )
@@ -161,7 +161,7 @@ class AgentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.get_agent_logs(
+        client.agents.get_agent_logs(
             agent_id="us_ag_YOUR_ID",
             environment_id="us_env_YOUR_ID",
         )
@@ -198,7 +198,7 @@ class AgentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.get_agent_log(
+        client.agents.get_agent_log(
             event_id="commons.EventId",
             environment_id="us_env_YOUR_ID",
         )
@@ -249,7 +249,7 @@ class AgentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.get_environment_agent_logs(
+        client.agents.get_environment_agent_logs(
             environment_id="us_env_YOUR_ID",
             space_id="us_sp_YOUR_ID",
             success=True,
@@ -311,7 +311,7 @@ class AgentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.get_environment_agent_executions(
+        client.agents.get_environment_agent_executions(
             environment_id="us_env_YOUR_ID",
             space_id="us_sp_YOUR_ID",
             success=True,
@@ -361,7 +361,7 @@ class AgentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.delete(
+        client.agents.delete(
             agent_id="us_ag_YOUR_ID",
             environment_id="us_env_YOUR_ID",
         )
@@ -401,7 +401,7 @@ class AsyncAgentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.list(
+        await client.agents.list(
             environment_id="us_env_YOUR_ID",
         )
         """
@@ -434,7 +434,7 @@ class AsyncAgentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.create(
+        await client.agents.create(
             environment_id="us_env_YOUR_ID",
             request=AgentConfig(
                 topics=[EventTopic.WORKBOOK_UPDATED],
@@ -474,7 +474,7 @@ class AsyncAgentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.get(
+        await client.agents.get(
             agent_id="us_ag_YOUR_ID",
             environment_id="us_env_YOUR_ID",
         )
@@ -511,7 +511,7 @@ class AsyncAgentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.get_agent_logs(
+        await client.agents.get_agent_logs(
             agent_id="us_ag_YOUR_ID",
             environment_id="us_env_YOUR_ID",
         )
@@ -548,7 +548,7 @@ class AsyncAgentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.get_agent_log(
+        await client.agents.get_agent_log(
             event_id="commons.EventId",
             environment_id="us_env_YOUR_ID",
         )
@@ -599,7 +599,7 @@ class AsyncAgentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.get_environment_agent_logs(
+        await client.agents.get_environment_agent_logs(
             environment_id="us_env_YOUR_ID",
             space_id="us_sp_YOUR_ID",
             success=True,
@@ -661,7 +661,7 @@ class AsyncAgentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.get_environment_agent_executions(
+        await client.agents.get_environment_agent_executions(
             environment_id="us_env_YOUR_ID",
             space_id="us_sp_YOUR_ID",
             success=True,
@@ -711,7 +711,7 @@ class AsyncAgentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.delete(
+        await client.agents.delete(
             agent_id="us_ag_YOUR_ID",
             environment_id="us_env_YOUR_ID",
         )

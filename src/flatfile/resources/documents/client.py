@@ -43,7 +43,7 @@ class DocumentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.list(
+        client.documents.list(
             space_id="us_sp_YOUR_ID",
         )
         """
@@ -81,7 +81,7 @@ class DocumentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.create(
+        client.documents.create(
             space_id="us_sp_YOUR_ID",
             request=DocumentConfig(
                 title="My Document 1",
@@ -132,7 +132,7 @@ class DocumentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.get(
+        client.documents.get(
             space_id="us_sp_YOUR_ID",
             document_id="us_dc_YOUR_ID",
         )
@@ -175,7 +175,7 @@ class DocumentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.update(
+        client.documents.update(
             space_id="us_sp_YOUR_ID",
             document_id="us_dc_YOUR_ID",
             request=DocumentConfig(
@@ -252,7 +252,7 @@ class AsyncDocumentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.list(
+        await client.documents.list(
             space_id="us_sp_YOUR_ID",
         )
         """
@@ -290,7 +290,7 @@ class AsyncDocumentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.create(
+        await client.documents.create(
             space_id="us_sp_YOUR_ID",
             request=DocumentConfig(
                 title="My Document 1",
@@ -341,7 +341,7 @@ class AsyncDocumentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.get(
+        await client.documents.get(
             space_id="us_sp_YOUR_ID",
             document_id="us_dc_YOUR_ID",
         )
@@ -384,7 +384,7 @@ class AsyncDocumentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.update(
+        await client.documents.update(
             space_id="us_sp_YOUR_ID",
             document_id="us_dc_YOUR_ID",
             request=DocumentConfig(

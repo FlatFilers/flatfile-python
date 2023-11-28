@@ -9,6 +9,7 @@ from .action_constraint_type import ActionConstraintType
 from .action_mode import ActionMode
 from .action_schedule import ActionSchedule
 from .agent_id import AgentId
+from .data_retention_policy_id import DataRetentionPolicyId
 from .document_id import DocumentId
 from .environment_id import EnvironmentId
 from .error import Error
@@ -56,6 +57,7 @@ __all__ = [
     "ActionMode",
     "ActionSchedule",
     "AgentId",
+    "DataRetentionPolicyId",
     "DocumentId",
     "EnvironmentId",
     "Error",

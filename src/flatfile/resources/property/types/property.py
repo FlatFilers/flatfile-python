@@ -74,29 +74,25 @@ from flatfile import (
     Property_String,
     StringConfig,
     StringConfigOptions,
-    StringProperty,
-    UniqueConstraint,
     UniqueConstraintConfig,
 )
 
 Property_String(
-    value=StringProperty(
-        key="code",
-        label="Product Code",
-        description="Unique identifier defining an individual product.",
-        constraints=[
-            Constraint_Unique(
-                value=UniqueConstraint(
-                    config=UniqueConstraintConfig(
-                        case_sensitive=False,
-                    ),
-                )
-            )
-        ],
-        config=StringConfig(
-            size=StringConfigOptions.TINY,
-        ),
-    )
+    type="string",
+    key="code",
+    label="Product Code",
+    description="Unique identifier defining an individual product.",
+    constraints=[
+        Constraint_Unique(
+            type="unique",
+            config=UniqueConstraintConfig(
+                case_sensitive=False,
+            ),
+        )
+    ],
+    config=StringConfig(
+        size=StringConfigOptions.TINY,
+    ),
 )
 """
 Property = typing.Union[

@@ -4,6 +4,7 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
+from ...commons.types.environment_id import EnvironmentId
 from ...commons.types.file_id import FileId
 from ...commons.types.job_id import JobId
 from .job_destination import JobDestination
@@ -45,6 +46,9 @@ class JobConfig(pydantic.BaseModel):
     info: typing.Optional[str] = pydantic.Field(description="Current status of job in text")
     managed: typing.Optional[bool] = pydantic.Field(
         description="Indicates if Flatfile is managing the control flow of this job or if it is being manually tracked."
+    )
+    environment_id: typing.Optional[EnvironmentId] = pydantic.Field(
+        alias="environmentId", description="The id of the environment this job belongs to"
     )
     part: typing.Optional[int] = pydantic.Field(description="The part number of this job")
     part_data: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(

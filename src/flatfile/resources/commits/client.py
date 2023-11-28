@@ -35,7 +35,7 @@ class CommitsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.get(
+        client.commits.get(
             commit_id="us_vr_YOUR_ID",
         )
         """
@@ -125,7 +125,7 @@ class AsyncCommitsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.get(
+        await client.commits.get(
             commit_id="us_vr_YOUR_ID",
         )
         """

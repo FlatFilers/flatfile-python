@@ -50,7 +50,7 @@ class EnvironmentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.list()
+        client.environments.list()
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -81,12 +81,12 @@ class EnvironmentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.create(
+        client.environments.create(
             request=EnvironmentConfigCreate(
                 name="dev",
                 is_prod=False,
                 guest_authentication=[GuestAuthenticationEnum.MAGIC_LINK],
-                metadata={"key": {"unknown": "value", "type": "unknown"}},
+                metadata={"key": "value"},
                 namespaces=["default"],
             ),
         )
@@ -119,7 +119,7 @@ class EnvironmentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.get_environment_event_token(
+        client.environments.get_environment_event_token(
             environment_id="us_env_YOUR_ID",
         )
         """
@@ -155,7 +155,7 @@ class EnvironmentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.get(
+        client.environments.get(
             environment_id="us_env_YOUR_ID",
         )
         """
@@ -193,13 +193,13 @@ class EnvironmentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.update(
+        client.environments.update(
             environment_id="us_env_YOUR_ID",
             request=EnvironmentConfigUpdate(
                 name="dev",
                 is_prod=False,
                 guest_authentication=[GuestAuthenticationEnum.MAGIC_LINK],
-                metadata={"key": {"unknown": "value", "type": "unknown"}},
+                metadata={"key": "value"},
                 namespaces=["default"],
             ),
         )
@@ -266,7 +266,7 @@ class AsyncEnvironmentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.list()
+        await client.environments.list()
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -297,12 +297,12 @@ class AsyncEnvironmentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.create(
+        await client.environments.create(
             request=EnvironmentConfigCreate(
                 name="dev",
                 is_prod=False,
                 guest_authentication=[GuestAuthenticationEnum.MAGIC_LINK],
-                metadata={"key": {"unknown": "value", "type": "unknown"}},
+                metadata={"key": "value"},
                 namespaces=["default"],
             ),
         )
@@ -335,7 +335,7 @@ class AsyncEnvironmentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.get_environment_event_token(
+        await client.environments.get_environment_event_token(
             environment_id="us_env_YOUR_ID",
         )
         """
@@ -371,7 +371,7 @@ class AsyncEnvironmentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.get(
+        await client.environments.get(
             environment_id="us_env_YOUR_ID",
         )
         """
@@ -409,13 +409,13 @@ class AsyncEnvironmentsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.update(
+        await client.environments.update(
             environment_id="us_env_YOUR_ID",
             request=EnvironmentConfigUpdate(
                 name="dev",
                 is_prod=False,
                 guest_authentication=[GuestAuthenticationEnum.MAGIC_LINK],
-                metadata={"key": {"unknown": "value", "type": "unknown"}},
+                metadata={"key": "value"},
                 namespaces=["default"],
             ),
         )

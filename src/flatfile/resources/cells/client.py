@@ -78,7 +78,7 @@ class CellsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.get_values(
+        client.cells.get_values(
             sheet_id="us_sh_YOUR_ID",
             field_key="firstName",
             sort_field="firstName",
@@ -167,7 +167,7 @@ class AsyncCellsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.get_values(
+        await client.cells.get_values(
             sheet_id="us_sh_YOUR_ID",
             field_key="firstName",
             sort_field="firstName",

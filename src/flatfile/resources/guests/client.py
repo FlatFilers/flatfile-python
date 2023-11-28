@@ -47,7 +47,7 @@ class GuestsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.list(
+        client.guests.list(
             space_id="us_sp_YOUR_ID",
         )
         """
@@ -82,7 +82,7 @@ class GuestsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.create(
+        client.guests.create(
             request=[
                 GuestConfig(
                     environment_id="us_env_YOUR_ID",
@@ -133,7 +133,7 @@ class GuestsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.get(
+        client.guests.get(
             guest_id="us_g_YOUR_ID",
         )
         """
@@ -164,7 +164,7 @@ class GuestsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.delete(
+        client.guests.delete(
             guest_id="us_g_YOUR_ID",
         )
         """
@@ -198,7 +198,7 @@ class GuestsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.update(
+        client.guests.update(
             guest_id="us_g_YOUR_ID",
             request=GuestConfigUpdate(
                 email="updated@example.com",
@@ -236,7 +236,7 @@ class GuestsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.get_guest_token(
+        client.guests.get_guest_token(
             guest_id="us_g_YOUR_ID",
         )
         """
@@ -269,7 +269,7 @@ class GuestsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.invite(
+        client.guests.invite(
             request=[
                 Invite(
                     guest_id="us_g_YOUR_ID",
@@ -315,7 +315,7 @@ class AsyncGuestsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.list(
+        await client.guests.list(
             space_id="us_sp_YOUR_ID",
         )
         """
@@ -350,7 +350,7 @@ class AsyncGuestsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.create(
+        await client.guests.create(
             request=[
                 GuestConfig(
                     environment_id="us_env_YOUR_ID",
@@ -401,7 +401,7 @@ class AsyncGuestsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.get(
+        await client.guests.get(
             guest_id="us_g_YOUR_ID",
         )
         """
@@ -432,7 +432,7 @@ class AsyncGuestsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.delete(
+        await client.guests.delete(
             guest_id="us_g_YOUR_ID",
         )
         """
@@ -466,7 +466,7 @@ class AsyncGuestsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.update(
+        await client.guests.update(
             guest_id="us_g_YOUR_ID",
             request=GuestConfigUpdate(
                 email="updated@example.com",
@@ -506,7 +506,7 @@ class AsyncGuestsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.get_guest_token(
+        await client.guests.get_guest_token(
             guest_id="us_g_YOUR_ID",
         )
         """
@@ -539,7 +539,7 @@ class AsyncGuestsClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.invite(
+        await client.guests.invite(
             request=[
                 Invite(
                     guest_id="us_g_YOUR_ID",

@@ -11,6 +11,7 @@ from .resources.agents.client import AgentsClient, AsyncAgentsClient
 from .resources.auth.client import AsyncAuthClient, AuthClient
 from .resources.cells.client import AsyncCellsClient, CellsClient
 from .resources.commits.client import AsyncCommitsClient, CommitsClient
+from .resources.data_retention_policies.client import AsyncDataRetentionPoliciesClient, DataRetentionPoliciesClient
 from .resources.documents.client import AsyncDocumentsClient, DocumentsClient
 from .resources.environments.client import AsyncEnvironmentsClient, EnvironmentsClient
 from .resources.events.client import AsyncEventsClient, EventsClient
@@ -37,18 +38,20 @@ class Flatfile:
         environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION,
         x_disable_hooks: typing_extensions.Literal["true"],
         token: typing.Union[str, typing.Callable[[], str]],
-        timeout: typing.Optional[float] = 60
+        timeout: typing.Optional[float] = 60,
+        httpx_client: typing.Optional[httpx.Client] = None
     ):
         self._client_wrapper = SyncClientWrapper(
             base_url=_get_base_url(base_url=base_url, environment=environment),
             x_disable_hooks=x_disable_hooks,
             token=token,
-            httpx_client=httpx.Client(timeout=timeout),
+            httpx_client=httpx.Client(timeout=timeout) if httpx_client is None else httpx_client,
         )
         self.agents = AgentsClient(client_wrapper=self._client_wrapper)
         self.auth = AuthClient(client_wrapper=self._client_wrapper)
         self.cells = CellsClient(client_wrapper=self._client_wrapper)
         self.commits = CommitsClient(client_wrapper=self._client_wrapper)
+        self.data_retention_policies = DataRetentionPoliciesClient(client_wrapper=self._client_wrapper)
         self.documents = DocumentsClient(client_wrapper=self._client_wrapper)
         self.environments = EnvironmentsClient(client_wrapper=self._client_wrapper)
         self.events = EventsClient(client_wrapper=self._client_wrapper)
@@ -75,18 +78,20 @@ class AsyncFlatfile:
         environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION,
         x_disable_hooks: typing_extensions.Literal["true"],
         token: typing.Union[str, typing.Callable[[], str]],
-        timeout: typing.Optional[float] = 60
+        timeout: typing.Optional[float] = 60,
+        httpx_client: typing.Optional[httpx.AsyncClient] = None
     ):
         self._client_wrapper = AsyncClientWrapper(
             base_url=_get_base_url(base_url=base_url, environment=environment),
             x_disable_hooks=x_disable_hooks,
             token=token,
-            httpx_client=httpx.AsyncClient(timeout=timeout),
+            httpx_client=httpx.AsyncClient(timeout=timeout) if httpx_client is None else httpx_client,
         )
         self.agents = AsyncAgentsClient(client_wrapper=self._client_wrapper)
         self.auth = AsyncAuthClient(client_wrapper=self._client_wrapper)
         self.cells = AsyncCellsClient(client_wrapper=self._client_wrapper)
         self.commits = AsyncCommitsClient(client_wrapper=self._client_wrapper)
+        self.data_retention_policies = AsyncDataRetentionPoliciesClient(client_wrapper=self._client_wrapper)
         self.documents = AsyncDocumentsClient(client_wrapper=self._client_wrapper)
         self.environments = AsyncEnvironmentsClient(client_wrapper=self._client_wrapper)
         self.events = AsyncEventsClient(client_wrapper=self._client_wrapper)

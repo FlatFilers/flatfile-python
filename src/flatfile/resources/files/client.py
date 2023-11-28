@@ -59,7 +59,7 @@ class FilesClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.list()
+        client.files.list()
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -130,7 +130,7 @@ class FilesClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.get(
+        client.files.get(
             file_id="us_fl_YOUR_ID",
         )
         """
@@ -207,7 +207,7 @@ class FilesClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        client.update(
+        client.files.update(
             file_id="us_fl_YOUR_ID",
             name="NewFileName",
         )
@@ -297,7 +297,7 @@ class AsyncFilesClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.list()
+        await client.files.list()
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -368,7 +368,7 @@ class AsyncFilesClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.get(
+        await client.files.get(
             file_id="us_fl_YOUR_ID",
         )
         """
@@ -445,7 +445,7 @@ class AsyncFilesClient:
             x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
-        await client.update(
+        await client.files.update(
             file_id="us_fl_YOUR_ID",
             name="NewFileName",
         )

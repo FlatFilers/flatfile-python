@@ -6,6 +6,7 @@ from . import (
     cells,
     commits,
     commons,
+    data_retention_policies,
     documents,
     environments,
     events,
@@ -63,6 +64,7 @@ from .commons import (
     ActionSchedule,
     AgentId,
     BadRequestError,
+    DataRetentionPolicyId,
     DocumentId,
     EnvironmentId,
     Error,
@@ -103,9 +105,14 @@ from .commons import (
     VersionId,
     WorkbookId,
 )
+from .data_retention_policies import (
+    DataRetentionPolicy,
+    DataRetentionPolicyConfig,
+    DataRetentionPolicyEnum,
+    DataRetentionPolicyResponse,
+)
 from .documents import Document, DocumentConfig, DocumentResponse, ListDocumentsResponse
 from .environments import (
-    DataRetentionPolicyEnum,
     Environment,
     EnvironmentConfigCreate,
     EnvironmentConfigUpdate,
@@ -417,7 +424,11 @@ __all__ = [
     "Credentials",
     "Credentials_ApiCredentials",
     "Credentials_UserCredentials",
+    "DataRetentionPolicy",
+    "DataRetentionPolicyConfig",
     "DataRetentionPolicyEnum",
+    "DataRetentionPolicyId",
+    "DataRetentionPolicyResponse",
     "DateProperty",
     "DeleteRecordsJobConfig",
     "DestinationField",
@@ -697,6 +708,7 @@ __all__ = [
     "cells",
     "commits",
     "commons",
+    "data_retention_policies",
     "documents",
     "environments",
     "events",
