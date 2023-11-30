@@ -13,6 +13,21 @@ except ImportError:
 
 
 class ListUsersResponse(pydantic.BaseModel):
+    """
+    from flatfile import ListUsersResponse, User
+
+    ListUsersResponse(
+        data=[
+            User(
+                id="us_usr_YOUR_ID",
+                email="john.smith@example.com",
+                name="john.smith",
+                account_id="us_acc_YOUR_ID",
+            )
+        ],
+    )
+    """
+
     data: typing.List[User]
 
     def json(self, **kwargs: typing.Any) -> str:

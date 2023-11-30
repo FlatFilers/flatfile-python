@@ -13,6 +13,61 @@ except ImportError:
 
 
 class GetRecordsResponse(pydantic.BaseModel):
+    """
+    import datetime
+
+    from flatfile import (
+        CellValueWithLinks,
+        GetRecordsResponse,
+        GetRecordsResponseData,
+        RecordCounts,
+        RecordWithLinks,
+    )
+
+    GetRecordsResponse(
+        data=GetRecordsResponseData(
+            records=[
+                RecordWithLinks(
+                    id="us_rc_YOUR_ID",
+                    values={
+                        "firstName": CellValueWithLinks(
+                            messages=[],
+                            valid=True,
+                            updated_at=datetime.datetime.fromisoformat(
+                                "2023-11-20 16:59:40.286000+00:00",
+                            ),
+                        ),
+                        "lastName": CellValueWithLinks(
+                            messages=[],
+                            valid=True,
+                            updated_at=datetime.datetime.fromisoformat(
+                                "2023-11-20 16:59:40.286000+00:00",
+                            ),
+                        ),
+                        "email": CellValueWithLinks(
+                            messages=[],
+                            valid=True,
+                            updated_at=datetime.datetime.fromisoformat(
+                                "2023-11-20 16:59:40.286000+00:00",
+                            ),
+                        ),
+                    },
+                    valid=True,
+                    metadata={},
+                )
+            ],
+            counts=RecordCounts(
+                valid=1000,
+                error=0,
+                total=1000,
+            ),
+            version_id="us_vr_YOUR_ID",
+            commit_id="us_vr_YOUR_ID",
+            success=True,
+        ),
+    )
+    """
+
     data: GetRecordsResponseData
 
     def json(self, **kwargs: typing.Any) -> str:

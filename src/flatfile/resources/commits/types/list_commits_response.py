@@ -13,6 +13,25 @@ except ImportError:
 
 
 class ListCommitsResponse(pydantic.BaseModel):
+    """
+    import datetime
+
+    from flatfile import Commit, ListCommitsResponse
+
+    ListCommitsResponse(
+        data=[
+            Commit(
+                id="us_vr_YOUR_ID",
+                sheet_id="us_sh_YOUR_ID",
+                created_by="us_usr_YOUR_ID",
+                created_at=datetime.datetime.fromisoformat(
+                    "2019-08-24 14:15:22+00:00",
+                ),
+            )
+        ],
+    )
+    """
+
     data: typing.List[Commit]
 
     def json(self, **kwargs: typing.Any) -> str:

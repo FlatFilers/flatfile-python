@@ -10,9 +10,12 @@ from ...core.remove_none_from_dict import remove_none_from_dict
 from ..commits.types.list_commits_response import ListCommitsResponse
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
+from ..commons.types.commit_id import CommitId
 from ..commons.types.errors import Errors
 from ..commons.types.filter import Filter
 from ..commons.types.filter_field import FilterField
+from ..commons.types.page_number import PageNumber
+from ..commons.types.page_size import PageSize
 from ..commons.types.record_id import RecordId
 from ..commons.types.search_field import SearchField
 from ..commons.types.search_value import SearchValue
@@ -22,6 +25,10 @@ from ..commons.types.sort_field import SortField
 from ..commons.types.success import Success
 from ..commons.types.version_id import VersionId
 from ..commons.types.workbook_id import WorkbookId
+from .types.cells_response import CellsResponse
+from .types.distinct import Distinct
+from .types.field_key import FieldKey
+from .types.include_counts import IncludeCounts
 from .types.list_sheets_response import ListSheetsResponse
 from .types.record_counts_response import RecordCountsResponse
 from .types.sheet_response import SheetResponse
@@ -42,6 +49,16 @@ class SheetsClient:
 
         Parameters:
             - workbook_id: WorkbookId. ID of workbook
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.sheets.list(
+            workbook_id="us_wb_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -64,6 +81,16 @@ class SheetsClient:
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.sheets.get(
+            sheet_id="us_sh_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -85,6 +112,16 @@ class SheetsClient:
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.sheets.delete(
+            sheet_id="us_sh_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
@@ -110,6 +147,16 @@ class SheetsClient:
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.sheets.validate(
+            sheet_id="us_sh_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -134,7 +181,9 @@ class SheetsClient:
         sheet_id: SheetId,
         *,
         version_id: typing.Optional[str] = None,
+        commit_id: typing.Optional[CommitId] = None,
         since_version_id: typing.Optional[VersionId] = None,
+        since_commit_id: typing.Optional[CommitId] = None,
         sort_field: typing.Optional[SortField] = None,
         sort_direction: typing.Optional[SortDirection] = None,
         filter: typing.Optional[Filter] = None,
@@ -149,21 +198,25 @@ class SheetsClient:
         Parameters:
             - sheet_id: SheetId. ID of sheet
 
-            - version_id: typing.Optional[str].
+            - version_id: typing.Optional[str]. Deprecated, use `sinceCommitId` instead.
 
-            - since_version_id: typing.Optional[VersionId].
+            - commit_id: typing.Optional[CommitId]. Returns records that were changed in that version  in that version and only those records.
 
-            - sort_field: typing.Optional[SortField].
+            - since_version_id: typing.Optional[VersionId]. Deprecated, use `sinceCommitId` instead.
+
+            - since_commit_id: typing.Optional[CommitId]. Returns records that were changed in that version in addition to any records from versions after that version.
+
+            - sort_field: typing.Optional[SortField]. The field to sort the data on.
 
             - sort_direction: typing.Optional[SortDirection]. Sort direction - asc (ascending) or desc (descending)
 
             - filter: typing.Optional[Filter]. Options to filter records
 
-            - filter_field: typing.Optional[FilterField].
+            - filter_field: typing.Optional[FilterField]. The field to filter the data on.
 
-            - search_value: typing.Optional[SearchValue].
+            - search_value: typing.Optional[SearchValue]. The value to search for data on.
 
-            - search_field: typing.Optional[SearchField].
+            - search_field: typing.Optional[SearchField]. The field to search for data on.
 
             - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
 
@@ -174,7 +227,9 @@ class SheetsClient:
             params=remove_none_from_dict(
                 {
                     "versionId": version_id,
+                    "commitId": commit_id,
                     "sinceVersionId": since_version_id,
+                    "sinceCommitId": since_commit_id,
                     "sortField": sort_field,
                     "sortDirection": sort_direction,
                     "filter": filter,
@@ -204,6 +259,8 @@ class SheetsClient:
         *,
         version_id: typing.Optional[str] = None,
         since_version_id: typing.Optional[VersionId] = None,
+        commit_id: typing.Optional[CommitId] = None,
+        since_commit_id: typing.Optional[CommitId] = None,
         filter: typing.Optional[Filter] = None,
         filter_field: typing.Optional[FilterField] = None,
         search_value: typing.Optional[SearchValue] = None,
@@ -217,21 +274,36 @@ class SheetsClient:
         Parameters:
             - sheet_id: SheetId. ID of sheet
 
-            - version_id: typing.Optional[str].
+            - version_id: typing.Optional[str]. Returns records that were changed in that version and only those records.
 
-            - since_version_id: typing.Optional[VersionId].
+            - since_version_id: typing.Optional[VersionId]. Deprecated, use `sinceCommitId` instead.
+
+            - commit_id: typing.Optional[CommitId]. Returns records that were changed in that version in addition to any records from versions after that version.
+
+            - since_commit_id: typing.Optional[CommitId]. Listing a commit ID here will return all records since the specified commit.
 
             - filter: typing.Optional[Filter]. Options to filter records
 
-            - filter_field: typing.Optional[FilterField].
+            - filter_field: typing.Optional[FilterField]. The field to filter the data on.
 
-            - search_value: typing.Optional[SearchValue].
+            - search_value: typing.Optional[SearchValue]. The value to search for data on.
 
-            - search_field: typing.Optional[SearchField].
+            - search_field: typing.Optional[SearchField]. The field to search for data on.
 
             - by_field: typing.Optional[bool]. If true, the error counts for each field will also be returned
 
             - q: typing.Optional[str]. An FFQL query used to filter the result set to be counted
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.sheets.get_record_counts(
+            sheet_id="us_sh_YOUR_ID",
+            version_id="us_vr_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -240,6 +312,8 @@ class SheetsClient:
                 {
                     "versionId": version_id,
                     "sinceVersionId": since_version_id,
+                    "commitId": commit_id,
+                    "sinceCommitId": since_commit_id,
                     "filter": filter,
                     "filterField": filter_field,
                     "searchValue": search_value,
@@ -267,6 +341,16 @@ class SheetsClient:
             - sheet_id: SheetId. ID of sheet
 
             - completed: typing.Optional[bool]. If true, only return commits that have been completed. If false, only return commits that have not been completed. If not provided, return all commits.
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.sheets.get_sheet_commits(
+            sheet_id="us_sh_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -277,6 +361,160 @@ class SheetsClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListCommitsResponse, _response.json())  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def lock_sheet(self, sheet_id: SheetId) -> Success:
+        """
+        Locks a sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.sheets.lock_sheet(
+            sheet_id="us_sh_YOUR_ID",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/lock"),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def unlock_sheet(self, sheet_id: SheetId) -> Success:
+        """
+        Removes a lock from a sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.sheets.unlock_sheet(
+            sheet_id="us_sh_YOUR_ID",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/unlock"),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def get_cell_values(
+        self,
+        sheet_id: SheetId,
+        *,
+        field_key: typing.Optional[FieldKey] = None,
+        sort_field: typing.Optional[SortField] = None,
+        sort_direction: typing.Optional[SortDirection] = None,
+        filter: typing.Optional[Filter] = None,
+        filter_field: typing.Optional[FilterField] = None,
+        page_size: typing.Optional[PageSize] = None,
+        page_number: typing.Optional[PageNumber] = None,
+        distinct: typing.Optional[Distinct] = None,
+        include_counts: typing.Optional[IncludeCounts] = None,
+        search_value: typing.Optional[SearchValue] = None,
+    ) -> CellsResponse:
+        """
+        Returns record cell values grouped by all fields in the sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - field_key: typing.Optional[FieldKey].
+
+            - sort_field: typing.Optional[SortField].
+
+            - sort_direction: typing.Optional[SortDirection].
+
+            - filter: typing.Optional[Filter].
+
+            - filter_field: typing.Optional[FilterField]. Name of field by which to filter records
+
+            - page_size: typing.Optional[PageSize]. Number of records to return in a page (default 1000 if pageNumber included)
+
+            - page_number: typing.Optional[PageNumber]. Based on pageSize, which page of records to return
+
+            - distinct: typing.Optional[Distinct].
+
+            - include_counts: typing.Optional[IncludeCounts].
+
+            - search_value: typing.Optional[SearchValue]. A value to find for a given field in a sheet. Wrap the value in "" for exact match
+        ---
+        from flatfile import Filter, SortDirection
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.sheets.get_cell_values(
+            sheet_id="us_sh_YOUR_ID",
+            field_key="firstName",
+            sort_field="firstName",
+            sort_direction=SortDirection.ASC,
+            filter=Filter.VALID,
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/cells"),
+            params=remove_none_from_dict(
+                {
+                    "fieldKey": field_key,
+                    "sortField": sort_field,
+                    "sortDirection": sort_direction,
+                    "filter": filter,
+                    "filterField": filter_field,
+                    "pageSize": page_size,
+                    "pageNumber": page_number,
+                    "distinct": distinct,
+                    "includeCounts": include_counts,
+                    "searchValue": search_value,
+                }
+            ),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(CellsResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
@@ -294,6 +532,16 @@ class AsyncSheetsClient:
 
         Parameters:
             - workbook_id: WorkbookId. ID of workbook
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.sheets.list(
+            workbook_id="us_wb_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -316,6 +564,16 @@ class AsyncSheetsClient:
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.sheets.get(
+            sheet_id="us_sh_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -337,6 +595,16 @@ class AsyncSheetsClient:
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.sheets.delete(
+            sheet_id="us_sh_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
@@ -362,6 +630,16 @@ class AsyncSheetsClient:
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.sheets.validate(
+            sheet_id="us_sh_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
@@ -386,7 +664,9 @@ class AsyncSheetsClient:
         sheet_id: SheetId,
         *,
         version_id: typing.Optional[str] = None,
+        commit_id: typing.Optional[CommitId] = None,
         since_version_id: typing.Optional[VersionId] = None,
+        since_commit_id: typing.Optional[CommitId] = None,
         sort_field: typing.Optional[SortField] = None,
         sort_direction: typing.Optional[SortDirection] = None,
         filter: typing.Optional[Filter] = None,
@@ -401,21 +681,25 @@ class AsyncSheetsClient:
         Parameters:
             - sheet_id: SheetId. ID of sheet
 
-            - version_id: typing.Optional[str].
+            - version_id: typing.Optional[str]. Deprecated, use `sinceCommitId` instead.
 
-            - since_version_id: typing.Optional[VersionId].
+            - commit_id: typing.Optional[CommitId]. Returns records that were changed in that version  in that version and only those records.
 
-            - sort_field: typing.Optional[SortField].
+            - since_version_id: typing.Optional[VersionId]. Deprecated, use `sinceCommitId` instead.
+
+            - since_commit_id: typing.Optional[CommitId]. Returns records that were changed in that version in addition to any records from versions after that version.
+
+            - sort_field: typing.Optional[SortField]. The field to sort the data on.
 
             - sort_direction: typing.Optional[SortDirection]. Sort direction - asc (ascending) or desc (descending)
 
             - filter: typing.Optional[Filter]. Options to filter records
 
-            - filter_field: typing.Optional[FilterField].
+            - filter_field: typing.Optional[FilterField]. The field to filter the data on.
 
-            - search_value: typing.Optional[SearchValue].
+            - search_value: typing.Optional[SearchValue]. The value to search for data on.
 
-            - search_field: typing.Optional[SearchField].
+            - search_field: typing.Optional[SearchField]. The field to search for data on.
 
             - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
 
@@ -426,7 +710,9 @@ class AsyncSheetsClient:
             params=remove_none_from_dict(
                 {
                     "versionId": version_id,
+                    "commitId": commit_id,
                     "sinceVersionId": since_version_id,
+                    "sinceCommitId": since_commit_id,
                     "sortField": sort_field,
                     "sortDirection": sort_direction,
                     "filter": filter,
@@ -456,6 +742,8 @@ class AsyncSheetsClient:
         *,
         version_id: typing.Optional[str] = None,
         since_version_id: typing.Optional[VersionId] = None,
+        commit_id: typing.Optional[CommitId] = None,
+        since_commit_id: typing.Optional[CommitId] = None,
         filter: typing.Optional[Filter] = None,
         filter_field: typing.Optional[FilterField] = None,
         search_value: typing.Optional[SearchValue] = None,
@@ -469,21 +757,36 @@ class AsyncSheetsClient:
         Parameters:
             - sheet_id: SheetId. ID of sheet
 
-            - version_id: typing.Optional[str].
+            - version_id: typing.Optional[str]. Returns records that were changed in that version and only those records.
 
-            - since_version_id: typing.Optional[VersionId].
+            - since_version_id: typing.Optional[VersionId]. Deprecated, use `sinceCommitId` instead.
+
+            - commit_id: typing.Optional[CommitId]. Returns records that were changed in that version in addition to any records from versions after that version.
+
+            - since_commit_id: typing.Optional[CommitId]. Listing a commit ID here will return all records since the specified commit.
 
             - filter: typing.Optional[Filter]. Options to filter records
 
-            - filter_field: typing.Optional[FilterField].
+            - filter_field: typing.Optional[FilterField]. The field to filter the data on.
 
-            - search_value: typing.Optional[SearchValue].
+            - search_value: typing.Optional[SearchValue]. The value to search for data on.
 
-            - search_field: typing.Optional[SearchField].
+            - search_field: typing.Optional[SearchField]. The field to search for data on.
 
             - by_field: typing.Optional[bool]. If true, the error counts for each field will also be returned
 
             - q: typing.Optional[str]. An FFQL query used to filter the result set to be counted
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.sheets.get_record_counts(
+            sheet_id="us_sh_YOUR_ID",
+            version_id="us_vr_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -492,6 +795,8 @@ class AsyncSheetsClient:
                 {
                     "versionId": version_id,
                     "sinceVersionId": since_version_id,
+                    "commitId": commit_id,
+                    "sinceCommitId": since_commit_id,
                     "filter": filter,
                     "filterField": filter_field,
                     "searchValue": search_value,
@@ -521,6 +826,16 @@ class AsyncSheetsClient:
             - sheet_id: SheetId. ID of sheet
 
             - completed: typing.Optional[bool]. If true, only return commits that have been completed. If false, only return commits that have not been completed. If not provided, return all commits.
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.sheets.get_sheet_commits(
+            sheet_id="us_sh_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -531,6 +846,160 @@ class AsyncSheetsClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListCommitsResponse, _response.json())  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def lock_sheet(self, sheet_id: SheetId) -> Success:
+        """
+        Locks a sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.sheets.lock_sheet(
+            sheet_id="us_sh_YOUR_ID",
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/lock"),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def unlock_sheet(self, sheet_id: SheetId) -> Success:
+        """
+        Removes a lock from a sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.sheets.unlock_sheet(
+            sheet_id="us_sh_YOUR_ID",
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/unlock"),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def get_cell_values(
+        self,
+        sheet_id: SheetId,
+        *,
+        field_key: typing.Optional[FieldKey] = None,
+        sort_field: typing.Optional[SortField] = None,
+        sort_direction: typing.Optional[SortDirection] = None,
+        filter: typing.Optional[Filter] = None,
+        filter_field: typing.Optional[FilterField] = None,
+        page_size: typing.Optional[PageSize] = None,
+        page_number: typing.Optional[PageNumber] = None,
+        distinct: typing.Optional[Distinct] = None,
+        include_counts: typing.Optional[IncludeCounts] = None,
+        search_value: typing.Optional[SearchValue] = None,
+    ) -> CellsResponse:
+        """
+        Returns record cell values grouped by all fields in the sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - field_key: typing.Optional[FieldKey].
+
+            - sort_field: typing.Optional[SortField].
+
+            - sort_direction: typing.Optional[SortDirection].
+
+            - filter: typing.Optional[Filter].
+
+            - filter_field: typing.Optional[FilterField]. Name of field by which to filter records
+
+            - page_size: typing.Optional[PageSize]. Number of records to return in a page (default 1000 if pageNumber included)
+
+            - page_number: typing.Optional[PageNumber]. Based on pageSize, which page of records to return
+
+            - distinct: typing.Optional[Distinct].
+
+            - include_counts: typing.Optional[IncludeCounts].
+
+            - search_value: typing.Optional[SearchValue]. A value to find for a given field in a sheet. Wrap the value in "" for exact match
+        ---
+        from flatfile import Filter, SortDirection
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.sheets.get_cell_values(
+            sheet_id="us_sh_YOUR_ID",
+            field_key="firstName",
+            sort_field="firstName",
+            sort_direction=SortDirection.ASC,
+            filter=Filter.VALID,
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/cells"),
+            params=remove_none_from_dict(
+                {
+                    "fieldKey": field_key,
+                    "sortField": sort_field,
+                    "sortDirection": sort_direction,
+                    "filter": filter,
+                    "filterField": filter_field,
+                    "pageSize": page_size,
+                    "pageNumber": page_number,
+                    "distinct": distinct,
+                    "includeCounts": include_counts,
+                    "searchValue": search_value,
+                }
+            ),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(CellsResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:

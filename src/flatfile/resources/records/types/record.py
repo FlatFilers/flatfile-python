@@ -11,6 +11,30 @@ from .record_data import RecordData
 class Record(RecordBase):
     """
     A single row of data in a Sheet
+    ---
+    from flatfile import CellValue, Record
+
+    Record(
+        id="us_rc_YOUR_ID",
+        version_id="us_vr_YOUR_ID",
+        commit_id="us_vr_YOUR_ID",
+        values={
+            "firstName": CellValue(
+                messages=[],
+                valid=True,
+            ),
+            "lastName": CellValue(
+                messages=[],
+                valid=True,
+            ),
+            "email": CellValue(
+                messages=[],
+                valid=True,
+            ),
+        },
+        valid=True,
+        metadata={},
+    )
     """
 
     values: RecordData

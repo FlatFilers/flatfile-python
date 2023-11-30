@@ -10,6 +10,7 @@ from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
+from ..commons.types.commit_id import CommitId
 from ..commons.types.errors import Errors
 from ..commons.types.event_id import EventId
 from ..commons.types.filter import Filter
@@ -46,8 +47,10 @@ class RecordsClient:
         self,
         sheet_id: SheetId,
         *,
-        version_id: typing.Optional[str] = None,
+        version_id: typing.Optional[VersionId] = None,
+        commit_id: typing.Optional[CommitId] = None,
         since_version_id: typing.Optional[VersionId] = None,
+        since_commit_id: typing.Optional[CommitId] = None,
         sort_field: typing.Optional[SortField] = None,
         sort_direction: typing.Optional[SortDirection] = None,
         filter: typing.Optional[Filter] = None,
@@ -70,9 +73,13 @@ class RecordsClient:
         Parameters:
             - sheet_id: SheetId. ID of sheet
 
-            - version_id: typing.Optional[str].
+            - version_id: typing.Optional[VersionId]. Deprecated, use `commitId` instead.
 
-            - since_version_id: typing.Optional[VersionId].
+            - commit_id: typing.Optional[CommitId].
+
+            - since_version_id: typing.Optional[VersionId]. Deprecated, use `sinceCommitId` instead.
+
+            - since_commit_id: typing.Optional[CommitId].
 
             - sort_field: typing.Optional[SortField].
 
@@ -103,6 +110,16 @@ class RecordsClient:
             - for_: typing.Optional[EventId]. if "for" is provided, the query parameters will be pulled from the event payload
 
             - q: typing.Optional[str]. An FFQL query used to filter the result set
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.records.get(
+            sheet_id="us_sh_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -110,7 +127,9 @@ class RecordsClient:
             params=remove_none_from_dict(
                 {
                     "versionId": version_id,
+                    "commitId": commit_id,
                     "sinceVersionId": since_version_id,
+                    "sinceCommitId": since_commit_id,
                     "sortField": sort_field,
                     "sortDirection": sort_direction,
                     "filter": filter,
@@ -151,6 +170,40 @@ class RecordsClient:
             - sheet_id: SheetId. ID of sheet
 
             - request: Records.
+        ---
+        from flatfile import CellValue, Record
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.records.update(
+            sheet_id="us_sh_YOUR_ID",
+            request=[
+                Record(
+                    id="us_rc_YOUR_ID",
+                    version_id="us_vr_YOUR_ID",
+                    commit_id="us_vr_YOUR_ID",
+                    values={
+                        "firstName": CellValue(
+                            messages=[],
+                            valid=True,
+                        ),
+                        "lastName": CellValue(
+                            messages=[],
+                            valid=True,
+                        ),
+                        "email": CellValue(
+                            messages=[],
+                            valid=True,
+                        ),
+                    },
+                    valid=True,
+                    metadata={},
+                )
+            ],
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "PUT",
@@ -179,6 +232,33 @@ class RecordsClient:
             - sheet_id: SheetId. ID of sheet
 
             - request: typing.List[RecordData].
+        ---
+        from flatfile import CellValue
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.records.insert(
+            sheet_id="us_sh_YOUR_ID",
+            request=[
+                {
+                    "firstName": CellValue(
+                        messages=[],
+                        valid=True,
+                    ),
+                    "lastName": CellValue(
+                        messages=[],
+                        valid=True,
+                    ),
+                    "email": CellValue(
+                        messages=[],
+                        valid=True,
+                    ),
+                }
+            ],
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -209,7 +289,17 @@ class RecordsClient:
             - sheet_id: SheetId. ID of sheet
 
             - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+                                                                                   ---
+        from flatfile.client import Flatfile
 
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.records.delete(
+            sheet_id="us_sh_YOUR_ID",
+            ids="us_rc_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
@@ -230,59 +320,6 @@ class RecordsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def find_and_replace_deprecated(
-        self,
-        sheet_id: SheetId,
-        *,
-        field_key: str,
-        search_value: str,
-        filter: typing.Optional[Filter] = None,
-        page_size: typing.Optional[int] = None,
-        page_number: typing.Optional[int] = None,
-        replace: typing.Any,
-    ) -> RecordsResponse:
-        """
-        Searches for the given searchValue in a field and replaces all instances of that value with replaceValue
-
-        Parameters:
-            - sheet_id: SheetId. ID of sheet
-
-            - field_key: str. A unique key used to identify a field in a sheet
-
-            - search_value: str. A value to find for a given field in a sheet. Wrap the value in "" for exact match
-
-            - filter: typing.Optional[Filter].
-
-            - page_size: typing.Optional[int]. Number of records to return in a page (default 1000 if pageNumber included)
-
-            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
-
-            - replace: typing.Any. The value to replace found values with
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            "PUT",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/replace"),
-            params=remove_none_from_dict(
-                {
-                    "fieldKey": field_key,
-                    "searchValue": search_value,
-                    "filter": filter,
-                    "pageSize": page_size,
-                    "pageNumber": page_number,
-                }
-            ),
-            json=jsonable_encoder({"replace": replace}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
-        )
-        if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(RecordsResponse, _response.json())  # type: ignore
-        try:
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
     def find_and_replace(
         self,
         sheet_id: SheetId,
@@ -297,7 +334,7 @@ class RecordsClient:
         field_key: str,
     ) -> VersionResponse:
         """
-        Searches for all values that match the 'find' value (globally or for a specific field via 'fieldKey') and replaces them with the 'replace' value. Wrap 'find' value in double quotes for exact match (""). Returns a versionId for the updated records
+        Searches for all values that match the 'find' value (globally or for a specific field via 'fieldKey') and replaces them with the 'replace' value. Wrap 'find' value in double quotes for exact match (""). Returns a commitId for the updated records
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
@@ -316,7 +353,18 @@ class RecordsClient:
 
             - replace: typing.Optional[CellValueUnion]. The value to replace found values with
 
-            - field_key: str. The value to replace found values with
+            - field_key: str. A unique key used to identify a field in a sheet
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.records.find_and_replace(
+            sheet_id="us_sh_YOUR_ID",
+            field_key="email",
+        )
         """
         _request: typing.Dict[str, typing.Any] = {"fieldKey": field_key}
         if find is not OMIT:
@@ -356,8 +404,10 @@ class AsyncRecordsClient:
         self,
         sheet_id: SheetId,
         *,
-        version_id: typing.Optional[str] = None,
+        version_id: typing.Optional[VersionId] = None,
+        commit_id: typing.Optional[CommitId] = None,
         since_version_id: typing.Optional[VersionId] = None,
+        since_commit_id: typing.Optional[CommitId] = None,
         sort_field: typing.Optional[SortField] = None,
         sort_direction: typing.Optional[SortDirection] = None,
         filter: typing.Optional[Filter] = None,
@@ -380,9 +430,13 @@ class AsyncRecordsClient:
         Parameters:
             - sheet_id: SheetId. ID of sheet
 
-            - version_id: typing.Optional[str].
+            - version_id: typing.Optional[VersionId]. Deprecated, use `commitId` instead.
 
-            - since_version_id: typing.Optional[VersionId].
+            - commit_id: typing.Optional[CommitId].
+
+            - since_version_id: typing.Optional[VersionId]. Deprecated, use `sinceCommitId` instead.
+
+            - since_commit_id: typing.Optional[CommitId].
 
             - sort_field: typing.Optional[SortField].
 
@@ -413,6 +467,16 @@ class AsyncRecordsClient:
             - for_: typing.Optional[EventId]. if "for" is provided, the query parameters will be pulled from the event payload
 
             - q: typing.Optional[str]. An FFQL query used to filter the result set
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.records.get(
+            sheet_id="us_sh_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -420,7 +484,9 @@ class AsyncRecordsClient:
             params=remove_none_from_dict(
                 {
                     "versionId": version_id,
+                    "commitId": commit_id,
                     "sinceVersionId": since_version_id,
+                    "sinceCommitId": since_commit_id,
                     "sortField": sort_field,
                     "sortDirection": sort_direction,
                     "filter": filter,
@@ -461,6 +527,40 @@ class AsyncRecordsClient:
             - sheet_id: SheetId. ID of sheet
 
             - request: Records.
+        ---
+        from flatfile import CellValue, Record
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.records.update(
+            sheet_id="us_sh_YOUR_ID",
+            request=[
+                Record(
+                    id="us_rc_YOUR_ID",
+                    version_id="us_vr_YOUR_ID",
+                    commit_id="us_vr_YOUR_ID",
+                    values={
+                        "firstName": CellValue(
+                            messages=[],
+                            valid=True,
+                        ),
+                        "lastName": CellValue(
+                            messages=[],
+                            valid=True,
+                        ),
+                        "email": CellValue(
+                            messages=[],
+                            valid=True,
+                        ),
+                    },
+                    valid=True,
+                    metadata={},
+                )
+            ],
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "PUT",
@@ -489,6 +589,33 @@ class AsyncRecordsClient:
             - sheet_id: SheetId. ID of sheet
 
             - request: typing.List[RecordData].
+        ---
+        from flatfile import CellValue
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.records.insert(
+            sheet_id="us_sh_YOUR_ID",
+            request=[
+                {
+                    "firstName": CellValue(
+                        messages=[],
+                        valid=True,
+                    ),
+                    "lastName": CellValue(
+                        messages=[],
+                        valid=True,
+                    ),
+                    "email": CellValue(
+                        messages=[],
+                        valid=True,
+                    ),
+                }
+            ],
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
@@ -519,7 +646,17 @@ class AsyncRecordsClient:
             - sheet_id: SheetId. ID of sheet
 
             - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+                                                                                   ---
+        from flatfile.client import AsyncFlatfile
 
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.records.delete(
+            sheet_id="us_sh_YOUR_ID",
+            ids="us_rc_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
@@ -540,59 +677,6 @@ class AsyncRecordsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def find_and_replace_deprecated(
-        self,
-        sheet_id: SheetId,
-        *,
-        field_key: str,
-        search_value: str,
-        filter: typing.Optional[Filter] = None,
-        page_size: typing.Optional[int] = None,
-        page_number: typing.Optional[int] = None,
-        replace: typing.Any,
-    ) -> RecordsResponse:
-        """
-        Searches for the given searchValue in a field and replaces all instances of that value with replaceValue
-
-        Parameters:
-            - sheet_id: SheetId. ID of sheet
-
-            - field_key: str. A unique key used to identify a field in a sheet
-
-            - search_value: str. A value to find for a given field in a sheet. Wrap the value in "" for exact match
-
-            - filter: typing.Optional[Filter].
-
-            - page_size: typing.Optional[int]. Number of records to return in a page (default 1000 if pageNumber included)
-
-            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
-
-            - replace: typing.Any. The value to replace found values with
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            "PUT",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/replace"),
-            params=remove_none_from_dict(
-                {
-                    "fieldKey": field_key,
-                    "searchValue": search_value,
-                    "filter": filter,
-                    "pageSize": page_size,
-                    "pageNumber": page_number,
-                }
-            ),
-            json=jsonable_encoder({"replace": replace}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
-        )
-        if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(RecordsResponse, _response.json())  # type: ignore
-        try:
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
     async def find_and_replace(
         self,
         sheet_id: SheetId,
@@ -607,7 +691,7 @@ class AsyncRecordsClient:
         field_key: str,
     ) -> VersionResponse:
         """
-        Searches for all values that match the 'find' value (globally or for a specific field via 'fieldKey') and replaces them with the 'replace' value. Wrap 'find' value in double quotes for exact match (""). Returns a versionId for the updated records
+        Searches for all values that match the 'find' value (globally or for a specific field via 'fieldKey') and replaces them with the 'replace' value. Wrap 'find' value in double quotes for exact match (""). Returns a commitId for the updated records
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
@@ -626,7 +710,18 @@ class AsyncRecordsClient:
 
             - replace: typing.Optional[CellValueUnion]. The value to replace found values with
 
-            - field_key: str. The value to replace found values with
+            - field_key: str. A unique key used to identify a field in a sheet
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.records.find_and_replace(
+            sheet_id="us_sh_YOUR_ID",
+            field_key="email",
+        )
         """
         _request: typing.Dict[str, typing.Any] = {"fieldKey": field_key}
         if find is not OMIT:

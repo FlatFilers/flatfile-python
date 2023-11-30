@@ -9,6 +9,19 @@ from .record_base import RecordBase
 
 
 class DiffRecord(RecordBase):
+    """
+    from flatfile import DiffRecord, DiffValue
+
+    DiffRecord(
+        id="us_rc_YOUR_ID",
+        values={
+            "firstName": DiffValue(),
+            "lastName": DiffValue(),
+            "email": DiffValue(),
+        },
+    )
+    """
+
     values: DiffData
 
     def json(self, **kwargs: typing.Any) -> str:

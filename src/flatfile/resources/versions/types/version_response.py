@@ -13,6 +13,16 @@ except ImportError:
 
 
 class VersionResponse(pydantic.BaseModel):
+    """
+    from flatfile import Version, VersionResponse
+
+    VersionResponse(
+        data=Version(
+            version_id="us_vr_YOUR_ID",
+        ),
+    )
+    """
+
     data: Version
 
     def json(self, **kwargs: typing.Any) -> str:

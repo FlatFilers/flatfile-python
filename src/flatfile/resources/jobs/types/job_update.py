@@ -16,11 +16,20 @@ except ImportError:
 class JobUpdate(pydantic.BaseModel):
     """
     A single unit of work that will be executed
+    ---
+    from flatfile import JobStatus, JobUpdate
+
+    JobUpdate(
+        status=JobStatus.COMPLETE,
+        progress=100,
+    )
     """
 
     config: typing.Optional[JobUpdateConfig]
     status: typing.Optional[JobStatus] = pydantic.Field(description="the status of the job")
-    progress: typing.Optional[float] = pydantic.Field(description="the progress of the job")
+    progress: typing.Optional[int] = pydantic.Field(
+        description="the progress of the job. Whole number between 0 and 100"
+    )
     outcome_acknowledged_at: typing.Optional[dt.datetime] = pydantic.Field(
         alias="outcomeAcknowledgedAt", description="the time that the job's outcome has been acknowledged by a user"
     )

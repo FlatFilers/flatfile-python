@@ -12,6 +12,16 @@ except ImportError:
 
 
 class RecordCounts(pydantic.BaseModel):
+    """
+    from flatfile import RecordCounts
+
+    RecordCounts(
+        valid=1000,
+        error=0,
+        total=1000,
+    )
+    """
+
     total: int
     valid: int
     error: int

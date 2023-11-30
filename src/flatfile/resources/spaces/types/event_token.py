@@ -26,12 +26,12 @@ class EventToken(pydantic.BaseModel):
     )
     """
 
-    account_id: typing.Optional[AccountId] = pydantic.Field(alias="accountId")
+    account_id: typing.Optional[AccountId] = pydantic.Field(alias="accountId", description="The ID of the Account.")
     subscribe_key: typing.Optional[str] = pydantic.Field(
         alias="subscribeKey", description="The id of the event bus to subscribe to"
     )
     ttl: typing.Optional[int] = pydantic.Field(description="Time to live in minutes")
-    token: typing.Optional[str]
+    token: typing.Optional[str] = pydantic.Field(description="This should be your API key.")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

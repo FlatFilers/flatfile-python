@@ -4,6 +4,7 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
+from ...commons.types.commit_id import CommitId
 from ...commons.types.record_id import RecordId
 from ...commons.types.version_id import VersionId
 from .validation_message import ValidationMessage
@@ -15,8 +16,23 @@ except ImportError:
 
 
 class RecordBase(pydantic.BaseModel):
+    """
+    from flatfile import RecordBase
+
+    RecordBase(
+        id="us_rc_YOUR_ID",
+        version_id="us_vr_YOUR_ID",
+        commit_id="us_vr_YOUR_ID",
+        valid=True,
+        metadata={},
+    )
+    """
+
     id: RecordId
-    version_id: typing.Optional[VersionId] = pydantic.Field(alias="versionId")
+    version_id: typing.Optional[VersionId] = pydantic.Field(
+        alias="versionId", description="Deprecated, use `commitId` instead."
+    )
+    commit_id: typing.Optional[CommitId] = pydantic.Field(alias="commitId")
     valid: typing.Optional[bool]
     messages: typing.Optional[typing.List[ValidationMessage]]
     metadata: typing.Optional[typing.Dict[str, typing.Any]]

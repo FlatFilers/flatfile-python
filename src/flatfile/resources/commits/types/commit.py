@@ -4,8 +4,8 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
+from ...commons.types.commit_id import CommitId
 from ...commons.types.sheet_id import SheetId
-from ...commons.types.version_id import VersionId
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -31,7 +31,7 @@ class Commit(pydantic.BaseModel):
     )
     """
 
-    id: VersionId
+    id: CommitId
     sheet_id: SheetId = pydantic.Field(alias="sheetId")
     created_by: str = pydantic.Field(alias="createdBy", description="The actor (user or system) who created the commit")
     completed_by: typing.Optional[str] = pydantic.Field(

@@ -58,6 +58,14 @@ class JobOutcomeNext_Snapshot(JobOutcomeNextSnapshot):
         allow_population_by_field_name = True
 
 
+"""
+from flatfile import JobOutcomeNext_Id
+
+JobOutcomeNext_Id(
+    type="id",
+    id="us_jb_YOUR_ID",
+)
+"""
 JobOutcomeNext = typing.Union[
     JobOutcomeNext_Id, JobOutcomeNext_Url, JobOutcomeNext_Download, JobOutcomeNext_Wait, JobOutcomeNext_Snapshot
 ]

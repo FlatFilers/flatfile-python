@@ -13,8 +13,10 @@ except ImportError:
 
 
 class SourceField(pydantic.BaseModel):
-    source_field: Property = pydantic.Field(alias="sourceField")
-    preview: typing.Optional[typing.List[str]]
+    source_field: Property = pydantic.Field(alias="sourceField", description="The description of the source field")
+    preview: typing.Optional[typing.List[str]] = pydantic.Field(
+        description="A list of preview values of the data in the source field"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

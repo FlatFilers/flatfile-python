@@ -6,12 +6,8 @@ from json.decoder import JSONDecodeError
 
 from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
-from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
 from ..commons.types.user_id import UserId
-from .types.api_token_response import ApiTokenResponse
-from .types.exchange_token_response import ExchangeTokenResponse
-from .types.list_api_tokens_response import ListApiTokensResponse
 from .types.list_users_response import ListUsersResponse
 from .types.user_response import UserResponse
 
@@ -19,9 +15,6 @@ try:
     import pydantic.v1 as pydantic  # type: ignore
 except ImportError:
     import pydantic  # type: ignore
-
-# this is used as the default value for optional parameters
-OMIT = typing.cast(typing.Any, ...)
 
 
 class UsersClient:
@@ -34,6 +27,16 @@ class UsersClient:
 
         Parameters:
             - email: typing.Optional[str]. Email of guest to return
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.users.list(
+            email="john.smith@example.com",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -56,6 +59,16 @@ class UsersClient:
 
         Parameters:
             - user_id: UserId. The user id
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.users.get(
+            user_id="us_usr_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -65,104 +78,6 @@ class UsersClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(UserResponse, _response.json())  # type: ignore
-        try:
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def list_api_tokens(
-        self,
-        user_id: UserId,
-        *,
-        tenant_id: str,
-        page_size: typing.Optional[int] = None,
-        page_number: typing.Optional[int] = None,
-    ) -> ListApiTokensResponse:
-        """
-        Gets all the api tokens for a user.
-
-        Parameters:
-            - user_id: UserId. The user id
-
-            - tenant_id: str.
-
-            - page_size: typing.Optional[int]. Number of tokens to return in a page (default 10)
-
-            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"users/{user_id}/api-token"),
-            params=remove_none_from_dict({"tenantId": tenant_id, "pageSize": page_size, "pageNumber": page_number}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
-        )
-        if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(ListApiTokensResponse, _response.json())  # type: ignore
-        try:
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def create_api_token(self, user_id: UserId, *, tenant_id: str) -> ApiTokenResponse:
-        """
-        Creates an api token for authenticating against Flatfile APIs.
-
-        Parameters:
-            - user_id: UserId. The user id
-
-            - tenant_id: str.
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"users/{user_id}/api-token"),
-            params=remove_none_from_dict({"tenantId": tenant_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
-        )
-        if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(ApiTokenResponse, _response.json())  # type: ignore
-        try:
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def exchange_token(
-        self,
-        *,
-        token: typing.Optional[str] = OMIT,
-        email: typing.Optional[str] = OMIT,
-        space_id: typing.Optional[str] = OMIT,
-    ) -> ExchangeTokenResponse:
-        """
-        Exchange an invitation for an access token
-
-        Parameters:
-            - token: typing.Optional[str]. The token to use for the request
-
-            - email: typing.Optional[str]. The invited guest's email, required if no token
-
-            - space_id: typing.Optional[str]. The spaceId, required if no token
-        """
-        _request: typing.Dict[str, typing.Any] = {}
-        if token is not OMIT:
-            _request["token"] = token
-        if email is not OMIT:
-            _request["email"] = email
-        if space_id is not OMIT:
-            _request["spaceId"] = space_id
-        _response = self._client_wrapper.httpx_client.request(
-            "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "invitations/exchange"),
-            json=jsonable_encoder(_request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
-        )
-        if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(ExchangeTokenResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
@@ -180,6 +95,16 @@ class AsyncUsersClient:
 
         Parameters:
             - email: typing.Optional[str]. Email of guest to return
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.users.list(
+            email="john.smith@example.com",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -202,6 +127,16 @@ class AsyncUsersClient:
 
         Parameters:
             - user_id: UserId. The user id
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.users.get(
+            user_id="us_usr_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -211,104 +146,6 @@ class AsyncUsersClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(UserResponse, _response.json())  # type: ignore
-        try:
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def list_api_tokens(
-        self,
-        user_id: UserId,
-        *,
-        tenant_id: str,
-        page_size: typing.Optional[int] = None,
-        page_number: typing.Optional[int] = None,
-    ) -> ListApiTokensResponse:
-        """
-        Gets all the api tokens for a user.
-
-        Parameters:
-            - user_id: UserId. The user id
-
-            - tenant_id: str.
-
-            - page_size: typing.Optional[int]. Number of tokens to return in a page (default 10)
-
-            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"users/{user_id}/api-token"),
-            params=remove_none_from_dict({"tenantId": tenant_id, "pageSize": page_size, "pageNumber": page_number}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
-        )
-        if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(ListApiTokensResponse, _response.json())  # type: ignore
-        try:
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def create_api_token(self, user_id: UserId, *, tenant_id: str) -> ApiTokenResponse:
-        """
-        Creates an api token for authenticating against Flatfile APIs.
-
-        Parameters:
-            - user_id: UserId. The user id
-
-            - tenant_id: str.
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"users/{user_id}/api-token"),
-            params=remove_none_from_dict({"tenantId": tenant_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
-        )
-        if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(ApiTokenResponse, _response.json())  # type: ignore
-        try:
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def exchange_token(
-        self,
-        *,
-        token: typing.Optional[str] = OMIT,
-        email: typing.Optional[str] = OMIT,
-        space_id: typing.Optional[str] = OMIT,
-    ) -> ExchangeTokenResponse:
-        """
-        Exchange an invitation for an access token
-
-        Parameters:
-            - token: typing.Optional[str]. The token to use for the request
-
-            - email: typing.Optional[str]. The invited guest's email, required if no token
-
-            - space_id: typing.Optional[str]. The spaceId, required if no token
-        """
-        _request: typing.Dict[str, typing.Any] = {}
-        if token is not OMIT:
-            _request["token"] = token
-        if email is not OMIT:
-            _request["email"] = email
-        if space_id is not OMIT:
-            _request["spaceId"] = space_id
-        _response = await self._client_wrapper.httpx_client.request(
-            "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "invitations/exchange"),
-            json=jsonable_encoder(_request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
-        )
-        if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(ExchangeTokenResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:

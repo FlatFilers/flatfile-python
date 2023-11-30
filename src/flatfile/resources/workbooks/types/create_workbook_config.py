@@ -19,16 +19,72 @@ except ImportError:
 class CreateWorkbookConfig(pydantic.BaseModel):
     """
     Properties used to create a new Workbook
+    ---
+    from flatfile import (
+        Action,
+        ActionMode,
+        CreateWorkbookConfig,
+        Property_String,
+        SheetConfig,
+        WorkbookConfigSettings,
+    )
+
+    CreateWorkbookConfig(
+        name="My First Workbook",
+        sheets=[
+            SheetConfig(
+                name="Contacts",
+                slug="contacts",
+                fields=[
+                    Property_String(
+                        type="string",
+                        key="firstName",
+                        label="First Name",
+                    ),
+                    Property_String(
+                        type="string",
+                        key="lastName",
+                        label="Last Name",
+                    ),
+                    Property_String(
+                        type="string",
+                        key="email",
+                        label="Email",
+                    ),
+                ],
+                mapping_confidence_threshold=0.5,
+            )
+        ],
+        labels=["simple-demo"],
+        actions=[
+            Action(
+                operation="submitAction",
+                mode=ActionMode.FOREGROUND,
+                label="Submit",
+                description="Submit data to webhook.site",
+                primary=True,
+            )
+        ],
+        settings=WorkbookConfigSettings(
+            track_changes=True,
+        ),
+    )
     """
 
-    name: str
-    labels: typing.Optional[typing.List[str]]
-    space_id: typing.Optional[SpaceId] = pydantic.Field(alias="spaceId")
-    environment_id: typing.Optional[EnvironmentId] = pydantic.Field(alias="environmentId")
-    namespace: typing.Optional[str]
-    sheets: typing.Optional[typing.List[SheetConfig]]
-    actions: typing.Optional[typing.List[Action]]
-    settings: typing.Optional[WorkbookConfigSettings]
+    name: str = pydantic.Field(description="The name of the Workbook.")
+    labels: typing.Optional[typing.List[str]] = pydantic.Field(
+        description="An optional list of labels for the Workbook."
+    )
+    space_id: typing.Optional[SpaceId] = pydantic.Field(
+        alias="spaceId", description="Space to associate with the Workbook."
+    )
+    environment_id: typing.Optional[EnvironmentId] = pydantic.Field(
+        alias="environmentId", description="Environment to associate with the Workbook"
+    )
+    namespace: typing.Optional[str] = pydantic.Field(description="Optional namespace to apply to the Workbook.")
+    sheets: typing.Optional[typing.List[SheetConfig]] = pydantic.Field(description="Sheets to create on the Workbook.")
+    actions: typing.Optional[typing.List[Action]] = pydantic.Field(description="Actions to create on the Workbook.")
+    settings: typing.Optional[WorkbookConfigSettings] = pydantic.Field(description="The Workbook settings.")
     metadata: typing.Optional[typing.Any] = pydantic.Field(description="Metadata for the workbook")
 
     def json(self, **kwargs: typing.Any) -> str:

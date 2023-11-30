@@ -12,6 +12,14 @@ except ImportError:
 
 
 class JobOutcomeNextId(pydantic.BaseModel):
+    """
+    from flatfile import JobOutcomeNextId
+
+    JobOutcomeNextId(
+        id="us_jb_YOUR_ID",
+    )
+    """
+
     id: str
     label: typing.Optional[str]
 

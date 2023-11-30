@@ -41,6 +41,17 @@ class SnapshotsClient:
             - sheet_id: SheetId. ID of sheet
 
             - label: typing.Optional[str]. Label for the snapshot
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.snapshots.create_snapshot(
+            sheet_id="us_sh_YOUR_ID",
+            label="My snapshot",
+        )
         """
         _request: typing.Dict[str, typing.Any] = {"sheetId": sheet_id}
         if label is not OMIT:
@@ -70,6 +81,16 @@ class SnapshotsClient:
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.snapshots.list_snapshots(
+            sheet_id="us_sh_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -98,6 +119,17 @@ class SnapshotsClient:
             - snapshot_id: SnapshotId. ID of snapshot
 
             - include_summary: bool. Whether to include a summary in the snapshot response
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.snapshots.get_snapshot(
+            snapshot_id="us_ss_YOUR_ID",
+            include_summary=True,
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -124,6 +156,16 @@ class SnapshotsClient:
 
         Parameters:
             - snapshot_id: SnapshotId. ID of snapshot
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.snapshots.delete_snapshot(
+            snapshot_id="us_ss_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
@@ -153,6 +195,22 @@ class SnapshotsClient:
             - snapshot_id: SnapshotId. ID of snapshot
 
             - request: typing.Optional[RestoreOptions].
+        ---
+        from flatfile import RestoreOptions
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.snapshots.restore_snapshot(
+            snapshot_id="us_ss_YOUR_ID",
+            request=RestoreOptions(
+                created=True,
+                updated=True,
+                deleted=True,
+            ),
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -192,6 +250,20 @@ class SnapshotsClient:
             - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
 
             - change_type: typing.Optional[ChangeType]. Filter records by change type
+        ---
+        from flatfile import ChangeType
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.snapshots.get_snapshot_records(
+            snapshot_id="us_ss_YOUR_ID",
+            page_size=10,
+            page_number=1,
+            change_type=ChangeType.CREATED_SINCE,
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -225,6 +297,17 @@ class AsyncSnapshotsClient:
             - sheet_id: SheetId. ID of sheet
 
             - label: typing.Optional[str]. Label for the snapshot
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.snapshots.create_snapshot(
+            sheet_id="us_sh_YOUR_ID",
+            label="My snapshot",
+        )
         """
         _request: typing.Dict[str, typing.Any] = {"sheetId": sheet_id}
         if label is not OMIT:
@@ -254,6 +337,16 @@ class AsyncSnapshotsClient:
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.snapshots.list_snapshots(
+            sheet_id="us_sh_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -282,6 +375,17 @@ class AsyncSnapshotsClient:
             - snapshot_id: SnapshotId. ID of snapshot
 
             - include_summary: bool. Whether to include a summary in the snapshot response
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.snapshots.get_snapshot(
+            snapshot_id="us_ss_YOUR_ID",
+            include_summary=True,
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -308,6 +412,16 @@ class AsyncSnapshotsClient:
 
         Parameters:
             - snapshot_id: SnapshotId. ID of snapshot
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.snapshots.delete_snapshot(
+            snapshot_id="us_ss_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
@@ -337,6 +451,22 @@ class AsyncSnapshotsClient:
             - snapshot_id: SnapshotId. ID of snapshot
 
             - request: typing.Optional[RestoreOptions].
+        ---
+        from flatfile import RestoreOptions
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.snapshots.restore_snapshot(
+            snapshot_id="us_ss_YOUR_ID",
+            request=RestoreOptions(
+                created=True,
+                updated=True,
+                deleted=True,
+            ),
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
@@ -376,6 +506,20 @@ class AsyncSnapshotsClient:
             - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
 
             - change_type: typing.Optional[ChangeType]. Filter records by change type
+        ---
+        from flatfile import ChangeType
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.snapshots.get_snapshot_records(
+            snapshot_id="us_ss_YOUR_ID",
+            page_size=10,
+            page_number=1,
+            change_type=ChangeType.CREATED_SINCE,
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",

@@ -17,6 +17,55 @@ except ImportError:
 class JobExecutionPlan(pydantic.BaseModel):
     """
     The execution plan for a job, for example, for a map job, the execution plan is the mapping of the source sheet to the destination sheet.
+    ---
+    from flatfile import (
+        Certainty,
+        Edge,
+        JobExecutionPlan,
+        Metadata,
+        Property_String,
+    )
+
+    JobExecutionPlan(
+        field_mapping=[
+            Edge(
+                source_field=Property_String(
+                    type="string",
+                    key="firstName",
+                ),
+                destination_field=Property_String(
+                    type="string",
+                    key="firstName",
+                    label="First Name",
+                ),
+                preview=["John", "Suzy", "Joe"],
+                metadata=Metadata(
+                    certainty=Certainty.ABSOLUTE,
+                    confidence=1.0,
+                    source="exact",
+                ),
+            ),
+            Edge(
+                source_field=Property_String(
+                    type="string",
+                    key="lastName",
+                ),
+                destination_field=Property_String(
+                    type="string",
+                    key="lastName",
+                    label="Last Name",
+                ),
+                preview=["Smith", "Que", "Montana"],
+                metadata=Metadata(
+                    certainty=Certainty.ABSOLUTE,
+                    confidence=1.0,
+                    source="exact",
+                ),
+            ),
+        ],
+        unmapped_source_fields=[],
+        unmapped_destination_fields=[],
+    )
     """
 
     field_mapping: typing.List[Edge] = pydantic.Field(alias="fieldMapping")

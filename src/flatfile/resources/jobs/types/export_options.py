@@ -4,6 +4,7 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
+from ...commons.types.commit_id import CommitId
 from ...commons.types.filter import Filter
 from ...commons.types.filter_field import FilterField
 from ...commons.types.record_id import RecordId
@@ -20,14 +21,29 @@ except ImportError:
 
 
 class ExportOptions(pydantic.BaseModel):
-    version_id: typing.Optional[VersionId] = pydantic.Field(alias="versionId")
-    sort_field: typing.Optional[SortField] = pydantic.Field(alias="sortField")
-    sort_direction: typing.Optional[SortDirection] = pydantic.Field(alias="sortDirection")
-    filter: typing.Optional[Filter]
-    filter_field: typing.Optional[FilterField] = pydantic.Field(alias="filterField")
-    search_value: typing.Optional[SearchValue] = pydantic.Field(alias="searchValue")
-    search_field: typing.Optional[SearchField] = pydantic.Field(alias="searchField")
-    q: typing.Optional[str]
+    version_id: typing.Optional[VersionId] = pydantic.Field(
+        alias="versionId", description="Deprecated, use `commitId` instead"
+    )
+    commit_id: typing.Optional[CommitId] = pydantic.Field(
+        alias="commitId", description="If provided, the snapshot version of the workbook will be used for the export"
+    )
+    sort_field: typing.Optional[SortField] = pydantic.Field(
+        alias="sortField", description="The field to sort the records on"
+    )
+    sort_direction: typing.Optional[SortDirection] = pydantic.Field(
+        alias="sortDirection", description="The direction to sort the records"
+    )
+    filter: typing.Optional[Filter] = pydantic.Field(description="The filter to apply to the records")
+    filter_field: typing.Optional[FilterField] = pydantic.Field(
+        alias="filterField", description="The field to filter on"
+    )
+    search_value: typing.Optional[SearchValue] = pydantic.Field(
+        alias="searchValue", description="The value to search for"
+    )
+    search_field: typing.Optional[SearchField] = pydantic.Field(
+        alias="searchField", description="The field to search for the search value in"
+    )
+    q: typing.Optional[str] = pydantic.Field(description="The FFQL query to filter records")
     ids: typing.Optional[typing.List[RecordId]] = pydantic.Field(
         description=(
             "The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records\n"

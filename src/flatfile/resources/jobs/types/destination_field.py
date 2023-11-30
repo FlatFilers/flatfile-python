@@ -13,8 +13,12 @@ except ImportError:
 
 
 class DestinationField(pydantic.BaseModel):
-    destination_field: Property = pydantic.Field(alias="destinationField")
-    preview: typing.Optional[typing.List[str]]
+    destination_field: Property = pydantic.Field(
+        alias="destinationField", description="The description of the destination field"
+    )
+    preview: typing.Optional[typing.List[str]] = pydantic.Field(
+        description="A list of preview values of the data in the destination field"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

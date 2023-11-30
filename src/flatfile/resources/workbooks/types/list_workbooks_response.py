@@ -13,6 +13,93 @@ except ImportError:
 
 
 class ListWorkbooksResponse(pydantic.BaseModel):
+    """
+    import datetime
+
+    from flatfile import (
+        Action,
+        ActionMode,
+        ListWorkbooksResponse,
+        Property_String,
+        RecordCounts,
+        Sheet,
+        SheetConfig,
+        Workbook,
+        WorkbookConfigSettings,
+    )
+
+    ListWorkbooksResponse(
+        data=[
+            Workbook(
+                id="us_wb_YOUR_ID",
+                name="My First Workbook",
+                space_id="us_sp_YOUR_ID",
+                environment_id="us_env_YOUR_ID",
+                sheets=[
+                    Sheet(
+                        id="us_sh_YOUR_ID",
+                        workbook_id="us_wb_YOUR_ID",
+                        name="Contacts",
+                        config=SheetConfig(
+                            name="Contacts",
+                            slug="contacts",
+                            fields=[
+                                Property_String(
+                                    type="string",
+                                    key="firstName",
+                                    label="First Name",
+                                ),
+                                Property_String(
+                                    type="string",
+                                    key="lastName",
+                                    label="Last Name",
+                                ),
+                                Property_String(
+                                    type="string",
+                                    key="email",
+                                    label="Email",
+                                ),
+                            ],
+                            mapping_confidence_threshold=0.5,
+                        ),
+                        count_records=RecordCounts(
+                            valid=1000,
+                            error=0,
+                            total=1000,
+                        ),
+                        locked_by="Example0",
+                        updated_at=datetime.datetime.fromisoformat(
+                            "2021-08-31 18:00:00+00:00",
+                        ),
+                        created_at=datetime.datetime.fromisoformat(
+                            "2021-08-31 18:00:00+00:00",
+                        ),
+                    )
+                ],
+                labels=["simple-demo"],
+                actions=[
+                    Action(
+                        operation="submitAction",
+                        mode=ActionMode.FOREGROUND,
+                        label="Submit",
+                        description="Submit data to webhook.site",
+                        primary=True,
+                    )
+                ],
+                settings=WorkbookConfigSettings(
+                    track_changes=True,
+                ),
+                updated_at=datetime.datetime.fromisoformat(
+                    "2021-01-01 00:00:00+00:00",
+                ),
+                created_at=datetime.datetime.fromisoformat(
+                    "2021-01-01 00:00:00+00:00",
+                ),
+            )
+        ],
+    )
+    """
+
     data: typing.List[Workbook]
 
     def json(self, **kwargs: typing.Any) -> str:

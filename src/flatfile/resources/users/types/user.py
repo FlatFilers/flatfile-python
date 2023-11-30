@@ -11,6 +11,15 @@ from .user_config import UserConfig
 class User(UserConfig):
     """
     Configurations for the user
+    ---
+    from flatfile import User
+
+    User(
+        id="us_usr_YOUR_ID",
+        email="john.smith@example.com",
+        name="john.smith",
+        account_id="us_acc_YOUR_ID",
+    )
     """
 
     id: UserId

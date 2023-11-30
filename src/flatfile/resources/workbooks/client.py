@@ -40,9 +40,20 @@ class WorkbooksClient:
         Returns all workbooks matching a filter for an account or space
 
         Parameters:
-            - space_id: typing.Optional[SpaceId].
+            - space_id: typing.Optional[SpaceId]. The associated Space ID of the Workbook.
 
             - include_counts: typing.Optional[bool]. Include counts for the workbook
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.workbooks.list(
+            space_id="us_sp_YOUR_ID",
+            include_counts=True,
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -67,6 +78,63 @@ class WorkbooksClient:
 
         Parameters:
             - request: CreateWorkbookConfig.
+        ---
+        from flatfile import (
+            Action,
+            ActionMode,
+            CreateWorkbookConfig,
+            Property_String,
+            SheetConfig,
+            WorkbookConfigSettings,
+        )
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.workbooks.create(
+            request=CreateWorkbookConfig(
+                name="My First Workbook",
+                sheets=[
+                    SheetConfig(
+                        name="Contacts",
+                        slug="contacts",
+                        fields=[
+                            Property_String(
+                                type="string",
+                                key="firstName",
+                                label="First Name",
+                            ),
+                            Property_String(
+                                type="string",
+                                key="lastName",
+                                label="Last Name",
+                            ),
+                            Property_String(
+                                type="string",
+                                key="email",
+                                label="Email",
+                            ),
+                        ],
+                        mapping_confidence_threshold=0.5,
+                    )
+                ],
+                labels=["simple-demo"],
+                actions=[
+                    Action(
+                        operation="submitAction",
+                        mode=ActionMode.FOREGROUND,
+                        label="Submit",
+                        description="Submit data to webhook.site",
+                        primary=True,
+                    )
+                ],
+                settings=WorkbookConfigSettings(
+                    track_changes=True,
+                ),
+            ),
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -91,6 +159,16 @@ class WorkbooksClient:
 
         Parameters:
             - workbook_id: WorkbookId. ID of workbook to return
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.workbooks.get(
+            workbook_id="us_wb_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -116,6 +194,16 @@ class WorkbooksClient:
 
         Parameters:
             - workbook_id: WorkbookId. ID of workbook to delete
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.workbooks.delete(
+            workbook_id="us_wb_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
@@ -143,6 +231,30 @@ class WorkbooksClient:
             - workbook_id: WorkbookId. ID of workbook to update
 
             - request: WorkbookUpdate.
+        ---
+        from flatfile import Action, ActionMode, WorkbookUpdate
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.workbooks.update(
+            workbook_id="us_wb_YOUR_ID",
+            request=WorkbookUpdate(
+                name="My Updated Workbook",
+                labels=["my-new-label"],
+                actions=[
+                    Action(
+                        operation="submitAction",
+                        mode=ActionMode.FOREGROUND,
+                        label="Submit Changes",
+                        description="Submit data to webhook.site",
+                        primary=True,
+                    )
+                ],
+            ),
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
@@ -173,6 +285,16 @@ class WorkbooksClient:
             - workbook_id: WorkbookId. ID of workbook
 
             - completed: typing.Optional[bool]. If true, only return commits that have been completed. If false, only return commits that have not been completed. If not provided, return all commits.
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.workbooks.get_workbook_commits(
+            workbook_id="us_wb_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -201,9 +323,20 @@ class AsyncWorkbooksClient:
         Returns all workbooks matching a filter for an account or space
 
         Parameters:
-            - space_id: typing.Optional[SpaceId].
+            - space_id: typing.Optional[SpaceId]. The associated Space ID of the Workbook.
 
             - include_counts: typing.Optional[bool]. Include counts for the workbook
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.workbooks.list(
+            space_id="us_sp_YOUR_ID",
+            include_counts=True,
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -228,6 +361,63 @@ class AsyncWorkbooksClient:
 
         Parameters:
             - request: CreateWorkbookConfig.
+        ---
+        from flatfile import (
+            Action,
+            ActionMode,
+            CreateWorkbookConfig,
+            Property_String,
+            SheetConfig,
+            WorkbookConfigSettings,
+        )
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.workbooks.create(
+            request=CreateWorkbookConfig(
+                name="My First Workbook",
+                sheets=[
+                    SheetConfig(
+                        name="Contacts",
+                        slug="contacts",
+                        fields=[
+                            Property_String(
+                                type="string",
+                                key="firstName",
+                                label="First Name",
+                            ),
+                            Property_String(
+                                type="string",
+                                key="lastName",
+                                label="Last Name",
+                            ),
+                            Property_String(
+                                type="string",
+                                key="email",
+                                label="Email",
+                            ),
+                        ],
+                        mapping_confidence_threshold=0.5,
+                    )
+                ],
+                labels=["simple-demo"],
+                actions=[
+                    Action(
+                        operation="submitAction",
+                        mode=ActionMode.FOREGROUND,
+                        label="Submit",
+                        description="Submit data to webhook.site",
+                        primary=True,
+                    )
+                ],
+                settings=WorkbookConfigSettings(
+                    track_changes=True,
+                ),
+            ),
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
@@ -252,6 +442,16 @@ class AsyncWorkbooksClient:
 
         Parameters:
             - workbook_id: WorkbookId. ID of workbook to return
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.workbooks.get(
+            workbook_id="us_wb_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -277,6 +477,16 @@ class AsyncWorkbooksClient:
 
         Parameters:
             - workbook_id: WorkbookId. ID of workbook to delete
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.workbooks.delete(
+            workbook_id="us_wb_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
@@ -304,6 +514,30 @@ class AsyncWorkbooksClient:
             - workbook_id: WorkbookId. ID of workbook to update
 
             - request: WorkbookUpdate.
+        ---
+        from flatfile import Action, ActionMode, WorkbookUpdate
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.workbooks.update(
+            workbook_id="us_wb_YOUR_ID",
+            request=WorkbookUpdate(
+                name="My Updated Workbook",
+                labels=["my-new-label"],
+                actions=[
+                    Action(
+                        operation="submitAction",
+                        mode=ActionMode.FOREGROUND,
+                        label="Submit Changes",
+                        description="Submit data to webhook.site",
+                        primary=True,
+                    )
+                ],
+            ),
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
@@ -334,6 +568,16 @@ class AsyncWorkbooksClient:
             - workbook_id: WorkbookId. ID of workbook
 
             - completed: typing.Optional[bool]. If true, only return commits that have been completed. If false, only return commits that have not been completed. If not provided, return all commits.
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.workbooks.get_workbook_commits(
+            workbook_id="us_wb_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",

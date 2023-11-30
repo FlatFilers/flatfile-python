@@ -13,6 +13,58 @@ except ImportError:
 
 
 class JobResponse(pydantic.BaseModel):
+    """
+    import datetime
+
+    from flatfile import (
+        Job,
+        JobMode,
+        JobResponse,
+        JobStatus,
+        JobSubject_Resource,
+        JobType,
+        Trigger,
+    )
+
+    JobResponse(
+        data=Job(
+            id="us_jb_YOUR_ID",
+            created_at=datetime.datetime.fromisoformat(
+                "2023-10-30 20:04:28.556000+00:00",
+            ),
+            updated_at=datetime.datetime.fromisoformat(
+                "2023-10-30 20:04:32.075000+00:00",
+            ),
+            started_at=datetime.datetime.fromisoformat(
+                "2023-10-30 20:04:29.453000+00:00",
+            ),
+            finished_at=datetime.datetime.fromisoformat(
+                "2023-10-30 20:04:32.074000+00:00",
+            ),
+            environment_id="us_env_YOUR_ID",
+            type=JobType.WORKBOOK,
+            operation="submitAction",
+            source="us_wb_YOUR_ID",
+            destination="us_wb_YOUR_ID",
+            trigger=Trigger.IMMEDIATE,
+            status=JobStatus.COMPLETE,
+            progress=100,
+            file_id="us_fl_YOUR_ID",
+            mode=JobMode.FOREGROUND,
+            input={},
+            subject=JobSubject_Resource(
+                type="resource",
+                id="us_wb_YOUR_ID",
+            ),
+            outcome={
+                "message": "Data was successfully submitted to Webhook.site. Go check it out at https://example.site/example."
+            },
+            info="Starting job to submit action to webhook.site",
+            managed=True,
+        ),
+    )
+    """
+
     data: Job
 
     def json(self, **kwargs: typing.Any) -> str:

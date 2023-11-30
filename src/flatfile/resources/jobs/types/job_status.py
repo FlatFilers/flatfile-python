@@ -9,6 +9,10 @@ T_Result = typing.TypeVar("T_Result")
 class JobStatus(str, enum.Enum):
     """
     the status of the job
+    ---
+    from flatfile import JobStatus
+
+    JobStatus.PLANNING
     """
 
     CREATED = "created"

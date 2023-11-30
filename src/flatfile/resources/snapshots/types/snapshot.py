@@ -16,12 +16,41 @@ except ImportError:
 
 
 class Snapshot(pydantic.BaseModel):
-    id: SnapshotId
-    sheet_id: SheetId = pydantic.Field(alias="sheetId")
-    label: typing.Optional[str]
-    summary: typing.Optional[SnapshotSummary]
-    created_at: dt.datetime = pydantic.Field(alias="createdAt")
-    created_by: UserId = pydantic.Field(alias="createdBy")
+    """
+    import datetime
+
+    from flatfile import Snapshot, SnapshotSummary, SummarySection
+
+    Snapshot(
+        id="us_ss_YOUR_ID",
+        sheet_id="us_sh_YOUR_ID",
+        label="My snapshot",
+        summary=SnapshotSummary(
+            created_since=SummarySection(
+                total=0,
+            ),
+            updated_since=SummarySection(
+                total=5,
+                by_field={"lastName": 5},
+            ),
+            deleted_since=SummarySection(
+                total=5,
+                by_field={"firstName": 1},
+            ),
+        ),
+        created_at=datetime.datetime.fromisoformat(
+            "2023-01-01 00:00:00+00:00",
+        ),
+        created_by="us_usr_YOUR_ID",
+    )
+    """
+
+    id: SnapshotId = pydantic.Field(description="The ID of the Snapshot.")
+    sheet_id: SheetId = pydantic.Field(alias="sheetId", description="The ID of the Sheet.")
+    label: typing.Optional[str] = pydantic.Field(description="The title of the Snapshot.")
+    summary: typing.Optional[SnapshotSummary] = pydantic.Field(description="A summary of the Snapshot.")
+    created_at: dt.datetime = pydantic.Field(alias="createdAt", description="The time the Snapshot was created.")
+    created_by: UserId = pydantic.Field(alias="createdBy", description="The actor who created the Snapshot.")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

@@ -17,6 +17,39 @@ except ImportError:
 class RecordWithLinks(pydantic.BaseModel):
     """
     A single row of data in a Sheet, including links to related rows
+    ---
+    import datetime
+
+    from flatfile import CellValueWithLinks, RecordWithLinks
+
+    RecordWithLinks(
+        id="us_rc_YOUR_ID",
+        values={
+            "firstName": CellValueWithLinks(
+                messages=[],
+                valid=True,
+                updated_at=datetime.datetime.fromisoformat(
+                    "2023-11-20 16:59:40.286000+00:00",
+                ),
+            ),
+            "lastName": CellValueWithLinks(
+                messages=[],
+                valid=True,
+                updated_at=datetime.datetime.fromisoformat(
+                    "2023-11-20 16:59:40.286000+00:00",
+                ),
+            ),
+            "email": CellValueWithLinks(
+                messages=[],
+                valid=True,
+                updated_at=datetime.datetime.fromisoformat(
+                    "2023-11-20 16:59:40.286000+00:00",
+                ),
+            ),
+        },
+        valid=True,
+        metadata={},
+    )
     """
 
     id: RecordId

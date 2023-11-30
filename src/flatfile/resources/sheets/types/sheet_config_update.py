@@ -19,15 +19,31 @@ class SheetConfigUpdate(pydantic.BaseModel):
     Changes to make to an existing sheet config
     """
 
-    name: typing.Optional[str]
-    description: typing.Optional[str]
-    slug: typing.Optional[str]
-    readonly: typing.Optional[bool]
-    allow_additional_fields: typing.Optional[bool] = pydantic.Field(alias="allowAdditionalFields")
-    mapping_confidence_threshold: typing.Optional[float] = pydantic.Field(alias="mappingConfidenceThreshold")
-    access: typing.Optional[typing.List[SheetAccess]]
-    fields: typing.Optional[typing.List[Property]]
-    actions: typing.Optional[typing.List[Action]]
+    name: typing.Optional[str] = pydantic.Field(
+        description="The name of your Sheet as it will appear to your end users."
+    )
+    description: typing.Optional[str] = pydantic.Field(
+        description="A sentence or two describing the purpose of your Sheet."
+    )
+    slug: typing.Optional[str] = pydantic.Field(description="A unique identifier for your Sheet.")
+    readonly: typing.Optional[bool] = pydantic.Field(
+        description="A boolean specifying whether or not this sheet is read only. Read only sheets are not editable by end users."
+    )
+    allow_additional_fields: typing.Optional[bool] = pydantic.Field(
+        alias="allowAdditionalFields", description="Allow end users to add fields during mapping."
+    )
+    mapping_confidence_threshold: typing.Optional[float] = pydantic.Field(
+        alias="mappingConfidenceThreshold", description="The minimum confidence required to automatically map a field"
+    )
+    access: typing.Optional[typing.List[SheetAccess]] = pydantic.Field(
+        description="Control Sheet-level access for all users."
+    )
+    fields: typing.Optional[typing.List[Property]] = pydantic.Field(
+        description="Where you define your Sheet’s data schema."
+    )
+    actions: typing.Optional[typing.List[Action]] = pydantic.Field(
+        description="An array of actions that end users can perform on this Sheet."
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

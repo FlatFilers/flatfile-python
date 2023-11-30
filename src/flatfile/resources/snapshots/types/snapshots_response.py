@@ -13,6 +13,44 @@ except ImportError:
 
 
 class SnapshotsResponse(pydantic.BaseModel):
+    """
+    import datetime
+
+    from flatfile import (
+        Snapshot,
+        SnapshotsResponse,
+        SnapshotSummary,
+        SummarySection,
+    )
+
+    SnapshotsResponse(
+        data=[
+            Snapshot(
+                id="us_ss_YOUR_ID",
+                sheet_id="us_sh_YOUR_ID",
+                label="My snapshot",
+                summary=SnapshotSummary(
+                    created_since=SummarySection(
+                        total=0,
+                    ),
+                    updated_since=SummarySection(
+                        total=5,
+                        by_field={"lastName": 5},
+                    ),
+                    deleted_since=SummarySection(
+                        total=5,
+                        by_field={"firstName": 1},
+                    ),
+                ),
+                created_at=datetime.datetime.fromisoformat(
+                    "2023-01-01 00:00:00+00:00",
+                ),
+                created_by="us_usr_YOUR_ID",
+            )
+        ],
+    )
+    """
+
     data: typing.List[Snapshot]
 
     def json(self, **kwargs: typing.Any) -> str:

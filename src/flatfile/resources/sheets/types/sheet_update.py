@@ -20,11 +20,13 @@ class SheetUpdate(pydantic.BaseModel):
     Changes to make to an existing sheet
     """
 
-    id: typing.Optional[SheetId]
-    workbook_id: typing.Optional[WorkbookId] = pydantic.Field(alias="workbookId")
-    config: typing.Optional[SheetConfig]
-    count_records: typing.Optional[RecordCounts] = pydantic.Field(alias="countRecords")
-    namespace: typing.Optional[str]
+    id: typing.Optional[SheetId] = pydantic.Field(description="The ID of the Sheet.")
+    workbook_id: typing.Optional[WorkbookId] = pydantic.Field(alias="workbookId", description="The ID of the Workbook.")
+    config: typing.Optional[SheetConfig] = pydantic.Field(description="Describes shape of data as well as behavior.")
+    count_records: typing.Optional[RecordCounts] = pydantic.Field(
+        alias="countRecords", description="The amount of records in the Sheet."
+    )
+    namespace: typing.Optional[str] = pydantic.Field(description="The scoped namespace of the Sheet.")
     updated_at: typing.Optional[dt.datetime] = pydantic.Field(
         alias="updatedAt", description="Date the sheet was last updated"
     )

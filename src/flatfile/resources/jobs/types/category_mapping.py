@@ -13,8 +13,12 @@ except ImportError:
 
 
 class CategoryMapping(pydantic.BaseModel):
-    source_value: typing.Optional[EnumValue] = pydantic.Field(alias="sourceValue")
-    destination_value: typing.Optional[EnumValue] = pydantic.Field(alias="destinationValue")
+    source_value: typing.Optional[EnumValue] = pydantic.Field(
+        alias="sourceValue", description="The source value to map from"
+    )
+    destination_value: typing.Optional[EnumValue] = pydantic.Field(
+        alias="destinationValue", description="The destination value to map to"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

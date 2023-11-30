@@ -7,6 +7,11 @@ from ....core.datetime_utils import serialize_datetime
 from ...commons.types.secret_id import SecretId
 from .write_secret import WriteSecret
 
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
+
 
 class Secret(WriteSecret):
     """
@@ -23,7 +28,7 @@ class Secret(WriteSecret):
     )
     """
 
-    id: SecretId
+    id: SecretId = pydantic.Field(description="The ID of the secret.")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

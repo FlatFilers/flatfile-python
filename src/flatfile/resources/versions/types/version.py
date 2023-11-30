@@ -13,6 +13,14 @@ except ImportError:
 
 
 class Version(pydantic.BaseModel):
+    """
+    from flatfile import Version
+
+    Version(
+        version_id="us_vr_YOUR_ID",
+    )
+    """
+
     version_id: VersionId = pydantic.Field(alias="versionId")
 
     def json(self, **kwargs: typing.Any) -> str:

@@ -21,7 +21,9 @@ class BaseProperty(pydantic.BaseModel):
     metadata: typing.Optional[typing.Any] = pydantic.Field(
         description="Useful for any contextual metadata regarding the schema. Store any valid json here."
     )
-    treatments: typing.Optional[typing.List[str]]
+    treatments: typing.Optional[typing.List[str]] = pydantic.Field(
+        description="A unique presentation for a field in the UI."
+    )
     alternative_names: typing.Optional[typing.List[str]] = pydantic.Field(alias="alternativeNames")
 
     def json(self, **kwargs: typing.Any) -> str:

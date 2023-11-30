@@ -15,6 +15,19 @@ except ImportError:
 class JobOutcome(pydantic.BaseModel):
     """
     Outcome summary of a job
+    ---
+    from flatfile import JobOutcome, JobOutcomeNext_Id
+
+    JobOutcome(
+        acknowledge=True,
+        button_text="Acknowledge",
+        next=JobOutcomeNext_Id(
+            type="id",
+            id="us_jb_YOUR_ID",
+        ),
+        heading="Success",
+        message="Job was successful",
+    )
     """
 
     acknowledge: typing.Optional[bool]

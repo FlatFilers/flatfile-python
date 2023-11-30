@@ -4,4 +4,33 @@ import typing
 
 from .cell_value_with_links import CellValueWithLinks
 
+"""
+import datetime
+
+from flatfile import CellValueWithLinks
+
+{
+    "firstName": CellValueWithLinks(
+        messages=[],
+        valid=True,
+        updated_at=datetime.datetime.fromisoformat(
+            "2023-11-20 16:59:40.286000+00:00",
+        ),
+    ),
+    "lastName": CellValueWithLinks(
+        messages=[],
+        valid=True,
+        updated_at=datetime.datetime.fromisoformat(
+            "2023-11-20 16:59:40.286000+00:00",
+        ),
+    ),
+    "email": CellValueWithLinks(
+        messages=[],
+        valid=True,
+        updated_at=datetime.datetime.fromisoformat(
+            "2023-11-20 16:59:40.286000+00:00",
+        ),
+    ),
+}
+"""
 RecordDataWithLinks = typing.Dict[str, CellValueWithLinks]

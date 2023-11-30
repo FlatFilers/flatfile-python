@@ -26,6 +26,14 @@ except ImportError:
 class JobConfig(pydantic.BaseModel):
     """
     A single unit of work that a pipeline will execute
+    ---
+    from flatfile import JobConfig, JobType
+
+    JobConfig(
+        type=JobType.WORKBOOK,
+        operation="submitAction",
+        source="us_wb_YOUR_ID",
+    )
     """
 
     type: JobType = pydantic.Field(description="The type of job")
@@ -35,7 +43,9 @@ class JobConfig(pydantic.BaseModel):
     config: typing.Optional[JobUpdateConfig]
     trigger: typing.Optional[Trigger] = pydantic.Field(description="the type of trigger to use for this job")
     status: typing.Optional[JobStatus] = pydantic.Field(description="the status of the job")
-    progress: typing.Optional[float] = pydantic.Field(description="the progress of the job")
+    progress: typing.Optional[int] = pydantic.Field(
+        description="the progress of the job. Whole number between 0 and 100"
+    )
     file_id: typing.Optional[FileId] = pydantic.Field(alias="fileId")
     mode: typing.Optional[JobMode] = pydantic.Field(description="the mode of the job")
     input: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(

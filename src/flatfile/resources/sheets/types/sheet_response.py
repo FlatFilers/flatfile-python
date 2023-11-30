@@ -13,6 +13,60 @@ except ImportError:
 
 
 class SheetResponse(pydantic.BaseModel):
+    """
+    import datetime
+
+    from flatfile import (
+        Property_String,
+        RecordCounts,
+        Sheet,
+        SheetConfig,
+        SheetResponse,
+    )
+
+    SheetResponse(
+        data=Sheet(
+            id="us_sh_YOUR_ID",
+            workbook_id="us_wb_YOUR_ID",
+            name="Contacts",
+            config=SheetConfig(
+                name="Contacts",
+                slug="contacts",
+                fields=[
+                    Property_String(
+                        type="string",
+                        key="firstName",
+                        label="First Name",
+                    ),
+                    Property_String(
+                        type="string",
+                        key="lastName",
+                        label="Last Name",
+                    ),
+                    Property_String(
+                        type="string",
+                        key="email",
+                        label="Email",
+                    ),
+                ],
+                mapping_confidence_threshold=0.5,
+            ),
+            count_records=RecordCounts(
+                valid=1000,
+                error=0,
+                total=1000,
+            ),
+            locked_by="Example0",
+            updated_at=datetime.datetime.fromisoformat(
+                "2021-08-31 18:00:00+00:00",
+            ),
+            created_at=datetime.datetime.fromisoformat(
+                "2021-08-31 18:00:00+00:00",
+            ),
+        ),
+    )
+    """
+
     data: Sheet
 
     def json(self, **kwargs: typing.Any) -> str:

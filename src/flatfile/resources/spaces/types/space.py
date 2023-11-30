@@ -19,6 +19,36 @@ except ImportError:
 class Space(InternalSpaceConfigBase):
     """
     A place to store your workbooks
+    ---
+    import datetime
+
+    from flatfile import GuestAuthenticationEnum, Space
+
+    Space(
+        id="us_sp_YOUR_ID",
+        name="My First Worbook",
+        display_order=1,
+        created_at=datetime.datetime.fromisoformat(
+            "2021-01-01 00:00:00+00:00",
+        ),
+        updated_at=datetime.datetime.fromisoformat(
+            "2021-01-01 00:00:00+00:00",
+        ),
+        created_by_user_id="us_usr_YOUR_ID",
+        workbooks_count=1,
+        files_count=1,
+        is_collaborative=True,
+        upgraded_at=datetime.datetime.fromisoformat(
+            "2021-01-01 00:00:00+00:00",
+        ),
+        guest_authentication=[
+            GuestAuthenticationEnum.MAGIC_LINK,
+            GuestAuthenticationEnum.SHARED_LINK,
+        ],
+        environment_id="us_env_YOUR_ID",
+        primary_workbook_id="us_wb_YOUR_ID",
+        labels=[],
+    )
     """
 
     id: SpaceId
@@ -35,11 +65,17 @@ class Space(InternalSpaceConfigBase):
     guest_link: typing.Optional[str] = pydantic.Field(alias="guestLink", description="Guest link to the space")
     name: str = pydantic.Field(description="The name of the space")
     display_order: typing.Optional[int] = pydantic.Field(alias="displayOrder", description="The display order")
-    access_token: typing.Optional[str] = pydantic.Field(alias="accessToken")
-    is_collaborative: typing.Optional[bool] = pydantic.Field(alias="isCollaborative")
-    size: typing.Optional[SpaceSize]
-    upgraded_at: typing.Optional[dt.datetime] = pydantic.Field(alias="upgradedAt")
-    guest_authentication: typing.List[GuestAuthenticationEnum] = pydantic.Field(alias="guestAuthentication")
+    access_token: typing.Optional[str] = pydantic.Field(alias="accessToken", description="Access token for the space")
+    is_collaborative: typing.Optional[bool] = pydantic.Field(
+        alias="isCollaborative", description="Flag for collaborative (project) spaces"
+    )
+    size: typing.Optional[SpaceSize] = pydantic.Field(description="Size information for the space")
+    upgraded_at: typing.Optional[dt.datetime] = pydantic.Field(
+        alias="upgradedAt", description="Date when the space was upgraded"
+    )
+    guest_authentication: typing.List[GuestAuthenticationEnum] = pydantic.Field(
+        alias="guestAuthentication", description="Type of guest authentication"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

@@ -54,21 +54,32 @@ class JobsClient:
     ) -> ListJobsResponse:
         """
         Parameters:
-            - environment_id: typing.Optional[EnvironmentId].
+            - environment_id: typing.Optional[EnvironmentId]. When provided, only jobs for the given environment will be returned
 
-            - space_id: typing.Optional[SpaceId].
+            - space_id: typing.Optional[SpaceId]. When provided, only jobs for the given space will be returned
 
-            - workbook_id: typing.Optional[WorkbookId].
+            - workbook_id: typing.Optional[WorkbookId]. When provided, only jobs for the given workbook will be returned
 
-            - file_id: typing.Optional[FileId].
+            - file_id: typing.Optional[FileId]. When provided, only jobs for the given file will be returned
 
-            - parent_id: typing.Optional[JobId].
+            - parent_id: typing.Optional[JobId]. When provided, only jobs that are parts of the given job will be returned
 
             - page_size: typing.Optional[int]. Number of jobs to return in a page (default 20)
 
             - page_number: typing.Optional[int]. Based on pageSize, which page of jobs to return
 
-            - sort_direction: typing.Optional[SortDirection].
+            - sort_direction: typing.Optional[SortDirection]. Sort direction - asc (ascending) or desc (descending)
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.jobs.list(
+            environment_id="us_env_YOUR_ID",
+            space_id="us_sp_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -100,6 +111,21 @@ class JobsClient:
         """
         Parameters:
             - request: JobConfig.
+        ---
+        from flatfile import JobConfig, JobType
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.jobs.create(
+            request=JobConfig(
+                type=JobType.WORKBOOK,
+                operation="submitAction",
+                source="us_wb_YOUR_ID",
+            ),
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -119,7 +145,17 @@ class JobsClient:
     def get(self, job_id: JobId) -> JobResponse:
         """
         Parameters:
-            - job_id: JobId.
+            - job_id: JobId. The id of the job to return
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.jobs.get(
+            job_id="us_jb_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -138,9 +174,24 @@ class JobsClient:
     def update(self, job_id: JobId, *, request: JobUpdate) -> JobResponse:
         """
         Parameters:
-            - job_id: JobId.
+            - job_id: JobId. The id of the job to patch
 
             - request: JobUpdate.
+        ---
+        from flatfile import JobStatus, JobUpdate
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.jobs.update(
+            job_id="us_jb_YOUR_ID",
+            request=JobUpdate(
+                status=JobStatus.COMPLETE,
+                progress=100,
+            ),
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
@@ -160,7 +211,17 @@ class JobsClient:
     def delete(self, job_id: JobId) -> Success:
         """
         Parameters:
-            - job_id: JobId.
+            - job_id: JobId. The id of the job to delete
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.jobs.delete(
+            job_id="us_jb_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
@@ -182,6 +243,16 @@ class JobsClient:
 
         Parameters:
             - job_id: str. ID of job to return
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.jobs.execute(
+            job_id="us_jb_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -203,6 +274,16 @@ class JobsClient:
 
         Parameters:
             - job_id: JobId. ID of job to return
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.jobs.get_execution_plan(
+            job_id="us_jb_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -226,6 +307,68 @@ class JobsClient:
             - job_id: JobId. ID of job to return
 
             - request: JobExecutionPlanRequest.
+        ---
+        from flatfile import (
+            DestinationField,
+            Edge,
+            JobExecutionPlanRequest,
+            Property_String,
+            SourceField,
+        )
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.jobs.update_execution_plan(
+            job_id="us_jb_YOUR_ID",
+            request=JobExecutionPlanRequest(
+                field_mapping=[
+                    Edge(
+                        source_field=Property_String(
+                            type="string",
+                            key="firstName",
+                        ),
+                        destination_field=Property_String(
+                            type="string",
+                            key="firstName",
+                            label="First Name",
+                        ),
+                    ),
+                    Edge(
+                        source_field=Property_String(
+                            type="string",
+                            key="lastName",
+                        ),
+                        destination_field=Property_String(
+                            type="string",
+                            key="lastName",
+                            label="Last Name",
+                        ),
+                    ),
+                ],
+                unmapped_source_fields=[
+                    SourceField(
+                        source_field=Property_String(
+                            type="string",
+                            key="email",
+                        ),
+                    )
+                ],
+                unmapped_destination_fields=[
+                    DestinationField(
+                        destination_field=Property_String(
+                            type="string",
+                            key="email",
+                            label="Email",
+                        ),
+                    )
+                ],
+                file_id="us_fl_YOUR_ID",
+                job_id="us_jb_YOUR_ID",
+            ),
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "PUT",
@@ -274,6 +417,26 @@ class JobsClient:
             - job_id: JobId. ID of job to return
 
             - request: typing.Optional[JobAckDetails].
+        ---
+        import datetime
+
+        from flatfile import JobAckDetails
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.jobs.ack(
+            job_id="us_jb_YOUR_ID",
+            request=JobAckDetails(
+                info="Acknowledged by user",
+                progress=100,
+                estimated_completion_at=datetime.datetime.fromisoformat(
+                    "2023-10-30 20:04:32.074000+00:00",
+                ),
+            ),
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -296,6 +459,16 @@ class JobsClient:
 
         Parameters:
             - job_id: JobId. ID of job to return
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.jobs.ack_outcome(
+            job_id="us_jb_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -319,6 +492,30 @@ class JobsClient:
             - job_id: JobId. ID of job to return
 
             - request: typing.Optional[JobCompleteDetails].
+        ---
+        from flatfile import JobCompleteDetails, JobOutcome, JobOutcomeNext_Id
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.jobs.complete(
+            job_id="us_jb_YOUR_ID",
+            request=JobCompleteDetails(
+                outcome=JobOutcome(
+                    acknowledge=True,
+                    button_text="Acknowledge",
+                    next=JobOutcomeNext_Id(
+                        type="id",
+                        id="us_jb_YOUR_ID",
+                    ),
+                    heading="Success",
+                    message="Job was successful",
+                ),
+                info="Job is Complete",
+            ),
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -343,6 +540,30 @@ class JobsClient:
             - job_id: JobId. ID of job to return
 
             - request: typing.Optional[JobCompleteDetails].
+        ---
+        from flatfile import JobCompleteDetails, JobOutcome, JobOutcomeNext_Id
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.jobs.fail(
+            job_id="us_jb_YOUR_ID",
+            request=JobCompleteDetails(
+                outcome=JobOutcome(
+                    acknowledge=True,
+                    button_text="Acknowledge",
+                    next=JobOutcomeNext_Id(
+                        type="id",
+                        id="us_jb_YOUR_ID",
+                    ),
+                    heading="Failed",
+                    message="Job failed",
+                ),
+                info="Job was failed",
+            ),
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -367,6 +588,20 @@ class JobsClient:
             - job_id: JobId. ID of job to return
 
             - request: typing.Optional[JobCancelDetails].
+        ---
+        from flatfile import JobCancelDetails
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.jobs.cancel(
+            job_id="us_jb_YOUR_ID",
+            request=JobCancelDetails(
+                info="Job was canceled",
+            ),
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -391,6 +626,20 @@ class JobsClient:
             - job_id: JobId. ID of job to return
 
             - request: JobSplitDetails.
+        ---
+        from flatfile import JobSplitDetails
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.jobs.split(
+            job_id="us_jb_YOUR_ID",
+            request=JobSplitDetails(
+                run_in_parallel=True,
+            ),
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -426,21 +675,32 @@ class AsyncJobsClient:
     ) -> ListJobsResponse:
         """
         Parameters:
-            - environment_id: typing.Optional[EnvironmentId].
+            - environment_id: typing.Optional[EnvironmentId]. When provided, only jobs for the given environment will be returned
 
-            - space_id: typing.Optional[SpaceId].
+            - space_id: typing.Optional[SpaceId]. When provided, only jobs for the given space will be returned
 
-            - workbook_id: typing.Optional[WorkbookId].
+            - workbook_id: typing.Optional[WorkbookId]. When provided, only jobs for the given workbook will be returned
 
-            - file_id: typing.Optional[FileId].
+            - file_id: typing.Optional[FileId]. When provided, only jobs for the given file will be returned
 
-            - parent_id: typing.Optional[JobId].
+            - parent_id: typing.Optional[JobId]. When provided, only jobs that are parts of the given job will be returned
 
             - page_size: typing.Optional[int]. Number of jobs to return in a page (default 20)
 
             - page_number: typing.Optional[int]. Based on pageSize, which page of jobs to return
 
-            - sort_direction: typing.Optional[SortDirection].
+            - sort_direction: typing.Optional[SortDirection]. Sort direction - asc (ascending) or desc (descending)
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.jobs.list(
+            environment_id="us_env_YOUR_ID",
+            space_id="us_sp_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -472,6 +732,21 @@ class AsyncJobsClient:
         """
         Parameters:
             - request: JobConfig.
+        ---
+        from flatfile import JobConfig, JobType
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.jobs.create(
+            request=JobConfig(
+                type=JobType.WORKBOOK,
+                operation="submitAction",
+                source="us_wb_YOUR_ID",
+            ),
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
@@ -491,7 +766,17 @@ class AsyncJobsClient:
     async def get(self, job_id: JobId) -> JobResponse:
         """
         Parameters:
-            - job_id: JobId.
+            - job_id: JobId. The id of the job to return
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.jobs.get(
+            job_id="us_jb_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -510,9 +795,24 @@ class AsyncJobsClient:
     async def update(self, job_id: JobId, *, request: JobUpdate) -> JobResponse:
         """
         Parameters:
-            - job_id: JobId.
+            - job_id: JobId. The id of the job to patch
 
             - request: JobUpdate.
+        ---
+        from flatfile import JobStatus, JobUpdate
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.jobs.update(
+            job_id="us_jb_YOUR_ID",
+            request=JobUpdate(
+                status=JobStatus.COMPLETE,
+                progress=100,
+            ),
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
@@ -532,7 +832,17 @@ class AsyncJobsClient:
     async def delete(self, job_id: JobId) -> Success:
         """
         Parameters:
-            - job_id: JobId.
+            - job_id: JobId. The id of the job to delete
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.jobs.delete(
+            job_id="us_jb_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
@@ -554,6 +864,16 @@ class AsyncJobsClient:
 
         Parameters:
             - job_id: str. ID of job to return
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.jobs.execute(
+            job_id="us_jb_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
@@ -575,6 +895,16 @@ class AsyncJobsClient:
 
         Parameters:
             - job_id: JobId. ID of job to return
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.jobs.get_execution_plan(
+            job_id="us_jb_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -598,6 +928,68 @@ class AsyncJobsClient:
             - job_id: JobId. ID of job to return
 
             - request: JobExecutionPlanRequest.
+        ---
+        from flatfile import (
+            DestinationField,
+            Edge,
+            JobExecutionPlanRequest,
+            Property_String,
+            SourceField,
+        )
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.jobs.update_execution_plan(
+            job_id="us_jb_YOUR_ID",
+            request=JobExecutionPlanRequest(
+                field_mapping=[
+                    Edge(
+                        source_field=Property_String(
+                            type="string",
+                            key="firstName",
+                        ),
+                        destination_field=Property_String(
+                            type="string",
+                            key="firstName",
+                            label="First Name",
+                        ),
+                    ),
+                    Edge(
+                        source_field=Property_String(
+                            type="string",
+                            key="lastName",
+                        ),
+                        destination_field=Property_String(
+                            type="string",
+                            key="lastName",
+                            label="Last Name",
+                        ),
+                    ),
+                ],
+                unmapped_source_fields=[
+                    SourceField(
+                        source_field=Property_String(
+                            type="string",
+                            key="email",
+                        ),
+                    )
+                ],
+                unmapped_destination_fields=[
+                    DestinationField(
+                        destination_field=Property_String(
+                            type="string",
+                            key="email",
+                            label="Email",
+                        ),
+                    )
+                ],
+                file_id="us_fl_YOUR_ID",
+                job_id="us_jb_YOUR_ID",
+            ),
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "PUT",
@@ -648,6 +1040,26 @@ class AsyncJobsClient:
             - job_id: JobId. ID of job to return
 
             - request: typing.Optional[JobAckDetails].
+        ---
+        import datetime
+
+        from flatfile import JobAckDetails
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.jobs.ack(
+            job_id="us_jb_YOUR_ID",
+            request=JobAckDetails(
+                info="Acknowledged by user",
+                progress=100,
+                estimated_completion_at=datetime.datetime.fromisoformat(
+                    "2023-10-30 20:04:32.074000+00:00",
+                ),
+            ),
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
@@ -670,6 +1082,16 @@ class AsyncJobsClient:
 
         Parameters:
             - job_id: JobId. ID of job to return
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.jobs.ack_outcome(
+            job_id="us_jb_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
@@ -693,6 +1115,30 @@ class AsyncJobsClient:
             - job_id: JobId. ID of job to return
 
             - request: typing.Optional[JobCompleteDetails].
+        ---
+        from flatfile import JobCompleteDetails, JobOutcome, JobOutcomeNext_Id
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.jobs.complete(
+            job_id="us_jb_YOUR_ID",
+            request=JobCompleteDetails(
+                outcome=JobOutcome(
+                    acknowledge=True,
+                    button_text="Acknowledge",
+                    next=JobOutcomeNext_Id(
+                        type="id",
+                        id="us_jb_YOUR_ID",
+                    ),
+                    heading="Success",
+                    message="Job was successful",
+                ),
+                info="Job is Complete",
+            ),
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
@@ -717,6 +1163,30 @@ class AsyncJobsClient:
             - job_id: JobId. ID of job to return
 
             - request: typing.Optional[JobCompleteDetails].
+        ---
+        from flatfile import JobCompleteDetails, JobOutcome, JobOutcomeNext_Id
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.jobs.fail(
+            job_id="us_jb_YOUR_ID",
+            request=JobCompleteDetails(
+                outcome=JobOutcome(
+                    acknowledge=True,
+                    button_text="Acknowledge",
+                    next=JobOutcomeNext_Id(
+                        type="id",
+                        id="us_jb_YOUR_ID",
+                    ),
+                    heading="Failed",
+                    message="Job failed",
+                ),
+                info="Job was failed",
+            ),
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
@@ -741,6 +1211,20 @@ class AsyncJobsClient:
             - job_id: JobId. ID of job to return
 
             - request: typing.Optional[JobCancelDetails].
+        ---
+        from flatfile import JobCancelDetails
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.jobs.cancel(
+            job_id="us_jb_YOUR_ID",
+            request=JobCancelDetails(
+                info="Job was canceled",
+            ),
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
@@ -765,6 +1249,20 @@ class AsyncJobsClient:
             - job_id: JobId. ID of job to return
 
             - request: JobSplitDetails.
+        ---
+        from flatfile import JobSplitDetails
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.jobs.split(
+            job_id="us_jb_YOUR_ID",
+            request=JobSplitDetails(
+                run_in_parallel=True,
+            ),
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",

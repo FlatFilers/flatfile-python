@@ -9,6 +9,10 @@ T_Result = typing.TypeVar("T_Result")
 class JobMode(str, enum.Enum):
     """
     the mode of the job
+    ---
+    from flatfile import JobMode
+
+    JobMode.FOREGROUND
     """
 
     FOREGROUND = "foreground"

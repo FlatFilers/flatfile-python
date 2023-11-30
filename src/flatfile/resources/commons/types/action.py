@@ -28,21 +28,39 @@ class Action(pydantic.BaseModel):
     )
     """
 
-    slug: typing.Optional[str]
-    operation: typing.Optional[str]
-    mode: typing.Optional[ActionMode]
-    label: str
-    tooltip: typing.Optional[str]
-    type: typing.Optional[str]
-    description: typing.Optional[str]
-    schedule: typing.Optional[ActionSchedule]
-    primary: typing.Optional[bool]
-    confirm: typing.Optional[bool]
-    icon: typing.Optional[str]
-    require_all_valid: typing.Optional[bool] = pydantic.Field(alias="requireAllValid")
-    require_selection: typing.Optional[bool] = pydantic.Field(alias="requireSelection")
-    input_form: typing.Optional[InputForm] = pydantic.Field(alias="inputForm")
-    constraints: typing.Optional[typing.List[ActionConstraint]]
+    slug: typing.Optional[str] = pydantic.Field(description=("**This is deprecated. Use `operation` instead.**\n"))
+    operation: typing.Optional[str] = pydantic.Field(description="This will become the job operation that is triggered")
+    mode: typing.Optional[ActionMode] = pydantic.Field(
+        description="Foreground and toolbarBlocking action mode will prevent interacting with the resource until complete"
+    )
+    label: str = pydantic.Field(description="The text on the button itself.")
+    tooltip: typing.Optional[str] = pydantic.Field(description="A tooltip that appears when hovering the action button")
+    type: typing.Optional[str] = pydantic.Field(description=("**This is deprecated.**\n"))
+    description: typing.Optional[str] = pydantic.Field(
+        description="The text that appears in the dialog after the action is clicked."
+    )
+    schedule: typing.Optional[ActionSchedule] = pydantic.Field(
+        description="Determines if the action should happen on a regular cadence."
+    )
+    primary: typing.Optional[bool] = pydantic.Field(
+        description="A primary action will be more visibly present, whether in Sheet or Workbook."
+    )
+    confirm: typing.Optional[bool] = pydantic.Field(description="Whether to show a modal to confirm the action")
+    icon: typing.Optional[str] = pydantic.Field(
+        description="Icon will work on primary actions. It will only accept an already existing Flatfile design system icon."
+    )
+    require_all_valid: typing.Optional[bool] = pydantic.Field(
+        alias="requireAllValid", description=("**This is deprecated. Use `constraints` instead.**\n")
+    )
+    require_selection: typing.Optional[bool] = pydantic.Field(
+        alias="requireSelection", description=("**This is deprecated. Use `constraints` instead.**\n")
+    )
+    input_form: typing.Optional[InputForm] = pydantic.Field(
+        alias="inputForm", description="Adds an input form for this action after it is clicked."
+    )
+    constraints: typing.Optional[typing.List[ActionConstraint]] = pydantic.Field(
+        description="A limitation or restriction on the action."
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

@@ -35,9 +35,9 @@ class SecretsClient:
         Fetch all secrets for a given environmentId and optionally apply space overrides
 
         Parameters:
-            - environment_id: EnvironmentId.
+            - environment_id: EnvironmentId. The Environment of the secret.
 
-            - space_id: typing.Optional[SpaceId].
+            - space_id: typing.Optional[SpaceId]. The Space of the secret.
         ---
         from flatfile.client import Flatfile
 
@@ -115,7 +115,7 @@ class SecretsClient:
         Deletes a specific Secret from the Environment or Space as is the case
 
         Parameters:
-            - secret_id: SecretId.
+            - secret_id: SecretId. The ID of the secret.
         ---
         from flatfile.client import Flatfile
 
@@ -157,9 +157,9 @@ class AsyncSecretsClient:
         Fetch all secrets for a given environmentId and optionally apply space overrides
 
         Parameters:
-            - environment_id: EnvironmentId.
+            - environment_id: EnvironmentId. The Environment of the secret.
 
-            - space_id: typing.Optional[SpaceId].
+            - space_id: typing.Optional[SpaceId]. The Space of the secret.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -237,7 +237,7 @@ class AsyncSecretsClient:
         Deletes a specific Secret from the Environment or Space as is the case
 
         Parameters:
-            - secret_id: SecretId.
+            - secret_id: SecretId. The ID of the secret.
         ---
         from flatfile.client import AsyncFlatfile
 

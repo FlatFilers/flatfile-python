@@ -9,6 +9,10 @@ T_Result = typing.TypeVar("T_Result")
 class JobType(str, enum.Enum):
     """
     The type of job
+    ---
+    from flatfile import JobType
+
+    JobType.FILE
     """
 
     FILE = "file"

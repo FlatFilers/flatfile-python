@@ -12,6 +12,14 @@ except ImportError:
 
 
 class ResourceJobSubject(pydantic.BaseModel):
+    """
+    from flatfile import ResourceJobSubject
+
+    ResourceJobSubject(
+        id="us_wb_YOUR_ID",
+    )
+    """
+
     id: str
 
     def json(self, **kwargs: typing.Any) -> str:

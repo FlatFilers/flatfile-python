@@ -18,11 +18,17 @@ except ImportError:
 
 
 class FindAndReplaceJobConfig(pydantic.BaseModel):
-    filter: typing.Optional[Filter]
-    filter_field: typing.Optional[FilterField] = pydantic.Field(alias="filterField")
-    search_value: typing.Optional[SearchValue] = pydantic.Field(alias="searchValue")
-    search_field: typing.Optional[SearchField] = pydantic.Field(alias="searchField")
-    q: typing.Optional[str]
+    filter: typing.Optional[Filter] = pydantic.Field(description="The filter to apply to the records")
+    filter_field: typing.Optional[FilterField] = pydantic.Field(
+        alias="filterField", description="The field to filter on"
+    )
+    search_value: typing.Optional[SearchValue] = pydantic.Field(
+        alias="searchValue", description="The value to search for"
+    )
+    search_field: typing.Optional[SearchField] = pydantic.Field(
+        alias="searchField", description="The field to search for the search value in"
+    )
+    q: typing.Optional[str] = pydantic.Field(description="The FFQL query to filter records")
     ids: typing.Optional[typing.List[RecordId]] = pydantic.Field(
         description=(
             "The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records\n"

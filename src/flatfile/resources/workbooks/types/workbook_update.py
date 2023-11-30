@@ -18,14 +18,38 @@ except ImportError:
 class WorkbookUpdate(pydantic.BaseModel):
     """
     The updates to be made to an existing workbook
+    ---
+    from flatfile import Action, ActionMode, WorkbookUpdate
+
+    WorkbookUpdate(
+        name="My Updated Workbook",
+        labels=["my-new-label"],
+        actions=[
+            Action(
+                operation="submitAction",
+                mode=ActionMode.FOREGROUND,
+                label="Submit Changes",
+                description="Submit data to webhook.site",
+                primary=True,
+            )
+        ],
+    )
     """
 
-    name: typing.Optional[str]
-    labels: typing.Optional[typing.List[str]]
-    space_id: typing.Optional[SpaceId] = pydantic.Field(alias="spaceId")
-    environment_id: typing.Optional[EnvironmentId] = pydantic.Field(alias="environmentId")
-    namespace: typing.Optional[str]
-    sheets: typing.Optional[typing.List[SheetConfigOrUpdate]]
+    name: typing.Optional[str] = pydantic.Field(description="The name of the Workbook.")
+    labels: typing.Optional[typing.List[str]] = pydantic.Field(
+        description="An optional list of labels for the Workbook."
+    )
+    space_id: typing.Optional[SpaceId] = pydantic.Field(
+        alias="spaceId", description="The Space Id associated with the Workbook."
+    )
+    environment_id: typing.Optional[EnvironmentId] = pydantic.Field(
+        alias="environmentId", description="The Environment Id associated with the Workbook."
+    )
+    namespace: typing.Optional[str] = pydantic.Field(description="The namespace of the Workbook.")
+    sheets: typing.Optional[typing.List[SheetConfigOrUpdate]] = pydantic.Field(
+        description="Describes shape of data as well as behavior"
+    )
     actions: typing.Optional[typing.List[Action]]
     metadata: typing.Optional[typing.Any] = pydantic.Field(description="Metadata for the workbook")
 

@@ -28,4 +28,12 @@ class JobSubject_Collection(CollectionJobSubject):
         allow_population_by_field_name = True
 
 
+"""
+from flatfile import JobSubject_Resource
+
+JobSubject_Resource(
+    type="resource",
+    id="us_wb_YOUR_ID",
+)
+"""
 JobSubject = typing.Union[JobSubject_Resource, JobSubject_Collection]

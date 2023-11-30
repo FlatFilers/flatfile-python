@@ -16,6 +16,101 @@ except ImportError:
 class JobPlan(pydantic.BaseModel):
     """
     The job/plan tuple that contains the full plan and the jobs status
+    ---
+    import datetime
+
+    from flatfile import (
+        Certainty,
+        Edge,
+        Job,
+        JobExecutionPlan,
+        JobMode,
+        JobPlan,
+        JobStatus,
+        JobSubject_Resource,
+        JobType,
+        Metadata,
+        Property_String,
+        Trigger,
+    )
+
+    JobPlan(
+        job=Job(
+            id="us_jb_YOUR_ID",
+            created_at=datetime.datetime.fromisoformat(
+                "2023-10-30 20:04:28.556000+00:00",
+            ),
+            updated_at=datetime.datetime.fromisoformat(
+                "2023-10-30 20:04:32.075000+00:00",
+            ),
+            started_at=datetime.datetime.fromisoformat(
+                "2023-10-30 20:04:29.453000+00:00",
+            ),
+            finished_at=datetime.datetime.fromisoformat(
+                "2023-10-30 20:04:32.074000+00:00",
+            ),
+            environment_id="us_env_YOUR_ID",
+            type=JobType.WORKBOOK,
+            operation="submitAction",
+            source="us_wb_YOUR_ID",
+            destination="us_wb_YOUR_ID",
+            trigger=Trigger.IMMEDIATE,
+            status=JobStatus.COMPLETE,
+            progress=100,
+            file_id="us_fl_YOUR_ID",
+            mode=JobMode.FOREGROUND,
+            input={},
+            subject=JobSubject_Resource(
+                type="resource",
+                id="us_wb_YOUR_ID",
+            ),
+            outcome={
+                "message": "Data was successfully submitted to Webhook.site. Go check it out at https://example.site/example."
+            },
+            info="Starting job to submit action to webhook.site",
+            managed=True,
+        ),
+        plan=JobExecutionPlan(
+            field_mapping=[
+                Edge(
+                    source_field=Property_String(
+                        type="string",
+                        key="firstName",
+                    ),
+                    destination_field=Property_String(
+                        type="string",
+                        key="firstName",
+                        label="First Name",
+                    ),
+                    preview=["John", "Suzy", "Joe"],
+                    metadata=Metadata(
+                        certainty=Certainty.ABSOLUTE,
+                        confidence=1.0,
+                        source="exact",
+                    ),
+                ),
+                Edge(
+                    source_field=Property_String(
+                        type="string",
+                        key="lastName",
+                    ),
+                    destination_field=Property_String(
+                        type="string",
+                        key="lastName",
+                        label="Last Name",
+                    ),
+                    preview=["Smith", "Que", "Montana"],
+                    metadata=Metadata(
+                        certainty=Certainty.ABSOLUTE,
+                        confidence=1.0,
+                        source="exact",
+                    ),
+                ),
+            ],
+            unmapped_source_fields=[],
+            unmapped_destination_fields=[],
+        ),
+    )
     """
 
     job: Job

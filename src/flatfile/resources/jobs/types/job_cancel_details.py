@@ -14,6 +14,12 @@ except ImportError:
 class JobCancelDetails(pydantic.BaseModel):
     """
     Info about the reason the job was canceled
+    ---
+    from flatfile import JobCancelDetails
+
+    JobCancelDetails(
+        info="Job was canceled",
+    )
     """
 
     info: typing.Optional[str]

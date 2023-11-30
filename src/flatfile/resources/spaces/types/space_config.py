@@ -16,6 +16,15 @@ except ImportError:
 class SpaceConfig(InternalSpaceConfigBase):
     """
     Properties used to create a new Space
+    ---
+    from flatfile import SpaceConfig
+
+    SpaceConfig(
+        name="My First Worbook",
+        display_order=1,
+        environment_id="us_env_YOUR_ID",
+        primary_workbook_id="us_wb_YOUR_ID",
+    )
     """
 
     name: typing.Optional[str] = pydantic.Field(description="The name of the space")

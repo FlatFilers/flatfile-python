@@ -18,9 +18,15 @@ class EnumDetails(pydantic.BaseModel):
     Only available if one or more of the destination fields is of type enum. Provides category mapping.
     """
 
-    mapping: typing.Optional[typing.List[CategoryMapping]]
-    unused_source_values: typing.Optional[typing.List[EnumValue]] = pydantic.Field(alias="unusedSourceValues")
-    unused_destination_values: typing.Optional[typing.List[EnumValue]] = pydantic.Field(alias="unusedDestinationValues")
+    mapping: typing.Optional[typing.List[CategoryMapping]] = pydantic.Field(
+        description="The mapping of source values to destination values"
+    )
+    unused_source_values: typing.Optional[typing.List[EnumValue]] = pydantic.Field(
+        alias="unusedSourceValues", description="A list of source values that are not mapped from"
+    )
+    unused_destination_values: typing.Optional[typing.List[EnumValue]] = pydantic.Field(
+        alias="unusedDestinationValues", description="A list of destination values that are not mapped to"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

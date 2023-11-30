@@ -49,21 +49,31 @@ class SpacesClient:
         Returns all spaces for an account or environment
 
         Parameters:
-            - environment_id: typing.Optional[EnvironmentId].
+            - environment_id: typing.Optional[EnvironmentId]. The ID of the environment.
 
             - page_size: typing.Optional[int]. Number of spaces to return in a page (default 10)
 
             - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
 
-            - search: typing.Optional[str].
+            - search: typing.Optional[str]. Search query for spaces
 
-            - archived: typing.Optional[bool].
+            - archived: typing.Optional[bool]. Flag to include archived spaces
 
-            - sort_field: typing.Optional[GetSpacesSortField].
+            - sort_field: typing.Optional[GetSpacesSortField]. Field to sort spaces by
 
-            - sort_direction: typing.Optional[SortDirection].
+            - sort_direction: typing.Optional[SortDirection]. Direction of sorting
 
-            - is_collaborative: typing.Optional[bool].
+            - is_collaborative: typing.Optional[bool]. Flag for collaborative (project) spaces
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.spaces.list(
+            environment_id="us_env_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -99,6 +109,22 @@ class SpacesClient:
 
         Parameters:
             - request: SpaceConfig.
+        ---
+        from flatfile import SpaceConfig
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.spaces.create(
+            request=SpaceConfig(
+                name="My First Worbook",
+                display_order=1,
+                environment_id="us_env_YOUR_ID",
+                primary_workbook_id="us_wb_YOUR_ID",
+            ),
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -125,6 +151,16 @@ class SpacesClient:
 
         Parameters:
             - space_id: SpaceId. ID of space to return
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.spaces.get(
+            space_id="us_sp_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
@@ -150,6 +186,16 @@ class SpacesClient:
 
         Parameters:
             - space_id: SpaceId. ID of space to delete
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.spaces.delete(
+            space_id="us_sp_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
@@ -175,6 +221,16 @@ class SpacesClient:
 
         Parameters:
             - ids: typing.Union[SpaceId, typing.List[SpaceId]]. List of ids for the spaces to be deleted
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.spaces.bulk_delete(
+            ids="us_sp_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
@@ -203,6 +259,20 @@ class SpacesClient:
             - space_id: SpaceId. ID of space to update
 
             - request: SpaceConfig.
+        ---
+        from flatfile import SpaceConfig
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.spaces.update(
+            space_id="us_sp_YOUR_ID",
+            request=SpaceConfig(
+                name="My Updated Worbook",
+            ),
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
@@ -229,6 +299,16 @@ class SpacesClient:
 
         Parameters:
             - space_id: SpaceId. ID of space to archive
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.spaces.archive_space(
+            space_id="us_sp_YOUR_ID",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -269,21 +349,31 @@ class AsyncSpacesClient:
         Returns all spaces for an account or environment
 
         Parameters:
-            - environment_id: typing.Optional[EnvironmentId].
+            - environment_id: typing.Optional[EnvironmentId]. The ID of the environment.
 
             - page_size: typing.Optional[int]. Number of spaces to return in a page (default 10)
 
             - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
 
-            - search: typing.Optional[str].
+            - search: typing.Optional[str]. Search query for spaces
 
-            - archived: typing.Optional[bool].
+            - archived: typing.Optional[bool]. Flag to include archived spaces
 
-            - sort_field: typing.Optional[GetSpacesSortField].
+            - sort_field: typing.Optional[GetSpacesSortField]. Field to sort spaces by
 
-            - sort_direction: typing.Optional[SortDirection].
+            - sort_direction: typing.Optional[SortDirection]. Direction of sorting
 
-            - is_collaborative: typing.Optional[bool].
+            - is_collaborative: typing.Optional[bool]. Flag for collaborative (project) spaces
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.spaces.list(
+            environment_id="us_env_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -319,6 +409,22 @@ class AsyncSpacesClient:
 
         Parameters:
             - request: SpaceConfig.
+        ---
+        from flatfile import SpaceConfig
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.spaces.create(
+            request=SpaceConfig(
+                name="My First Worbook",
+                display_order=1,
+                environment_id="us_env_YOUR_ID",
+                primary_workbook_id="us_wb_YOUR_ID",
+            ),
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
@@ -345,6 +451,16 @@ class AsyncSpacesClient:
 
         Parameters:
             - space_id: SpaceId. ID of space to return
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.spaces.get(
+            space_id="us_sp_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
@@ -370,6 +486,16 @@ class AsyncSpacesClient:
 
         Parameters:
             - space_id: SpaceId. ID of space to delete
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.spaces.delete(
+            space_id="us_sp_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
@@ -395,6 +521,16 @@ class AsyncSpacesClient:
 
         Parameters:
             - ids: typing.Union[SpaceId, typing.List[SpaceId]]. List of ids for the spaces to be deleted
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.spaces.bulk_delete(
+            ids="us_sp_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
@@ -423,6 +559,20 @@ class AsyncSpacesClient:
             - space_id: SpaceId. ID of space to update
 
             - request: SpaceConfig.
+        ---
+        from flatfile import SpaceConfig
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.spaces.update(
+            space_id="us_sp_YOUR_ID",
+            request=SpaceConfig(
+                name="My Updated Worbook",
+            ),
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
@@ -449,6 +599,16 @@ class AsyncSpacesClient:
 
         Parameters:
             - space_id: SpaceId. ID of space to archive
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.spaces.archive_space(
+            space_id="us_sp_YOUR_ID",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",

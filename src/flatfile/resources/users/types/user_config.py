@@ -15,6 +15,14 @@ except ImportError:
 class UserConfig(pydantic.BaseModel):
     """
     Properties used to create a new user
+    ---
+    from flatfile import UserConfig
+
+    UserConfig(
+        email="john.smith@example.com",
+        name="john.smith",
+        account_id="us_acc_YOUR_ID",
+    )
     """
 
     email: str

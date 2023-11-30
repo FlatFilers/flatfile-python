@@ -8,7 +8,11 @@ T_Result = typing.TypeVar("T_Result")
 
 class Trigger(str, enum.Enum):
     """
-    the type of trigger to use for this job
+    The type of trigger to use for this job
+    ---
+    from flatfile import Trigger
+
+    Trigger.IMMEDIATE
     """
 
     MANUAL = "manual"

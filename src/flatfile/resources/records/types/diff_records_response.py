@@ -13,6 +13,23 @@ except ImportError:
 
 
 class DiffRecordsResponse(pydantic.BaseModel):
+    """
+    from flatfile import DiffRecord, DiffRecordsResponse, DiffValue
+
+    DiffRecordsResponse(
+        data=[
+            DiffRecord(
+                id="us_rc_YOUR_ID",
+                values={
+                    "firstName": DiffValue(),
+                    "lastName": DiffValue(),
+                    "email": DiffValue(),
+                },
+            )
+        ],
+    )
+    """
+
     data: DiffRecords
 
     def json(self, **kwargs: typing.Any) -> str:

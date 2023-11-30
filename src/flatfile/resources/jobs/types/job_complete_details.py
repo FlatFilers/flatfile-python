@@ -15,6 +15,22 @@ except ImportError:
 class JobCompleteDetails(pydantic.BaseModel):
     """
     Outcome summary of a job
+    ---
+    from flatfile import JobCompleteDetails, JobOutcome, JobOutcomeNext_Id
+
+    JobCompleteDetails(
+        outcome=JobOutcome(
+            acknowledge=True,
+            button_text="Acknowledge",
+            next=JobOutcomeNext_Id(
+                type="id",
+                id="us_jb_YOUR_ID",
+            ),
+            heading="Success",
+            message="Job was successful",
+        ),
+        info="Job is Complete",
+    )
     """
 
     outcome: typing.Optional[JobOutcome]

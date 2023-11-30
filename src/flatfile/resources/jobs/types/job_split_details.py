@@ -15,6 +15,12 @@ except ImportError:
 class JobSplitDetails(pydantic.BaseModel):
     """
     Info about the reason the job was split
+    ---
+    from flatfile import JobSplitDetails
+
+    JobSplitDetails(
+        run_in_parallel=True,
+    )
     """
 
     parts: JobParts

@@ -15,14 +15,18 @@ except ImportError:
 
 
 class Edge(pydantic.BaseModel):
-    source_field: Property = pydantic.Field(alias="sourceField")
-    destination_field: Property = pydantic.Field(alias="destinationField")
-    preview: typing.Optional[typing.List[str]]
+    source_field: Property = pydantic.Field(alias="sourceField", description="The description of the source field")
+    destination_field: Property = pydantic.Field(
+        alias="destinationField", description="The description of the destination field"
+    )
+    preview: typing.Optional[typing.List[str]] = pydantic.Field(
+        description="A list of preview values of the data in the destination field"
+    )
     enum_details: typing.Optional[EnumDetails] = pydantic.Field(
         alias="enumDetails",
         description="Only available if one or more of the destination fields is of type enum. Provides category mapping.",
     )
-    metadata: typing.Optional[Metadata]
+    metadata: typing.Optional[Metadata] = pydantic.Field(description="Metadata about the edge")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

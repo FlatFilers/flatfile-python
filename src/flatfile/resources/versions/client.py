@@ -28,12 +28,21 @@ class VersionsClient:
         self, *, sheet_id: typing.Optional[SheetId] = OMIT, parent_version_id: typing.Optional[VersionId] = OMIT
     ) -> VersionResponse:
         """
-        Creates a new version id that can be used to group record updates
-
         Parameters:
-            - sheet_id: typing.Optional[SheetId].
+            - sheet_id: typing.Optional[SheetId]. The ID of the Sheet.
 
-            - parent_version_id: typing.Optional[VersionId].
+            - parent_version_id: typing.Optional[VersionId]. Deprecated, creating or updating a group of records together will automatically generate a commitId to group those record changes together.
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        client.versions.create_id(
+            sheet_id="us_sh_YOUR_ID",
+            parent_version_id="us_vr_YOUR_ID",
+        )
         """
         _request: typing.Dict[str, typing.Any] = {}
         if sheet_id is not OMIT:
@@ -64,12 +73,21 @@ class AsyncVersionsClient:
         self, *, sheet_id: typing.Optional[SheetId] = OMIT, parent_version_id: typing.Optional[VersionId] = OMIT
     ) -> VersionResponse:
         """
-        Creates a new version id that can be used to group record updates
-
         Parameters:
-            - sheet_id: typing.Optional[SheetId].
+            - sheet_id: typing.Optional[SheetId]. The ID of the Sheet.
 
-            - parent_version_id: typing.Optional[VersionId].
+            - parent_version_id: typing.Optional[VersionId]. Deprecated, creating or updating a group of records together will automatically generate a commitId to group those record changes together.
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
+            token="YOUR_TOKEN",
+        )
+        await client.versions.create_id(
+            sheet_id="us_sh_YOUR_ID",
+            parent_version_id="us_vr_YOUR_ID",
+        )
         """
         _request: typing.Dict[str, typing.Any] = {}
         if sheet_id is not OMIT:

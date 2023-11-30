@@ -7,9 +7,9 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
+from ..commons.types.commit_id import CommitId
 from ..commons.types.errors import Errors
 from ..commons.types.success import Success
-from ..commons.types.version_id import VersionId
 from .types.commit_response import CommitResponse
 
 try:
@@ -22,12 +22,12 @@ class CommitsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def get(self, commit_id: VersionId) -> CommitResponse:
+    def get(self, commit_id: CommitId) -> CommitResponse:
         """
         Returns the details of a commit version
 
         Parameters:
-            - commit_id: VersionId. ID of the commit version to return
+            - commit_id: CommitId. ID of the commit version to return
         ---
         from flatfile.client import Flatfile
 
@@ -57,12 +57,12 @@ class CommitsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def complete(self, commit_id: VersionId) -> Success:
+    def complete(self, commit_id: CommitId) -> Success:
         """
         Completes a commit version. This marks the commit as complete and acknowledges that the changes have been applied to the sheet.
 
         Parameters:
-            - commit_id: VersionId. ID of the commit version to complete
+            - commit_id: CommitId. ID of the commit version to complete
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -82,12 +82,12 @@ class CommitsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def replay(self, commit_id: VersionId) -> Success:
+    def replay(self, commit_id: CommitId) -> Success:
         """
         Replays a commit:created event.
 
         Parameters:
-            - commit_id: VersionId. ID of the commit version to re-emit a commit:created event for
+            - commit_id: CommitId. ID of the commit version to re-emit a commit:created event for
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
@@ -112,12 +112,12 @@ class AsyncCommitsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    async def get(self, commit_id: VersionId) -> CommitResponse:
+    async def get(self, commit_id: CommitId) -> CommitResponse:
         """
         Returns the details of a commit version
 
         Parameters:
-            - commit_id: VersionId. ID of the commit version to return
+            - commit_id: CommitId. ID of the commit version to return
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -147,12 +147,12 @@ class AsyncCommitsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def complete(self, commit_id: VersionId) -> Success:
+    async def complete(self, commit_id: CommitId) -> Success:
         """
         Completes a commit version. This marks the commit as complete and acknowledges that the changes have been applied to the sheet.
 
         Parameters:
-            - commit_id: VersionId. ID of the commit version to complete
+            - commit_id: CommitId. ID of the commit version to complete
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
@@ -172,12 +172,12 @@ class AsyncCommitsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def replay(self, commit_id: VersionId) -> Success:
+    async def replay(self, commit_id: CommitId) -> Success:
         """
         Replays a commit:created event.
 
         Parameters:
-            - commit_id: VersionId. ID of the commit version to re-emit a commit:created event for
+            - commit_id: CommitId. ID of the commit version to re-emit a commit:created event for
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",

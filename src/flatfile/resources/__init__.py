@@ -2,18 +2,14 @@
 
 from . import (
     agents,
-    auth,
-    cells,
     commits,
     commons,
-    data_retention_policies,
     documents,
     environments,
     events,
     files,
     guests,
     jobs,
-    mapping,
     property,
     records,
     roles,
@@ -39,23 +35,8 @@ from .agents import (
     GetExecutionsResponse,
     ListAgentsResponse,
 )
-from .auth import (
-    ApiCredentials,
-    ApiKey,
-    ApiKeyId,
-    ApiKeyOperation,
-    ApiKeyType,
-    ApiKeysResponse,
-    Credentials,
-    Credentials_ApiCredentials,
-    Credentials_UserCredentials,
-    RawKey,
-    UserCredentials,
-)
-from .cells import CellValueWithCounts, CellsResponse, CellsResponseData, Distinct, FieldKey, IncludeCounts
 from .commits import Commit, CommitResponse, ListCommitsResponse
 from .commons import (
-    AccessToken,
     AccountId,
     Action,
     ActionConstraint,
@@ -64,7 +45,7 @@ from .commons import (
     ActionSchedule,
     AgentId,
     BadRequestError,
-    DataRetentionPolicyId,
+    CommitId,
     DocumentId,
     EnvironmentId,
     Error,
@@ -82,7 +63,6 @@ from .commons import (
     InputForm,
     InputFormType,
     JobId,
-    MappingId,
     NotFoundError,
     PageNumber,
     PageSize,
@@ -104,12 +84,6 @@ from .commons import (
     UserId,
     VersionId,
     WorkbookId,
-)
-from .data_retention_policies import (
-    DataRetentionPolicy,
-    DataRetentionPolicyConfig,
-    DataRetentionPolicyEnum,
-    DataRetentionPolicyResponse,
 )
 from .documents import Document, DocumentConfig, DocumentResponse, ListDocumentsResponse
 from .environments import (
@@ -248,15 +222,6 @@ from .jobs import (
     SourceField,
     Trigger,
 )
-from .mapping import (
-    MappingRule,
-    MappingRuleBase,
-    MappingRuleConfig,
-    MappingRuleOneToOne,
-    MappingRuleResponse,
-    MappingRuleType,
-    MappingRulesResponse,
-)
 from .property import (
     ArrayableProperty,
     BaseProperty,
@@ -316,6 +281,12 @@ from .records import (
 from .roles import ActorIdUnion, AssignRoleResponse, AssignRoleResponseData, ResourceIdUnion
 from .secrets import Secret, SecretName, SecretValue, SecretsResponse, WriteSecret
 from .sheets import (
+    CellValueWithCounts,
+    CellsResponse,
+    CellsResponseData,
+    Distinct,
+    FieldKey,
+    IncludeCounts,
     ListSheetsResponse,
     RecordCountsResponse,
     RecordCountsResponseData,
@@ -348,17 +319,7 @@ from .spaces import (
     SpaceResponse,
     SpaceSize,
 )
-from .users import (
-    ApiToken,
-    ApiTokenResponse,
-    ExchangeTokenData,
-    ExchangeTokenResponse,
-    ListApiTokensResponse,
-    ListUsersResponse,
-    User,
-    UserConfig,
-    UserResponse,
-)
+from .users import ListUsersResponse, User, UserConfig, UserResponse
 from .versions import Version, VersionResponse
 from .workbooks import (
     CreateWorkbookConfig,
@@ -370,7 +331,6 @@ from .workbooks import (
 )
 
 __all__ = [
-    "AccessToken",
     "AccountId",
     "Action",
     "ActionConstraint",
@@ -384,14 +344,6 @@ __all__ = [
     "AgentId",
     "AgentLog",
     "AgentResponse",
-    "ApiCredentials",
-    "ApiKey",
-    "ApiKeyId",
-    "ApiKeyOperation",
-    "ApiKeyType",
-    "ApiKeysResponse",
-    "ApiToken",
-    "ApiTokenResponse",
     "ArrayableProperty",
     "AssignRoleResponse",
     "AssignRoleResponseData",
@@ -411,6 +363,7 @@ __all__ = [
     "ChangeType",
     "CollectionJobSubject",
     "Commit",
+    "CommitId",
     "CommitResponse",
     "Compiler",
     "Constraint",
@@ -421,14 +374,6 @@ __all__ = [
     "CreateEventConfig",
     "CreateGuestResponse",
     "CreateWorkbookConfig",
-    "Credentials",
-    "Credentials_ApiCredentials",
-    "Credentials_UserCredentials",
-    "DataRetentionPolicy",
-    "DataRetentionPolicyConfig",
-    "DataRetentionPolicyEnum",
-    "DataRetentionPolicyId",
-    "DataRetentionPolicyResponse",
     "DateProperty",
     "DeleteRecordsJobConfig",
     "DestinationField",
@@ -502,8 +447,6 @@ __all__ = [
     "Event_WorkbookCreated",
     "Event_WorkbookDeleted",
     "Event_WorkbookUpdated",
-    "ExchangeTokenData",
-    "ExchangeTokenResponse",
     "Execution",
     "ExportJobConfig",
     "ExportOptions",
@@ -584,7 +527,6 @@ __all__ = [
     "JobUpdateConfig",
     "ListAgentsResponse",
     "ListAllEventsResponse",
-    "ListApiTokensResponse",
     "ListCommitsResponse",
     "ListDocumentsResponse",
     "ListEnvironmentsResponse",
@@ -595,15 +537,7 @@ __all__ = [
     "ListSpacesResponse",
     "ListUsersResponse",
     "ListWorkbooksResponse",
-    "MappingId",
     "MappingProgramJobConfig",
-    "MappingRule",
-    "MappingRuleBase",
-    "MappingRuleConfig",
-    "MappingRuleOneToOne",
-    "MappingRuleResponse",
-    "MappingRuleType",
-    "MappingRulesResponse",
     "Metadata",
     "Mode",
     "ModelFileStatusEnum",
@@ -624,7 +558,6 @@ __all__ = [
     "Property_Number",
     "Property_Reference",
     "Property_String",
-    "RawKey",
     "Record",
     "RecordBase",
     "RecordCounts",
@@ -688,7 +621,6 @@ __all__ = [
     "UniqueConstraintConfig",
     "User",
     "UserConfig",
-    "UserCredentials",
     "UserId",
     "UserResponse",
     "ValidationMessage",
@@ -704,18 +636,14 @@ __all__ = [
     "WorkbookUpdate",
     "WriteSecret",
     "agents",
-    "auth",
-    "cells",
     "commits",
     "commons",
-    "data_retention_policies",
     "documents",
     "environments",
     "events",
     "files",
     "guests",
     "jobs",
-    "mapping",
     "property",
     "records",
     "roles",

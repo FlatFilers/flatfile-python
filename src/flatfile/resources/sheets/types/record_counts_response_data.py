@@ -4,12 +4,30 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
-from ...commons.types.success import Success
 from ...records.types.record_counts import RecordCounts
 
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
-class RecordCountsResponseData(Success):
+
+class RecordCountsResponseData(pydantic.BaseModel):
+    """
+    from flatfile import RecordCounts, RecordCountsResponseData
+
+    RecordCountsResponseData(
+        counts=RecordCounts(
+            valid=1000,
+            error=0,
+            total=1000,
+        ),
+        success=True,
+    )
+    """
+
     counts: RecordCounts
+    success: bool
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -22,5 +40,4 @@ class RecordCountsResponseData(Success):
     class Config:
         frozen = True
         smart_union = True
-        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

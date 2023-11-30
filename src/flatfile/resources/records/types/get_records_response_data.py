@@ -4,6 +4,7 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
+from ...commons.types.commit_id import CommitId
 from ...commons.types.success_data import SuccessData
 from ...commons.types.version_id import VersionId
 from .record_counts import RecordCounts
@@ -18,11 +19,64 @@ except ImportError:
 class GetRecordsResponseData(SuccessData):
     """
     A list of records with optional record counts
+    ---
+    import datetime
+
+    from flatfile import (
+        CellValueWithLinks,
+        GetRecordsResponseData,
+        RecordCounts,
+        RecordWithLinks,
+    )
+
+    GetRecordsResponseData(
+        records=[
+            RecordWithLinks(
+                id="us_rc_YOUR_ID",
+                values={
+                    "firstName": CellValueWithLinks(
+                        messages=[],
+                        valid=True,
+                        updated_at=datetime.datetime.fromisoformat(
+                            "2023-11-20 16:59:40.286000+00:00",
+                        ),
+                    ),
+                    "lastName": CellValueWithLinks(
+                        messages=[],
+                        valid=True,
+                        updated_at=datetime.datetime.fromisoformat(
+                            "2023-11-20 16:59:40.286000+00:00",
+                        ),
+                    ),
+                    "email": CellValueWithLinks(
+                        messages=[],
+                        valid=True,
+                        updated_at=datetime.datetime.fromisoformat(
+                            "2023-11-20 16:59:40.286000+00:00",
+                        ),
+                    ),
+                },
+                valid=True,
+                metadata={},
+            )
+        ],
+        counts=RecordCounts(
+            valid=1000,
+            error=0,
+            total=1000,
+        ),
+        version_id="us_vr_YOUR_ID",
+        commit_id="us_vr_YOUR_ID",
+        success=True,
+    )
     """
 
     records: RecordsWithLinks
     counts: typing.Optional[RecordCounts]
-    version_id: typing.Optional[VersionId] = pydantic.Field(alias="versionId")
+    version_id: typing.Optional[VersionId] = pydantic.Field(
+        alias="versionId", description="Deprecated, use `commitId` instead."
+    )
+    commit_id: typing.Optional[CommitId] = pydantic.Field(alias="commitId")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

@@ -4,4 +4,18 @@ import typing
 
 from .diff_record import DiffRecord
 
+"""
+from flatfile import DiffRecord, DiffValue
+
+[
+    DiffRecord(
+        id="us_rc_YOUR_ID",
+        values={
+            "firstName": DiffValue(),
+            "lastName": DiffValue(),
+            "email": DiffValue(),
+        },
+    )
+]
+"""
 DiffRecords = typing.List[DiffRecord]

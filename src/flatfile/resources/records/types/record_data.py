@@ -4,4 +4,22 @@ import typing
 
 from .cell_value import CellValue
 
+"""
+from flatfile import CellValue
+
+{
+    "firstName": CellValue(
+        messages=[],
+        valid=True,
+    ),
+    "lastName": CellValue(
+        messages=[],
+        valid=True,
+    ),
+    "email": CellValue(
+        messages=[],
+        valid=True,
+    ),
+}
+"""
 RecordData = typing.Dict[str, CellValue]

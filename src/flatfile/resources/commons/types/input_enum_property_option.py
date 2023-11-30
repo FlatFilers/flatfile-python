@@ -22,7 +22,7 @@ class InputEnumPropertyOption(pydantic.BaseModel):
         description="An arbitrary JSON object to be associated with this option and made available to hooks"
     )
     value: typing.Any = pydantic.Field(
-        description="The value or ID of this option. This value will be sent in egress.  The type is a string | integer | boolean."
+        description="The value or ID of this option. This value will be sent in egress. The type is a string | integer | boolean."
     )
 
     def json(self, **kwargs: typing.Any) -> str:

@@ -7,6 +7,10 @@ T_Result = typing.TypeVar("T_Result")
 
 
 class ActionMode(str, enum.Enum):
+    """
+    Foreground actions will prevent interacting with the resource until complete
+    """
+
     FOREGROUND = "foreground"
     BACKGROUND = "background"
     TOOLBAR_BLOCKING = "toolbarBlocking"

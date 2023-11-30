@@ -13,6 +13,40 @@ except ImportError:
 
 
 class SpaceResponse(pydantic.BaseModel):
+    """
+    import datetime
+
+    from flatfile import GuestAuthenticationEnum, Space, SpaceResponse
+
+    SpaceResponse(
+        data=Space(
+            id="us_sp_YOUR_ID",
+            name="My First Worbook",
+            display_order=1,
+            created_at=datetime.datetime.fromisoformat(
+                "2021-01-01 00:00:00+00:00",
+            ),
+            updated_at=datetime.datetime.fromisoformat(
+                "2021-01-01 00:00:00+00:00",
+            ),
+            created_by_user_id="us_usr_YOUR_ID",
+            workbooks_count=1,
+            files_count=1,
+            is_collaborative=True,
+            upgraded_at=datetime.datetime.fromisoformat(
+                "2021-01-01 00:00:00+00:00",
+            ),
+            guest_authentication=[
+                GuestAuthenticationEnum.MAGIC_LINK,
+                GuestAuthenticationEnum.SHARED_LINK,
+            ],
+            environment_id="us_env_YOUR_ID",
+            primary_workbook_id="us_wb_YOUR_ID",
+            labels=[],
+        ),
+    )
+    """
+
     data: Space
 
     def json(self, **kwargs: typing.Any) -> str:

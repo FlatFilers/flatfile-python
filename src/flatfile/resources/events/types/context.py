@@ -5,6 +5,7 @@ import typing
 
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.account_id import AccountId
+from ...commons.types.commit_id import CommitId
 from ...commons.types.document_id import DocumentId
 from ...commons.types.environment_id import EnvironmentId
 from ...commons.types.event_id import EventId
@@ -50,8 +51,10 @@ class Context(pydantic.BaseModel):
     sheet_id: typing.Optional[SheetId] = pydantic.Field(alias="sheetId")
     sheet_slug: typing.Optional[SheetSlug] = pydantic.Field(alias="sheetSlug")
     snapshot_id: typing.Optional[SnapshotId] = pydantic.Field(alias="snapshotId")
-    version_id: typing.Optional[VersionId] = pydantic.Field(alias="versionId")
-    commit_id: typing.Optional[VersionId] = pydantic.Field(alias="commitId")
+    version_id: typing.Optional[VersionId] = pydantic.Field(
+        alias="versionId", description="Deprecated, use `commitId` instead."
+    )
+    commit_id: typing.Optional[CommitId] = pydantic.Field(alias="commitId")
     job_id: typing.Optional[JobId] = pydantic.Field(alias="jobId")
     file_id: typing.Optional[FileId] = pydantic.Field(alias="fileId")
     document_id: typing.Optional[DocumentId] = pydantic.Field(alias="documentId")

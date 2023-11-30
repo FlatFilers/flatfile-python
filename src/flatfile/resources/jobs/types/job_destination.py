@@ -2,4 +2,7 @@
 
 from ...commons.types.workbook_id import WorkbookId
 
+"""
+"us_wb_YOUR_ID"
+"""
 JobDestination = WorkbookId
