@@ -11,19 +11,8 @@ except ImportError:
     import pydantic  # type: ignore
 
 
-class JobOutcomeNextId(pydantic.BaseModel):
-    """
-    from flatfile import JobOutcomeNextId
-
-    JobOutcomeNextId(
-        id="us_jb_YOUR_ID",
-    )
-    """
-
-    id: str
+class JobOutcomeNextRetry(pydantic.BaseModel):
     label: typing.Optional[str]
-    path: typing.Optional[str]
-    query: typing.Optional[str]
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

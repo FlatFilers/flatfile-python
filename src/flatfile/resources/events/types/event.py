@@ -63,6 +63,15 @@ class Event_SpaceDeleted(GenericEvent):
         allow_population_by_field_name = True
 
 
+class Event_SpaceExpired(GenericEvent):
+    topic: typing_extensions.Literal["space:expired"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
 class Event_DocumentCreated(GenericEvent):
     topic: typing_extensions.Literal["document:created"]
 
@@ -110,6 +119,15 @@ class Event_WorkbookUpdated(GenericEvent):
 
 class Event_WorkbookDeleted(GenericEvent):
     topic: typing_extensions.Literal["workbook:deleted"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+class Event_WorkbookExpired(GenericEvent):
+    topic: typing_extensions.Literal["workbook:expired"]
 
     class Config:
         frozen = True
@@ -200,6 +218,15 @@ class Event_FileUpdated(GenericEvent):
 
 class Event_FileDeleted(GenericEvent):
     topic: typing_extensions.Literal["file:deleted"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+class Event_FileExpired(GenericEvent):
+    topic: typing_extensions.Literal["file:expired"]
 
     class Config:
         frozen = True
@@ -359,12 +386,14 @@ Event = typing.Union[
     Event_SpaceCreated,
     Event_SpaceUpdated,
     Event_SpaceDeleted,
+    Event_SpaceExpired,
     Event_DocumentCreated,
     Event_DocumentUpdated,
     Event_DocumentDeleted,
     Event_WorkbookCreated,
     Event_WorkbookUpdated,
     Event_WorkbookDeleted,
+    Event_WorkbookExpired,
     Event_SheetCreated,
     Event_SheetUpdated,
     Event_SheetDeleted,
@@ -375,6 +404,7 @@ Event = typing.Union[
     Event_FileCreated,
     Event_FileUpdated,
     Event_FileDeleted,
+    Event_FileExpired,
     Event_JobCreated,
     Event_JobUpdated,
     Event_JobDeleted,

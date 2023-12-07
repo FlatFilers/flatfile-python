@@ -30,12 +30,14 @@ from .job_outcome_next import (
     JobOutcomeNext,
     JobOutcomeNext_Download,
     JobOutcomeNext_Id,
+    JobOutcomeNext_Retry,
     JobOutcomeNext_Snapshot,
     JobOutcomeNext_Url,
     JobOutcomeNext_Wait,
 )
 from .job_outcome_next_download import JobOutcomeNextDownload
 from .job_outcome_next_id import JobOutcomeNextId
+from .job_outcome_next_retry import JobOutcomeNextRetry
 from .job_outcome_next_snapshot import JobOutcomeNextSnapshot
 from .job_outcome_next_url import JobOutcomeNextUrl
 from .job_outcome_next_wait import JobOutcomeNextWait
@@ -91,11 +93,13 @@ __all__ = [
     "JobOutcomeNext",
     "JobOutcomeNextDownload",
     "JobOutcomeNextId",
+    "JobOutcomeNextRetry",
     "JobOutcomeNextSnapshot",
     "JobOutcomeNextUrl",
     "JobOutcomeNextWait",
     "JobOutcomeNext_Download",
     "JobOutcomeNext_Id",
+    "JobOutcomeNext_Retry",
     "JobOutcomeNext_Snapshot",
     "JobOutcomeNext_Url",
     "JobOutcomeNext_Wait",

@@ -99,6 +99,9 @@ class Workbook(pydantic.BaseModel):
         created_at=datetime.datetime.fromisoformat(
             "2021-01-01 00:00:00+00:00",
         ),
+        expired_at=datetime.datetime.fromisoformat(
+            "2021-01-01 00:00:00+00:00",
+        ),
     )
     """
 
@@ -120,6 +123,9 @@ class Workbook(pydantic.BaseModel):
     namespace: typing.Optional[str]
     updated_at: dt.datetime = pydantic.Field(alias="updatedAt", description="Date the workbook was last updated")
     created_at: dt.datetime = pydantic.Field(alias="createdAt", description="Date the workbook was created")
+    expired_at: typing.Optional[dt.datetime] = pydantic.Field(
+        alias="expiredAt", description="Date the workbook was created"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

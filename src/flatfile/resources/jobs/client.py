@@ -15,6 +15,7 @@ from ..commons.types.sort_direction import SortDirection
 from ..commons.types.space_id import SpaceId
 from ..commons.types.success import Success
 from ..commons.types.workbook_id import WorkbookId
+from ..records.types.diff_records_response import DiffRecordsResponse
 from .types.job_ack_details import JobAckDetails
 from .types.job_cancel_details import JobCancelDetails
 from .types.job_complete_details import JobCompleteDetails
@@ -26,6 +27,7 @@ from .types.job_response import JobResponse
 from .types.job_split_details import JobSplitDetails
 from .types.job_update import JobUpdate
 from .types.list_jobs_response import ListJobsResponse
+from .types.mutate_job_config import MutateJobConfig
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -312,7 +314,6 @@ class JobsClient:
             DestinationField,
             Edge,
             JobExecutionPlanRequest,
-            Property_String,
             SourceField,
         )
         from flatfile.client import Flatfile
@@ -324,47 +325,9 @@ class JobsClient:
         client.jobs.update_execution_plan(
             job_id="us_jb_YOUR_ID",
             request=JobExecutionPlanRequest(
-                field_mapping=[
-                    Edge(
-                        source_field=Property_String(
-                            type="string",
-                            key="firstName",
-                        ),
-                        destination_field=Property_String(
-                            type="string",
-                            key="firstName",
-                            label="First Name",
-                        ),
-                    ),
-                    Edge(
-                        source_field=Property_String(
-                            type="string",
-                            key="lastName",
-                        ),
-                        destination_field=Property_String(
-                            type="string",
-                            key="lastName",
-                            label="Last Name",
-                        ),
-                    ),
-                ],
-                unmapped_source_fields=[
-                    SourceField(
-                        source_field=Property_String(
-                            type="string",
-                            key="email",
-                        ),
-                    )
-                ],
-                unmapped_destination_fields=[
-                    DestinationField(
-                        destination_field=Property_String(
-                            type="string",
-                            key="email",
-                            label="Email",
-                        ),
-                    )
-                ],
+                field_mapping=[Edge(), Edge()],
+                unmapped_source_fields=[SourceField()],
+                unmapped_destination_fields=[DestinationField()],
                 file_id="us_fl_YOUR_ID",
                 job_id="us_jb_YOUR_ID",
             ),
@@ -612,6 +575,49 @@ class JobsClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def retry(self, job_id: JobId) -> JobResponse:
+        """
+        Retry a failt job and return the job
+
+        Parameters:
+            - job_id: JobId. ID of job to return
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/retry"),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def preview_mutation(self, *, request: MutateJobConfig) -> DiffRecordsResponse:
+        """
+        Preview the results of a mutation
+
+        Parameters:
+            - request: MutateJobConfig.
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "jobs/preview-mutation"),
+            json=jsonable_encoder(request),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(DiffRecordsResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
@@ -933,7 +939,6 @@ class AsyncJobsClient:
             DestinationField,
             Edge,
             JobExecutionPlanRequest,
-            Property_String,
             SourceField,
         )
         from flatfile.client import AsyncFlatfile
@@ -945,47 +950,9 @@ class AsyncJobsClient:
         await client.jobs.update_execution_plan(
             job_id="us_jb_YOUR_ID",
             request=JobExecutionPlanRequest(
-                field_mapping=[
-                    Edge(
-                        source_field=Property_String(
-                            type="string",
-                            key="firstName",
-                        ),
-                        destination_field=Property_String(
-                            type="string",
-                            key="firstName",
-                            label="First Name",
-                        ),
-                    ),
-                    Edge(
-                        source_field=Property_String(
-                            type="string",
-                            key="lastName",
-                        ),
-                        destination_field=Property_String(
-                            type="string",
-                            key="lastName",
-                            label="Last Name",
-                        ),
-                    ),
-                ],
-                unmapped_source_fields=[
-                    SourceField(
-                        source_field=Property_String(
-                            type="string",
-                            key="email",
-                        ),
-                    )
-                ],
-                unmapped_destination_fields=[
-                    DestinationField(
-                        destination_field=Property_String(
-                            type="string",
-                            key="email",
-                            label="Email",
-                        ),
-                    )
-                ],
+                field_mapping=[Edge(), Edge()],
+                unmapped_source_fields=[SourceField()],
+                unmapped_destination_fields=[DestinationField()],
                 file_id="us_fl_YOUR_ID",
                 job_id="us_jb_YOUR_ID",
             ),
@@ -1235,6 +1202,49 @@ class AsyncJobsClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def retry(self, job_id: JobId) -> JobResponse:
+        """
+        Retry a failt job and return the job
+
+        Parameters:
+            - job_id: JobId. ID of job to return
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/retry"),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def preview_mutation(self, *, request: MutateJobConfig) -> DiffRecordsResponse:
+        """
+        Preview the results of a mutation
+
+        Parameters:
+            - request: MutateJobConfig.
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "jobs/preview-mutation"),
+            json=jsonable_encoder(request),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(DiffRecordsResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:

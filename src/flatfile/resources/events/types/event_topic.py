@@ -21,12 +21,14 @@ class EventTopic(str, enum.Enum):
     SPACE_CREATED = "space:created"
     SPACE_UPDATED = "space:updated"
     SPACE_DELETED = "space:deleted"
+    SPACE_EXPIRED = "space:expired"
     DOCUMENT_CREATED = "document:created"
     DOCUMENT_UPDATED = "document:updated"
     DOCUMENT_DELETED = "document:deleted"
     WORKBOOK_CREATED = "workbook:created"
     WORKBOOK_UPDATED = "workbook:updated"
     WORKBOOK_DELETED = "workbook:deleted"
+    WORKBOOK_EXPIRED = "workbook:expired"
     SHEET_CREATED = "sheet:created"
     SHEET_UPDATED = "sheet:updated"
     SHEET_DELETED = "sheet:deleted"
@@ -37,6 +39,7 @@ class EventTopic(str, enum.Enum):
     FILE_CREATED = "file:created"
     FILE_UPDATED = "file:updated"
     FILE_DELETED = "file:deleted"
+    FILE_EXPIRED = "file:expired"
     JOB_CREATED = "job:created"
     JOB_UPDATED = "job:updated"
     JOB_DELETED = "job:deleted"
@@ -59,12 +62,14 @@ class EventTopic(str, enum.Enum):
         space_created: typing.Callable[[], T_Result],
         space_updated: typing.Callable[[], T_Result],
         space_deleted: typing.Callable[[], T_Result],
+        space_expired: typing.Callable[[], T_Result],
         document_created: typing.Callable[[], T_Result],
         document_updated: typing.Callable[[], T_Result],
         document_deleted: typing.Callable[[], T_Result],
         workbook_created: typing.Callable[[], T_Result],
         workbook_updated: typing.Callable[[], T_Result],
         workbook_deleted: typing.Callable[[], T_Result],
+        workbook_expired: typing.Callable[[], T_Result],
         sheet_created: typing.Callable[[], T_Result],
         sheet_updated: typing.Callable[[], T_Result],
         sheet_deleted: typing.Callable[[], T_Result],
@@ -75,6 +80,7 @@ class EventTopic(str, enum.Enum):
         file_created: typing.Callable[[], T_Result],
         file_updated: typing.Callable[[], T_Result],
         file_deleted: typing.Callable[[], T_Result],
+        file_expired: typing.Callable[[], T_Result],
         job_created: typing.Callable[[], T_Result],
         job_updated: typing.Callable[[], T_Result],
         job_deleted: typing.Callable[[], T_Result],
@@ -101,6 +107,8 @@ class EventTopic(str, enum.Enum):
             return space_updated()
         if self is EventTopic.SPACE_DELETED:
             return space_deleted()
+        if self is EventTopic.SPACE_EXPIRED:
+            return space_expired()
         if self is EventTopic.DOCUMENT_CREATED:
             return document_created()
         if self is EventTopic.DOCUMENT_UPDATED:
@@ -113,6 +121,8 @@ class EventTopic(str, enum.Enum):
             return workbook_updated()
         if self is EventTopic.WORKBOOK_DELETED:
             return workbook_deleted()
+        if self is EventTopic.WORKBOOK_EXPIRED:
+            return workbook_expired()
         if self is EventTopic.SHEET_CREATED:
             return sheet_created()
         if self is EventTopic.SHEET_UPDATED:
@@ -133,6 +143,8 @@ class EventTopic(str, enum.Enum):
             return file_updated()
         if self is EventTopic.FILE_DELETED:
             return file_deleted()
+        if self is EventTopic.FILE_EXPIRED:
+            return file_expired()
         if self is EventTopic.JOB_CREATED:
             return job_created()
         if self is EventTopic.JOB_UPDATED:

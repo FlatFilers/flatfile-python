@@ -60,6 +60,9 @@ class File(pydantic.BaseModel):
     )
     created_at: dt.datetime = pydantic.Field(alias="createdAt", description="Date the file was created")
     updated_at: dt.datetime = pydantic.Field(alias="updatedAt", description="Date the file was last updated")
+    expired_at: typing.Optional[dt.datetime] = pydantic.Field(
+        alias="expiredAt", description="Date the file was expired"
+    )
     space_id: SpaceId = pydantic.Field(alias="spaceId")
     workbook_id: typing.Optional[WorkbookId] = pydantic.Field(alias="workbookId")
     sheet_id: typing.Optional[SheetId] = pydantic.Field(alias="sheetId")

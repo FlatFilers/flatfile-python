@@ -94,6 +94,9 @@ class WorkbookResponse(pydantic.BaseModel):
             created_at=datetime.datetime.fromisoformat(
                 "2021-01-01 00:00:00+00:00",
             ),
+            expired_at=datetime.datetime.fromisoformat(
+                "2021-01-01 00:00:00+00:00",
+            ),
         ),
     )
     """

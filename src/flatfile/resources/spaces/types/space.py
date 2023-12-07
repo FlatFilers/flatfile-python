@@ -62,6 +62,9 @@ class Space(InternalSpaceConfigBase):
     )
     created_at: dt.datetime = pydantic.Field(alias="createdAt", description="Date when space was created")
     updated_at: dt.datetime = pydantic.Field(alias="updatedAt", description="Date when space was updated")
+    expired_at: typing.Optional[dt.datetime] = pydantic.Field(
+        alias="expiredAt", description="Date when space was expired"
+    )
     guest_link: typing.Optional[str] = pydantic.Field(alias="guestLink", description="Guest link to the space")
     name: str = pydantic.Field(description="The name of the space")
     display_order: typing.Optional[int] = pydantic.Field(alias="displayOrder", description="The display order")
