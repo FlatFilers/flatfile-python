@@ -9,7 +9,9 @@ from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
 from ..commons.errors.bad_request_error import BadRequestError
+from ..commons.errors.forbidden_error import ForbiddenError
 from ..commons.errors.not_found_error import NotFoundError
+from ..commons.types.actor_role_id import ActorRoleId
 from ..commons.types.agent_id import AgentId
 from ..commons.types.environment_id import EnvironmentId
 from ..commons.types.errors import Errors
@@ -19,6 +21,9 @@ from ..commons.types.page_size import PageSize
 from ..commons.types.space_id import SpaceId
 from ..commons.types.success import Success
 from ..commons.types.success_query_parameter import SuccessQueryParameter
+from ..roles.types.assign_actor_role_request import AssignActorRoleRequest
+from ..roles.types.assign_role_response import AssignRoleResponse
+from ..roles.types.list_actor_roles_response import ListActorRolesResponse
 from .types.agent_config import AgentConfig
 from .types.agent_response import AgentResponse
 from .types.get_agent_logs_response import GetAgentLogsResponse
@@ -48,7 +53,6 @@ class AgentsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.agents.list(
@@ -81,7 +85,6 @@ class AgentsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.agents.create(
@@ -121,7 +124,6 @@ class AgentsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.agents.get(
@@ -148,6 +150,92 @@ class AgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def list_agent_roles(self, agent_id: AgentId) -> ListActorRolesResponse:
+        """
+        Lists roles assigned to an agent.
+
+        Parameters:
+            - agent_id: AgentId. The agent id
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}/roles"),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(ListActorRolesResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def assign_agent_role(self, agent_id: AgentId, *, request: AssignActorRoleRequest) -> AssignRoleResponse:
+        """
+        Assigns a role to a agent.
+
+        Parameters:
+            - agent_id: AgentId. The agent id
+
+            - request: AssignActorRoleRequest.
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}/roles"),
+            json=jsonable_encoder(request),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(AssignRoleResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def delete_agent_role(self, agent_id: AgentId, actor_role_id: ActorRoleId) -> Success:
+        """
+        Removes a role from an agent.
+
+        Parameters:
+            - agent_id: AgentId. The agent id
+
+            - actor_role_id: ActorRoleId. The actor role id
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "DELETE",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}/roles/{actor_role_id}"),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     def get_agent_logs(self, agent_id: AgentId, *, environment_id: EnvironmentId) -> GetAgentLogsResponse:
         """
         Parameters:
@@ -158,7 +246,6 @@ class AgentsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.agents.get_agent_logs(
@@ -195,7 +282,6 @@ class AgentsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.agents.get_agent_log(
@@ -246,7 +332,6 @@ class AgentsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.agents.get_environment_agent_logs(
@@ -308,7 +393,6 @@ class AgentsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.agents.get_environment_agent_executions(
@@ -358,7 +442,6 @@ class AgentsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.agents.delete(
@@ -398,7 +481,6 @@ class AsyncAgentsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.agents.list(
@@ -431,7 +513,6 @@ class AsyncAgentsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.agents.create(
@@ -471,7 +552,6 @@ class AsyncAgentsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.agents.get(
@@ -498,6 +578,92 @@ class AsyncAgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    async def list_agent_roles(self, agent_id: AgentId) -> ListActorRolesResponse:
+        """
+        Lists roles assigned to an agent.
+
+        Parameters:
+            - agent_id: AgentId. The agent id
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}/roles"),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(ListActorRolesResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def assign_agent_role(self, agent_id: AgentId, *, request: AssignActorRoleRequest) -> AssignRoleResponse:
+        """
+        Assigns a role to a agent.
+
+        Parameters:
+            - agent_id: AgentId. The agent id
+
+            - request: AssignActorRoleRequest.
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}/roles"),
+            json=jsonable_encoder(request),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(AssignRoleResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def delete_agent_role(self, agent_id: AgentId, actor_role_id: ActorRoleId) -> Success:
+        """
+        Removes a role from an agent.
+
+        Parameters:
+            - agent_id: AgentId. The agent id
+
+            - actor_role_id: ActorRoleId. The actor role id
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "DELETE",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}/roles/{actor_role_id}"),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     async def get_agent_logs(self, agent_id: AgentId, *, environment_id: EnvironmentId) -> GetAgentLogsResponse:
         """
         Parameters:
@@ -508,7 +674,6 @@ class AsyncAgentsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.agents.get_agent_logs(
@@ -545,7 +710,6 @@ class AsyncAgentsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.agents.get_agent_log(
@@ -596,7 +760,6 @@ class AsyncAgentsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.agents.get_environment_agent_logs(
@@ -658,7 +821,6 @@ class AsyncAgentsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.agents.get_environment_agent_executions(
@@ -708,7 +870,6 @@ class AsyncAgentsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.agents.delete(

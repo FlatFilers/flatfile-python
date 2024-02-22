@@ -75,7 +75,6 @@ class JobsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.jobs.list(
@@ -118,7 +117,6 @@ class JobsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.jobs.create(
@@ -152,7 +150,6 @@ class JobsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.jobs.get(
@@ -184,7 +181,6 @@ class JobsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.jobs.update(
@@ -218,7 +214,6 @@ class JobsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.jobs.delete(
@@ -249,7 +244,6 @@ class JobsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.jobs.execute(
@@ -280,7 +274,6 @@ class JobsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.jobs.get_execution_plan(
@@ -314,20 +307,58 @@ class JobsClient:
             DestinationField,
             Edge,
             JobExecutionPlanRequest,
+            Property_String,
             SourceField,
         )
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.jobs.update_execution_plan(
             job_id="us_jb_YOUR_ID",
             request=JobExecutionPlanRequest(
-                field_mapping=[Edge(), Edge()],
-                unmapped_source_fields=[SourceField()],
-                unmapped_destination_fields=[DestinationField()],
+                field_mapping=[
+                    Edge(
+                        source_field=Property_String(
+                            type="string",
+                            key="firstName",
+                        ),
+                        destination_field=Property_String(
+                            type="string",
+                            key="firstName",
+                            label="First Name",
+                        ),
+                    ),
+                    Edge(
+                        source_field=Property_String(
+                            type="string",
+                            key="lastName",
+                        ),
+                        destination_field=Property_String(
+                            type="string",
+                            key="lastName",
+                            label="Last Name",
+                        ),
+                    ),
+                ],
+                unmapped_source_fields=[
+                    SourceField(
+                        source_field=Property_String(
+                            type="string",
+                            key="email",
+                        ),
+                    )
+                ],
+                unmapped_destination_fields=[
+                    DestinationField(
+                        destination_field=Property_String(
+                            type="string",
+                            key="email",
+                            label="Email",
+                        ),
+                    )
+                ],
                 file_id="us_fl_YOUR_ID",
                 job_id="us_jb_YOUR_ID",
             ),
@@ -387,7 +418,6 @@ class JobsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.jobs.ack(
@@ -426,7 +456,6 @@ class JobsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.jobs.ack_outcome(
@@ -460,7 +489,6 @@ class JobsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.jobs.complete(
@@ -508,7 +536,6 @@ class JobsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.jobs.fail(
@@ -556,7 +583,6 @@ class JobsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.jobs.cancel(
@@ -637,7 +663,6 @@ class JobsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.jobs.split(
@@ -700,7 +725,6 @@ class AsyncJobsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.jobs.list(
@@ -743,7 +767,6 @@ class AsyncJobsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.jobs.create(
@@ -777,7 +800,6 @@ class AsyncJobsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.jobs.get(
@@ -809,7 +831,6 @@ class AsyncJobsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.jobs.update(
@@ -843,7 +864,6 @@ class AsyncJobsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.jobs.delete(
@@ -874,7 +894,6 @@ class AsyncJobsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.jobs.execute(
@@ -905,7 +924,6 @@ class AsyncJobsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.jobs.get_execution_plan(
@@ -939,20 +957,58 @@ class AsyncJobsClient:
             DestinationField,
             Edge,
             JobExecutionPlanRequest,
+            Property_String,
             SourceField,
         )
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.jobs.update_execution_plan(
             job_id="us_jb_YOUR_ID",
             request=JobExecutionPlanRequest(
-                field_mapping=[Edge(), Edge()],
-                unmapped_source_fields=[SourceField()],
-                unmapped_destination_fields=[DestinationField()],
+                field_mapping=[
+                    Edge(
+                        source_field=Property_String(
+                            type="string",
+                            key="firstName",
+                        ),
+                        destination_field=Property_String(
+                            type="string",
+                            key="firstName",
+                            label="First Name",
+                        ),
+                    ),
+                    Edge(
+                        source_field=Property_String(
+                            type="string",
+                            key="lastName",
+                        ),
+                        destination_field=Property_String(
+                            type="string",
+                            key="lastName",
+                            label="Last Name",
+                        ),
+                    ),
+                ],
+                unmapped_source_fields=[
+                    SourceField(
+                        source_field=Property_String(
+                            type="string",
+                            key="email",
+                        ),
+                    )
+                ],
+                unmapped_destination_fields=[
+                    DestinationField(
+                        destination_field=Property_String(
+                            type="string",
+                            key="email",
+                            label="Email",
+                        ),
+                    )
+                ],
                 file_id="us_fl_YOUR_ID",
                 job_id="us_jb_YOUR_ID",
             ),
@@ -1014,7 +1070,6 @@ class AsyncJobsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.jobs.ack(
@@ -1053,7 +1108,6 @@ class AsyncJobsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.jobs.ack_outcome(
@@ -1087,7 +1141,6 @@ class AsyncJobsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.jobs.complete(
@@ -1135,7 +1188,6 @@ class AsyncJobsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.jobs.fail(
@@ -1183,7 +1235,6 @@ class AsyncJobsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.jobs.cancel(
@@ -1264,7 +1315,6 @@ class AsyncJobsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.jobs.split(

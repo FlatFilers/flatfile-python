@@ -4,6 +4,7 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
+from .field_record_counts import FieldRecordCounts
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -26,6 +27,9 @@ class RecordCounts(pydantic.BaseModel):
     valid: int
     error: int
     errors_by_field: typing.Optional[typing.Dict[str, int]] = pydantic.Field(alias="errorsByField")
+    by_field: typing.Optional[typing.Dict[str, FieldRecordCounts]] = pydantic.Field(
+        alias="byField", description="Counts for valid, error, and total records grouped by field key"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

@@ -34,6 +34,9 @@ class Space(InternalSpaceConfigBase):
         updated_at=datetime.datetime.fromisoformat(
             "2021-01-01 00:00:00+00:00",
         ),
+        last_activity_at=datetime.datetime.fromisoformat(
+            "2021-01-01 00:00:00+00:00",
+        ),
         created_by_user_id="us_usr_YOUR_ID",
         workbooks_count=1,
         files_count=1,
@@ -64,6 +67,10 @@ class Space(InternalSpaceConfigBase):
     updated_at: dt.datetime = pydantic.Field(alias="updatedAt", description="Date when space was updated")
     expired_at: typing.Optional[dt.datetime] = pydantic.Field(
         alias="expiredAt", description="Date when space was expired"
+    )
+    last_activity_at: typing.Optional[dt.datetime] = pydantic.Field(
+        alias="lastActivityAt",
+        description="Date that the last activity in the space occurred. This could include any create or update activity in the space like adding a record to a sheet, uploading a new file, or updating the configuration of a workbook. This date is only tracked to the precision of a day.",
     )
     guest_link: typing.Optional[str] = pydantic.Field(alias="guestLink", description="Guest link to the space")
     name: str = pydantic.Field(description="The name of the space")

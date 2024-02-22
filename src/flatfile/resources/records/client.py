@@ -114,7 +114,6 @@ class RecordsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.records.get(
@@ -175,7 +174,6 @@ class RecordsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.records.update(
@@ -237,7 +235,6 @@ class RecordsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.records.insert(
@@ -279,21 +276,18 @@ class RecordsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete(
-        self, sheet_id: SheetId, *, ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]] = None
-    ) -> Success:
+    def delete(self, sheet_id: SheetId, *, ids: typing.Union[RecordId, typing.List[RecordId]]) -> Success:
         """
         Deletes records from a workbook sheet
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
 
-            - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
-                                                                                   ---
+            - ids: typing.Union[RecordId, typing.List[RecordId]]. A list of record IDs to delete. Maximum of 100 allowed.
+        ---
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.records.delete(
@@ -329,6 +323,7 @@ class RecordsClient:
         search_value: typing.Optional[SearchValue] = None,
         search_field: typing.Optional[SearchField] = None,
         ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]] = None,
+        q: typing.Optional[str] = None,
         find: typing.Optional[CellValueUnion] = OMIT,
         replace: typing.Optional[CellValueUnion] = OMIT,
         field_key: str,
@@ -349,7 +344,9 @@ class RecordsClient:
 
             - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
 
-            - find: typing.Optional[CellValueUnion]. A value to find for a given field in a sheet. Wrap the value in "" for exact match
+            - q: typing.Optional[str]. An FFQL query used to filter the result set
+
+            - find: typing.Optional[CellValueUnion]. A value to find for a given field in a sheet. For exact matches, wrap the value in double quotes ("Bob")
 
             - replace: typing.Optional[CellValueUnion]. The value to replace found values with
 
@@ -358,7 +355,6 @@ class RecordsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.records.find_and_replace(
@@ -381,6 +377,7 @@ class RecordsClient:
                     "searchValue": search_value,
                     "searchField": search_field,
                     "ids": ids,
+                    "q": q,
                 }
             ),
             json=jsonable_encoder(_request),
@@ -471,7 +468,6 @@ class AsyncRecordsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.records.get(
@@ -532,7 +528,6 @@ class AsyncRecordsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.records.update(
@@ -594,7 +589,6 @@ class AsyncRecordsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.records.insert(
@@ -636,21 +630,18 @@ class AsyncRecordsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete(
-        self, sheet_id: SheetId, *, ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]] = None
-    ) -> Success:
+    async def delete(self, sheet_id: SheetId, *, ids: typing.Union[RecordId, typing.List[RecordId]]) -> Success:
         """
         Deletes records from a workbook sheet
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
 
-            - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
-                                                                                   ---
+            - ids: typing.Union[RecordId, typing.List[RecordId]]. A list of record IDs to delete. Maximum of 100 allowed.
+        ---
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.records.delete(
@@ -686,6 +677,7 @@ class AsyncRecordsClient:
         search_value: typing.Optional[SearchValue] = None,
         search_field: typing.Optional[SearchField] = None,
         ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]] = None,
+        q: typing.Optional[str] = None,
         find: typing.Optional[CellValueUnion] = OMIT,
         replace: typing.Optional[CellValueUnion] = OMIT,
         field_key: str,
@@ -706,7 +698,9 @@ class AsyncRecordsClient:
 
             - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
 
-            - find: typing.Optional[CellValueUnion]. A value to find for a given field in a sheet. Wrap the value in "" for exact match
+            - q: typing.Optional[str]. An FFQL query used to filter the result set
+
+            - find: typing.Optional[CellValueUnion]. A value to find for a given field in a sheet. For exact matches, wrap the value in double quotes ("Bob")
 
             - replace: typing.Optional[CellValueUnion]. The value to replace found values with
 
@@ -715,7 +709,6 @@ class AsyncRecordsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.records.find_and_replace(
@@ -738,6 +731,7 @@ class AsyncRecordsClient:
                     "searchValue": search_value,
                     "searchField": search_field,
                     "ids": ids,
+                    "q": q,
                 }
             ),
             json=jsonable_encoder(_request),

@@ -18,6 +18,9 @@ class InputField(pydantic.BaseModel):
     label: str = pydantic.Field(description="Visible name of a Field.")
     description: typing.Optional[str] = pydantic.Field(description="Brief description below the name of the Field.")
     type: str = pydantic.Field(description="Field Types inform the user interface how to sort and display data.")
+    default_value: typing.Optional[typing.Any] = pydantic.Field(
+        alias="defaultValue", description="Default value for a Field."
+    )
     config: typing.Optional[InputConfig] = pydantic.Field(description="Additional configuration for enum Fields.")
     constraints: typing.Optional[typing.List[InputConstraint]] = pydantic.Field(
         description="Indicate additional validations that will be applied to the Field."
@@ -34,4 +37,5 @@ class InputField(pydantic.BaseModel):
     class Config:
         frozen = True
         smart_union = True
+        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

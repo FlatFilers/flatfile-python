@@ -30,19 +30,20 @@ class SecretsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def list(self, *, environment_id: EnvironmentId, space_id: typing.Optional[SpaceId] = None) -> SecretsResponse:
+    def list(
+        self, *, environment_id: typing.Optional[EnvironmentId] = None, space_id: typing.Optional[SpaceId] = None
+    ) -> SecretsResponse:
         """
         Fetch all secrets for a given environmentId and optionally apply space overrides
 
         Parameters:
-            - environment_id: EnvironmentId. The Environment of the secret.
+            - environment_id: typing.Optional[EnvironmentId]. The Environment of the secret.
 
             - space_id: typing.Optional[SpaceId]. The Space of the secret.
         ---
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.secrets.list(
@@ -79,7 +80,6 @@ class SecretsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.secrets.upsert(
@@ -120,7 +120,6 @@ class SecretsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.secrets.delete(
@@ -151,20 +150,19 @@ class AsyncSecretsClient:
         self._client_wrapper = client_wrapper
 
     async def list(
-        self, *, environment_id: EnvironmentId, space_id: typing.Optional[SpaceId] = None
+        self, *, environment_id: typing.Optional[EnvironmentId] = None, space_id: typing.Optional[SpaceId] = None
     ) -> SecretsResponse:
         """
         Fetch all secrets for a given environmentId and optionally apply space overrides
 
         Parameters:
-            - environment_id: EnvironmentId. The Environment of the secret.
+            - environment_id: typing.Optional[EnvironmentId]. The Environment of the secret.
 
             - space_id: typing.Optional[SpaceId]. The Space of the secret.
         ---
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.secrets.list(
@@ -201,7 +199,6 @@ class AsyncSecretsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.secrets.upsert(
@@ -242,7 +239,6 @@ class AsyncSecretsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.secrets.delete(

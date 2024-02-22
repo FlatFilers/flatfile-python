@@ -6,6 +6,7 @@ import typing
 
 import typing_extensions
 
+from .external_constraint import ExternalConstraint
 from .unique_constraint import UniqueConstraint
 
 try:
@@ -39,4 +40,13 @@ class Constraint_Computed(pydantic.BaseModel):
         smart_union = True
 
 
-Constraint = typing.Union[Constraint_Required, Constraint_Unique, Constraint_Computed]
+class Constraint_External(ExternalConstraint):
+    type: typing_extensions.Literal["external"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+Constraint = typing.Union[Constraint_Required, Constraint_Unique, Constraint_Computed, Constraint_External]

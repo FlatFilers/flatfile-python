@@ -4,8 +4,8 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
+from ...commons.types.actor_role_id import ActorRoleId
 from ...commons.types.role_id import RoleId
-from ...commons.types.success_data import SuccessData
 from .actor_id_union import ActorIdUnion
 from .resource_id_union import ResourceIdUnion
 
@@ -15,10 +15,13 @@ except ImportError:
     import pydantic  # type: ignore
 
 
-class AssignRoleResponseData(SuccessData):
+class AssignRoleResponseData(pydantic.BaseModel):
+    id: ActorRoleId
     role_id: RoleId = pydantic.Field(alias="roleId")
     actor_id: ActorIdUnion = pydantic.Field(alias="actorId")
     resource_id: ResourceIdUnion = pydantic.Field(alias="resourceId")
+    created_at: dt.datetime = pydantic.Field(alias="createdAt")
+    updated_at: dt.datetime = pydantic.Field(alias="updatedAt")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

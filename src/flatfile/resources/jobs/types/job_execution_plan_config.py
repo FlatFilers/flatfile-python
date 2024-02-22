@@ -24,6 +24,7 @@ class JobExecutionPlanConfig(pydantic.BaseModel):
     unmapped_destination_fields: typing.Optional[typing.List[DestinationField]] = pydantic.Field(
         alias="unmappedDestinationFields"
     )
+    program_id: typing.Optional[str] = pydantic.Field(alias="programId")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

@@ -18,11 +18,26 @@ class JobExecutionPlan(pydantic.BaseModel):
     """
     The execution plan for a job, for example, for a map job, the execution plan is the mapping of the source sheet to the destination sheet.
     ---
-    from flatfile import Certainty, Edge, JobExecutionPlan, Metadata
+    from flatfile import (
+        Certainty,
+        Edge,
+        JobExecutionPlan,
+        Metadata,
+        Property_String,
+    )
 
     JobExecutionPlan(
         field_mapping=[
             Edge(
+                source_field=Property_String(
+                    type="string",
+                    key="firstName",
+                ),
+                destination_field=Property_String(
+                    type="string",
+                    key="firstName",
+                    label="First Name",
+                ),
                 preview=["John", "Suzy", "Joe"],
                 metadata=Metadata(
                     certainty=Certainty.ABSOLUTE,
@@ -31,6 +46,15 @@ class JobExecutionPlan(pydantic.BaseModel):
                 ),
             ),
             Edge(
+                source_field=Property_String(
+                    type="string",
+                    key="lastName",
+                ),
+                destination_field=Property_String(
+                    type="string",
+                    key="lastName",
+                    label="Last Name",
+                ),
                 preview=["Smith", "Que", "Montana"],
                 metadata=Metadata(
                     certainty=Certainty.ABSOLUTE,
@@ -47,6 +71,7 @@ class JobExecutionPlan(pydantic.BaseModel):
     field_mapping: typing.List[Edge] = pydantic.Field(alias="fieldMapping")
     unmapped_source_fields: typing.List[SourceField] = pydantic.Field(alias="unmappedSourceFields")
     unmapped_destination_fields: typing.List[DestinationField] = pydantic.Field(alias="unmappedDestinationFields")
+    program_id: typing.Optional[str] = pydantic.Field(alias="programId")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

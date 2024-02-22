@@ -21,7 +21,10 @@ class EventTopic(str, enum.Enum):
     SPACE_CREATED = "space:created"
     SPACE_UPDATED = "space:updated"
     SPACE_DELETED = "space:deleted"
+    SPACE_ARCHIVED = "space:archived"
     SPACE_EXPIRED = "space:expired"
+    SPACE_GUEST_ADDED = "space:guestAdded"
+    SPACE_GUEST_REMOVED = "space:guestRemoved"
     DOCUMENT_CREATED = "document:created"
     DOCUMENT_UPDATED = "document:updated"
     DOCUMENT_DELETED = "document:deleted"
@@ -49,10 +52,19 @@ class EventTopic(str, enum.Enum):
     JOB_OUTCOME_ACKNOWLEDGED = "job:outcome-acknowledged"
     JOB_PARTS_COMPLETED = "job:parts-completed"
     JOB_FAILED = "job:failed"
+    PROGRAM_CREATED = "program:created"
+    PROGRAM_UPDATED = "program:updated"
     COMMIT_CREATED = "commit:created"
     COMMIT_UPDATED = "commit:updated"
     COMMIT_COMPLETED = "commit:completed"
     LAYER_CREATED = "layer:created"
+    SECRET_CREATED = "secret:created"
+    SECRET_UPDATED = "secret:updated"
+    SECRET_DELETED = "secret:deleted"
+    CRON_5_MINUTES = "cron:5-minutes"
+    CRON_HOURLY = "cron:hourly"
+    CRON_DAILY = "cron:daily"
+    CRON_WEEKLY = "cron:weekly"
 
     def visit(
         self,
@@ -62,7 +74,10 @@ class EventTopic(str, enum.Enum):
         space_created: typing.Callable[[], T_Result],
         space_updated: typing.Callable[[], T_Result],
         space_deleted: typing.Callable[[], T_Result],
+        space_archived: typing.Callable[[], T_Result],
         space_expired: typing.Callable[[], T_Result],
+        space_guest_added: typing.Callable[[], T_Result],
+        space_guest_removed: typing.Callable[[], T_Result],
         document_created: typing.Callable[[], T_Result],
         document_updated: typing.Callable[[], T_Result],
         document_deleted: typing.Callable[[], T_Result],
@@ -90,10 +105,19 @@ class EventTopic(str, enum.Enum):
         job_outcome_acknowledged: typing.Callable[[], T_Result],
         job_parts_completed: typing.Callable[[], T_Result],
         job_failed: typing.Callable[[], T_Result],
+        program_created: typing.Callable[[], T_Result],
+        program_updated: typing.Callable[[], T_Result],
         commit_created: typing.Callable[[], T_Result],
         commit_updated: typing.Callable[[], T_Result],
         commit_completed: typing.Callable[[], T_Result],
         layer_created: typing.Callable[[], T_Result],
+        secret_created: typing.Callable[[], T_Result],
+        secret_updated: typing.Callable[[], T_Result],
+        secret_deleted: typing.Callable[[], T_Result],
+        cron_5_minutes: typing.Callable[[], T_Result],
+        cron_hourly: typing.Callable[[], T_Result],
+        cron_daily: typing.Callable[[], T_Result],
+        cron_weekly: typing.Callable[[], T_Result],
     ) -> T_Result:
         if self is EventTopic.AGENT_CREATED:
             return agent_created()
@@ -107,8 +131,14 @@ class EventTopic(str, enum.Enum):
             return space_updated()
         if self is EventTopic.SPACE_DELETED:
             return space_deleted()
+        if self is EventTopic.SPACE_ARCHIVED:
+            return space_archived()
         if self is EventTopic.SPACE_EXPIRED:
             return space_expired()
+        if self is EventTopic.SPACE_GUEST_ADDED:
+            return space_guest_added()
+        if self is EventTopic.SPACE_GUEST_REMOVED:
+            return space_guest_removed()
         if self is EventTopic.DOCUMENT_CREATED:
             return document_created()
         if self is EventTopic.DOCUMENT_UPDATED:
@@ -163,6 +193,10 @@ class EventTopic(str, enum.Enum):
             return job_parts_completed()
         if self is EventTopic.JOB_FAILED:
             return job_failed()
+        if self is EventTopic.PROGRAM_CREATED:
+            return program_created()
+        if self is EventTopic.PROGRAM_UPDATED:
+            return program_updated()
         if self is EventTopic.COMMIT_CREATED:
             return commit_created()
         if self is EventTopic.COMMIT_UPDATED:
@@ -171,3 +205,17 @@ class EventTopic(str, enum.Enum):
             return commit_completed()
         if self is EventTopic.LAYER_CREATED:
             return layer_created()
+        if self is EventTopic.SECRET_CREATED:
+            return secret_created()
+        if self is EventTopic.SECRET_UPDATED:
+            return secret_updated()
+        if self is EventTopic.SECRET_DELETED:
+            return secret_deleted()
+        if self is EventTopic.CRON_5_MINUTES:
+            return cron_5_minutes()
+        if self is EventTopic.CRON_HOURLY:
+            return cron_hourly()
+        if self is EventTopic.CRON_DAILY:
+            return cron_daily()
+        if self is EventTopic.CRON_WEEKLY:
+            return cron_weekly()

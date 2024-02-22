@@ -31,6 +31,7 @@ class AgentConfig(pydantic.BaseModel):
     )
     compiler: typing.Optional[Compiler] = pydantic.Field(description="The compiler of the agent")
     source: typing.Optional[str] = pydantic.Field(description="The source of the agent")
+    slug: typing.Optional[str] = pydantic.Field(description="The slug of the agent")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

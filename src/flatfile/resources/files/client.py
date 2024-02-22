@@ -56,7 +56,6 @@ class FilesClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.files.list()
@@ -127,7 +126,6 @@ class FilesClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.files.get(
@@ -204,7 +202,6 @@ class FilesClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.files.update(
@@ -218,9 +215,9 @@ class FilesClient:
         if name is not OMIT:
             _request["name"] = name
         if mode is not OMIT:
-            _request["mode"] = mode
+            _request["mode"] = mode.value
         if status is not OMIT:
-            _request["status"] = status
+            _request["status"] = status.value
         if actions is not OMIT:
             _request["actions"] = actions
         _response = self._client_wrapper.httpx_client.request(
@@ -294,7 +291,6 @@ class AsyncFilesClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.files.list()
@@ -365,7 +361,6 @@ class AsyncFilesClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.files.get(
@@ -442,7 +437,6 @@ class AsyncFilesClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.files.update(
@@ -456,9 +450,9 @@ class AsyncFilesClient:
         if name is not OMIT:
             _request["name"] = name
         if mode is not OMIT:
-            _request["mode"] = mode
+            _request["mode"] = mode.value
         if status is not OMIT:
-            _request["status"] = status
+            _request["status"] = status.value
         if actions is not OMIT:
             _request["actions"] = actions
         _response = await self._client_wrapper.httpx_client.request(

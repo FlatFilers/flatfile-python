@@ -63,8 +63,35 @@ class Event_SpaceDeleted(GenericEvent):
         allow_population_by_field_name = True
 
 
+class Event_SpaceArchived(GenericEvent):
+    topic: typing_extensions.Literal["space:archived"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
 class Event_SpaceExpired(GenericEvent):
     topic: typing_extensions.Literal["space:expired"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+class Event_SpaceGuestAdded(GenericEvent):
+    topic: typing_extensions.Literal["space:guestAdded"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+class Event_SpaceGuestRemoved(GenericEvent):
+    topic: typing_extensions.Literal["space:guestRemoved"]
 
     class Config:
         frozen = True
@@ -315,6 +342,24 @@ class Event_JobPartsCompleted(GenericEvent):
         allow_population_by_field_name = True
 
 
+class Event_ProgramCreated(GenericEvent):
+    topic: typing_extensions.Literal["program:created"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+class Event_ProgramUpdated(GenericEvent):
+    topic: typing_extensions.Literal["program:updated"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
 class Event_CommitCreated(GenericEvent):
     topic: typing_extensions.Literal["commit:created"]
 
@@ -335,6 +380,33 @@ class Event_CommitUpdated(GenericEvent):
 
 class Event_CommitCompleted(GenericEvent):
     topic: typing_extensions.Literal["commit:completed"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+class Event_SecretCreated(GenericEvent):
+    topic: typing_extensions.Literal["secret:created"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+class Event_SecretUpdated(GenericEvent):
+    topic: typing_extensions.Literal["secret:updated"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+class Event_SecretDeleted(GenericEvent):
+    topic: typing_extensions.Literal["secret:deleted"]
 
     class Config:
         frozen = True
@@ -386,7 +458,10 @@ Event = typing.Union[
     Event_SpaceCreated,
     Event_SpaceUpdated,
     Event_SpaceDeleted,
+    Event_SpaceArchived,
     Event_SpaceExpired,
+    Event_SpaceGuestAdded,
+    Event_SpaceGuestRemoved,
     Event_DocumentCreated,
     Event_DocumentUpdated,
     Event_DocumentDeleted,
@@ -414,8 +489,13 @@ Event = typing.Union[
     Event_JobScheduled,
     Event_JobOutcomeAcknowledged,
     Event_JobPartsCompleted,
+    Event_ProgramCreated,
+    Event_ProgramUpdated,
     Event_CommitCreated,
     Event_CommitUpdated,
     Event_CommitCompleted,
+    Event_SecretCreated,
+    Event_SecretUpdated,
+    Event_SecretDeleted,
     Event_LayerCreated,
 ]

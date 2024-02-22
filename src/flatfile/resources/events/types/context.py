@@ -11,6 +11,7 @@ from ...commons.types.environment_id import EnvironmentId
 from ...commons.types.event_id import EventId
 from ...commons.types.file_id import FileId
 from ...commons.types.job_id import JobId
+from ...commons.types.program_id import ProgramId
 from ...commons.types.sheet_id import SheetId
 from ...commons.types.snapshot_id import SnapshotId
 from ...commons.types.space_id import SpaceId
@@ -56,6 +57,7 @@ class Context(pydantic.BaseModel):
     )
     commit_id: typing.Optional[CommitId] = pydantic.Field(alias="commitId")
     job_id: typing.Optional[JobId] = pydantic.Field(alias="jobId")
+    program_id: typing.Optional[ProgramId] = pydantic.Field(alias="programId")
     file_id: typing.Optional[FileId] = pydantic.Field(alias="fileId")
     document_id: typing.Optional[DocumentId] = pydantic.Field(alias="documentId")
     preceding_event_id: typing.Optional[EventId] = pydantic.Field(alias="precedingEventId")

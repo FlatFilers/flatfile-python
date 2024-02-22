@@ -8,6 +8,7 @@ from .diff_record import DiffRecord
 from .diff_records import DiffRecords
 from .diff_records_response import DiffRecordsResponse
 from .diff_value import DiffValue
+from .field_record_counts import FieldRecordCounts
 from .get_records_response import GetRecordsResponse
 from .get_records_response_data import GetRecordsResponseData
 from .record import Record
@@ -33,6 +34,7 @@ __all__ = [
     "DiffRecords",
     "DiffRecordsResponse",
     "DiffValue",
+    "FieldRecordCounts",
     "GetRecordsResponse",
     "GetRecordsResponseData",
     "Record",

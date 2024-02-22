@@ -4,11 +4,12 @@ from .arrayable_property import ArrayableProperty
 from .base_property import BaseProperty
 from .boolean_property import BooleanProperty
 from .boolean_property_config import BooleanPropertyConfig
-from .constraint import Constraint, Constraint_Computed, Constraint_Required, Constraint_Unique
+from .constraint import Constraint, Constraint_Computed, Constraint_External, Constraint_Required, Constraint_Unique
 from .date_property import DateProperty
 from .enum_property import EnumProperty
 from .enum_property_config import EnumPropertyConfig
 from .enum_property_option import EnumPropertyOption
+from .external_constraint import ExternalConstraint
 from .number_config import NumberConfig
 from .number_property import NumberProperty
 from .property import (
@@ -36,12 +37,14 @@ __all__ = [
     "BooleanPropertyConfig",
     "Constraint",
     "Constraint_Computed",
+    "Constraint_External",
     "Constraint_Required",
     "Constraint_Unique",
     "DateProperty",
     "EnumProperty",
     "EnumPropertyConfig",
     "EnumPropertyOption",
+    "ExternalConstraint",
     "NumberConfig",
     "NumberProperty",
     "Property",

@@ -7,6 +7,7 @@ from ....core.datetime_utils import serialize_datetime
 from ...commons.types.action import Action
 from ...property.types.property import Property
 from .sheet_access import SheetAccess
+from .sheet_constraint import SheetConstraint
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -64,6 +65,12 @@ class SheetConfig(pydantic.BaseModel):
     fields: typing.List[Property] = pydantic.Field(description="Where you define your Sheet’s data schema.")
     actions: typing.Optional[typing.List[Action]] = pydantic.Field(
         description="An array of actions that end users can perform on this Sheet."
+    )
+    metadata: typing.Optional[typing.Any] = pydantic.Field(
+        description="Useful for any contextual metadata regarding the schema. Store any valid json"
+    )
+    constraints: typing.Optional[typing.List[SheetConstraint]] = pydantic.Field(
+        description="An array of constraints that end users can perform on this Sheet."
     )
 
     def json(self, **kwargs: typing.Any) -> str:

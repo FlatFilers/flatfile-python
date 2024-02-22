@@ -40,6 +40,7 @@ class SpacesClient:
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
         search: typing.Optional[str] = None,
+        namespace: typing.Optional[str] = None,
         archived: typing.Optional[bool] = None,
         sort_field: typing.Optional[GetSpacesSortField] = None,
         sort_direction: typing.Optional[SortDirection] = None,
@@ -57,6 +58,8 @@ class SpacesClient:
 
             - search: typing.Optional[str]. Search query for spaces
 
+            - namespace: typing.Optional[str]. Search by namespace
+
             - archived: typing.Optional[bool]. Flag to include archived spaces
 
             - sort_field: typing.Optional[GetSpacesSortField]. Field to sort spaces by
@@ -68,7 +71,6 @@ class SpacesClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.spaces.list(
@@ -84,6 +86,7 @@ class SpacesClient:
                     "pageSize": page_size,
                     "pageNumber": page_number,
                     "search": search,
+                    "namespace": namespace,
                     "archived": archived,
                     "sortField": sort_field,
                     "sortDirection": sort_direction,
@@ -114,7 +117,6 @@ class SpacesClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.spaces.create(
@@ -155,7 +157,6 @@ class SpacesClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.spaces.get(
@@ -190,7 +191,6 @@ class SpacesClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.spaces.delete(
@@ -225,7 +225,6 @@ class SpacesClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.spaces.bulk_delete(
@@ -264,7 +263,6 @@ class SpacesClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.spaces.update(
@@ -303,7 +301,6 @@ class SpacesClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.spaces.archive_space(
@@ -340,6 +337,7 @@ class AsyncSpacesClient:
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
         search: typing.Optional[str] = None,
+        namespace: typing.Optional[str] = None,
         archived: typing.Optional[bool] = None,
         sort_field: typing.Optional[GetSpacesSortField] = None,
         sort_direction: typing.Optional[SortDirection] = None,
@@ -357,6 +355,8 @@ class AsyncSpacesClient:
 
             - search: typing.Optional[str]. Search query for spaces
 
+            - namespace: typing.Optional[str]. Search by namespace
+
             - archived: typing.Optional[bool]. Flag to include archived spaces
 
             - sort_field: typing.Optional[GetSpacesSortField]. Field to sort spaces by
@@ -368,7 +368,6 @@ class AsyncSpacesClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.spaces.list(
@@ -384,6 +383,7 @@ class AsyncSpacesClient:
                     "pageSize": page_size,
                     "pageNumber": page_number,
                     "search": search,
+                    "namespace": namespace,
                     "archived": archived,
                     "sortField": sort_field,
                     "sortDirection": sort_direction,
@@ -414,7 +414,6 @@ class AsyncSpacesClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.spaces.create(
@@ -455,7 +454,6 @@ class AsyncSpacesClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.spaces.get(
@@ -490,7 +488,6 @@ class AsyncSpacesClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.spaces.delete(
@@ -525,7 +522,6 @@ class AsyncSpacesClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.spaces.bulk_delete(
@@ -564,7 +560,6 @@ class AsyncSpacesClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.spaces.update(
@@ -603,7 +598,6 @@ class AsyncSpacesClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.spaces.archive_space(

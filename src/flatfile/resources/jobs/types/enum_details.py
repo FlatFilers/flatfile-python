@@ -18,7 +18,7 @@ class EnumDetails(pydantic.BaseModel):
     Only available if one or more of the destination fields is of type enum. Provides category mapping.
     """
 
-    mapping: typing.Optional[typing.List[CategoryMapping]] = pydantic.Field(
+    mapping: typing.List[CategoryMapping] = pydantic.Field(
         description="The mapping of source values to destination values"
     )
     unused_source_values: typing.Optional[typing.List[EnumValue]] = pydantic.Field(

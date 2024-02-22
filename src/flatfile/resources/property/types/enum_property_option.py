@@ -22,7 +22,11 @@ class EnumPropertyOption(pydantic.BaseModel):
         description="An arbitrary JSON object to be associated with this option and made available to hooks"
     )
     value: typing.Any = pydantic.Field(
-        description="The value or ID of this option. This value will be sent in egress.  The type is a string | integer | boolean."
+        description=(
+            "The value or ID of this option. This value will be sent in egress. The type is a string \n"
+            " integer \n"
+            " boolean.\n"
+        )
     )
     alternative_names: typing.Optional[typing.List[str]] = pydantic.Field(
         alias="alternativeNames", description="Alternative names to match this enum option to"

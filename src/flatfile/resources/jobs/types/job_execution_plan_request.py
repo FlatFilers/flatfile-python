@@ -20,13 +20,52 @@ class JobExecutionPlanRequest(JobExecutionPlan):
         DestinationField,
         Edge,
         JobExecutionPlanRequest,
+        Property_String,
         SourceField,
     )
 
     JobExecutionPlanRequest(
-        field_mapping=[Edge(), Edge()],
-        unmapped_source_fields=[SourceField()],
-        unmapped_destination_fields=[DestinationField()],
+        field_mapping=[
+            Edge(
+                source_field=Property_String(
+                    type="string",
+                    key="firstName",
+                ),
+                destination_field=Property_String(
+                    type="string",
+                    key="firstName",
+                    label="First Name",
+                ),
+            ),
+            Edge(
+                source_field=Property_String(
+                    type="string",
+                    key="lastName",
+                ),
+                destination_field=Property_String(
+                    type="string",
+                    key="lastName",
+                    label="Last Name",
+                ),
+            ),
+        ],
+        unmapped_source_fields=[
+            SourceField(
+                source_field=Property_String(
+                    type="string",
+                    key="email",
+                ),
+            )
+        ],
+        unmapped_destination_fields=[
+            DestinationField(
+                destination_field=Property_String(
+                    type="string",
+                    key="email",
+                    label="Email",
+                ),
+            )
+        ],
         file_id="us_fl_YOUR_ID",
         job_id="us_jb_YOUR_ID",
     )

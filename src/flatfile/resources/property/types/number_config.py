@@ -20,7 +20,9 @@ class NumberConfig(pydantic.BaseModel):
     )
     """
 
-    decimal_places: int = pydantic.Field(alias="decimalPlaces", description="Number of decimal places to round data to")
+    decimal_places: typing.Optional[int] = pydantic.Field(
+        alias="decimalPlaces", description="Number of decimal places to round data to"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

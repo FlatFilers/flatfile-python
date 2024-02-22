@@ -7,11 +7,18 @@ from ....core.datetime_utils import serialize_datetime
 from ...commons.types.user_id import UserId
 from .user_config import UserConfig
 
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
+
 
 class User(UserConfig):
     """
     Configurations for the user
     ---
+    import datetime
+
     from flatfile import User
 
     User(
@@ -19,10 +26,24 @@ class User(UserConfig):
         email="john.smith@example.com",
         name="john.smith",
         account_id="us_acc_YOUR_ID",
+        idp="FRONTEGG",
+        idp_ref="ab1cf38e-e617-4547-b37d-376a7ac9e554",
+        metadata={},
+        created_at=datetime.datetime.fromisoformat(
+            "2023-10-30 16:59:45.735000+00:00",
+        ),
+        updated_at=datetime.datetime.fromisoformat(
+            "2023-10-30 16:59:45.735000+00:00",
+        ),
     )
     """
 
     id: UserId
+    idp: str
+    idp_ref: typing.Optional[str] = pydantic.Field(alias="idpRef")
+    metadata: typing.Dict[str, typing.Any]
+    created_at: dt.datetime = pydantic.Field(alias="createdAt")
+    updated_at: dt.datetime = pydantic.Field(alias="updatedAt")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

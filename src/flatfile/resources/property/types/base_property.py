@@ -15,7 +15,9 @@ except ImportError:
 class BaseProperty(pydantic.BaseModel):
     key: str
     label: typing.Optional[str] = pydantic.Field(description="User friendly field name")
-    description: typing.Optional[str]
+    description: typing.Optional[str] = pydantic.Field(
+        description="A short description of the field. Markdown syntax is supported."
+    )
     constraints: typing.Optional[typing.List[Constraint]]
     readonly: typing.Optional[bool]
     metadata: typing.Optional[typing.Any] = pydantic.Field(

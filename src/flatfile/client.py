@@ -3,18 +3,21 @@
 import typing
 
 import httpx
-import typing_extensions
 
 from .core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from .environment import FlatfileEnvironment
 from .resources.agents.client import AgentsClient, AsyncAgentsClient
+from .resources.apps.client import AppsClient, AsyncAppsClient
 from .resources.commits.client import AsyncCommitsClient, CommitsClient
+from .resources.data_retention_policies.client import AsyncDataRetentionPoliciesClient, DataRetentionPoliciesClient
 from .resources.documents.client import AsyncDocumentsClient, DocumentsClient
+from .resources.entitlements.client import AsyncEntitlementsClient, EntitlementsClient
 from .resources.environments.client import AsyncEnvironmentsClient, EnvironmentsClient
 from .resources.events.client import AsyncEventsClient, EventsClient
 from .resources.files.client import AsyncFilesClient, FilesClient
 from .resources.guests.client import AsyncGuestsClient, GuestsClient
 from .resources.jobs.client import AsyncJobsClient, JobsClient
+from .resources.mapping.client import AsyncMappingClient, MappingClient
 from .resources.records.client import AsyncRecordsClient, RecordsClient
 from .resources.roles.client import AsyncRolesClient, RolesClient
 from .resources.secrets.client import AsyncSecretsClient, SecretsClient
@@ -32,25 +35,27 @@ class Flatfile:
         *,
         base_url: typing.Optional[str] = None,
         environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION,
-        x_disable_hooks: typing_extensions.Literal["true"],
         token: typing.Union[str, typing.Callable[[], str]],
         timeout: typing.Optional[float] = 60,
         httpx_client: typing.Optional[httpx.Client] = None
     ):
         self._client_wrapper = SyncClientWrapper(
             base_url=_get_base_url(base_url=base_url, environment=environment),
-            x_disable_hooks=x_disable_hooks,
             token=token,
             httpx_client=httpx.Client(timeout=timeout) if httpx_client is None else httpx_client,
         )
         self.agents = AgentsClient(client_wrapper=self._client_wrapper)
+        self.apps = AppsClient(client_wrapper=self._client_wrapper)
         self.commits = CommitsClient(client_wrapper=self._client_wrapper)
+        self.data_retention_policies = DataRetentionPoliciesClient(client_wrapper=self._client_wrapper)
         self.documents = DocumentsClient(client_wrapper=self._client_wrapper)
+        self.entitlements = EntitlementsClient(client_wrapper=self._client_wrapper)
         self.environments = EnvironmentsClient(client_wrapper=self._client_wrapper)
         self.events = EventsClient(client_wrapper=self._client_wrapper)
         self.files = FilesClient(client_wrapper=self._client_wrapper)
         self.guests = GuestsClient(client_wrapper=self._client_wrapper)
         self.jobs = JobsClient(client_wrapper=self._client_wrapper)
+        self.mapping = MappingClient(client_wrapper=self._client_wrapper)
         self.records = RecordsClient(client_wrapper=self._client_wrapper)
         self.roles = RolesClient(client_wrapper=self._client_wrapper)
         self.secrets = SecretsClient(client_wrapper=self._client_wrapper)
@@ -68,25 +73,27 @@ class AsyncFlatfile:
         *,
         base_url: typing.Optional[str] = None,
         environment: FlatfileEnvironment = FlatfileEnvironment.PRODUCTION,
-        x_disable_hooks: typing_extensions.Literal["true"],
         token: typing.Union[str, typing.Callable[[], str]],
         timeout: typing.Optional[float] = 60,
         httpx_client: typing.Optional[httpx.AsyncClient] = None
     ):
         self._client_wrapper = AsyncClientWrapper(
             base_url=_get_base_url(base_url=base_url, environment=environment),
-            x_disable_hooks=x_disable_hooks,
             token=token,
             httpx_client=httpx.AsyncClient(timeout=timeout) if httpx_client is None else httpx_client,
         )
         self.agents = AsyncAgentsClient(client_wrapper=self._client_wrapper)
+        self.apps = AsyncAppsClient(client_wrapper=self._client_wrapper)
         self.commits = AsyncCommitsClient(client_wrapper=self._client_wrapper)
+        self.data_retention_policies = AsyncDataRetentionPoliciesClient(client_wrapper=self._client_wrapper)
         self.documents = AsyncDocumentsClient(client_wrapper=self._client_wrapper)
+        self.entitlements = AsyncEntitlementsClient(client_wrapper=self._client_wrapper)
         self.environments = AsyncEnvironmentsClient(client_wrapper=self._client_wrapper)
         self.events = AsyncEventsClient(client_wrapper=self._client_wrapper)
         self.files = AsyncFilesClient(client_wrapper=self._client_wrapper)
         self.guests = AsyncGuestsClient(client_wrapper=self._client_wrapper)
         self.jobs = AsyncJobsClient(client_wrapper=self._client_wrapper)
+        self.mapping = AsyncMappingClient(client_wrapper=self._client_wrapper)
         self.records = AsyncRecordsClient(client_wrapper=self._client_wrapper)
         self.roles = AsyncRolesClient(client_wrapper=self._client_wrapper)
         self.secrets = AsyncSecretsClient(client_wrapper=self._client_wrapper)

@@ -27,6 +27,7 @@ class Sheet(pydantic.BaseModel):
         id="us_sh_YOUR_ID",
         workbook_id="us_wb_YOUR_ID",
         name="Contacts",
+        slug="contacts",
         config=SheetConfig(
             name="Contacts",
             slug="contacts",
@@ -67,6 +68,7 @@ class Sheet(pydantic.BaseModel):
     id: SheetId = pydantic.Field(description="The ID of the Sheet.")
     workbook_id: WorkbookId = pydantic.Field(alias="workbookId", description="The ID of the Workbook.")
     name: str = pydantic.Field(description="The name of the Sheet.")
+    slug: str = pydantic.Field(description="The slug of the Sheet.")
     config: SheetConfig = pydantic.Field(description="Describes shape of data as well as behavior")
     count_records: typing.Optional[RecordCounts] = pydantic.Field(
         alias="countRecords", description="The amount of records in the Sheet."

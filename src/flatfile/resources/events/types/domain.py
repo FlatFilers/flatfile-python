@@ -21,6 +21,9 @@ class Domain(str, enum.Enum):
     JOB = "job"
     DOCUMENT = "document"
     SHEET = "sheet"
+    PROGRAM = "program"
+    SECRET = "secret"
+    CRON = "cron"
 
     def visit(
         self,
@@ -30,6 +33,9 @@ class Domain(str, enum.Enum):
         job: typing.Callable[[], T_Result],
         document: typing.Callable[[], T_Result],
         sheet: typing.Callable[[], T_Result],
+        program: typing.Callable[[], T_Result],
+        secret: typing.Callable[[], T_Result],
+        cron: typing.Callable[[], T_Result],
     ) -> T_Result:
         if self is Domain.FILE:
             return file()
@@ -43,3 +49,9 @@ class Domain(str, enum.Enum):
             return document()
         if self is Domain.SHEET:
             return sheet()
+        if self is Domain.PROGRAM:
+            return program()
+        if self is Domain.SECRET:
+            return secret()
+        if self is Domain.CRON:
+            return cron()

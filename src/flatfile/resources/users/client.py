@@ -6,8 +6,18 @@ from json.decoder import JSONDecodeError
 
 from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
+from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
+from ..commons.errors.bad_request_error import BadRequestError
+from ..commons.errors.forbidden_error import ForbiddenError
+from ..commons.errors.not_found_error import NotFoundError
+from ..commons.types.actor_role_id import ActorRoleId
+from ..commons.types.errors import Errors
+from ..commons.types.success import Success
 from ..commons.types.user_id import UserId
+from ..roles.types.assign_actor_role_request import AssignActorRoleRequest
+from ..roles.types.assign_role_response import AssignRoleResponse
+from ..roles.types.list_actor_roles_response import ListActorRolesResponse
 from .types.list_users_response import ListUsersResponse
 from .types.user_response import UserResponse
 
@@ -15,6 +25,9 @@ try:
     import pydantic.v1 as pydantic  # type: ignore
 except ImportError:
     import pydantic  # type: ignore
+
+# this is used as the default value for optional parameters
+OMIT = typing.cast(typing.Any, ...)
 
 
 class UsersClient:
@@ -31,7 +44,6 @@ class UsersClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.users.list(
@@ -53,6 +65,33 @@ class UsersClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def update(self, user_id: UserId, *, name: typing.Optional[str] = OMIT) -> UserResponse:
+        """
+        Updates a user
+
+        Parameters:
+            - user_id: UserId. The user id
+
+            - name: typing.Optional[str].
+        """
+        _request: typing.Dict[str, typing.Any] = {}
+        if name is not OMIT:
+            _request["name"] = name
+        _response = self._client_wrapper.httpx_client.request(
+            "PATCH",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"users/{user_id}"),
+            json=jsonable_encoder(_request),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(UserResponse, _response.json())  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     def get(self, user_id: UserId) -> UserResponse:
         """
         Gets a user
@@ -63,7 +102,6 @@ class UsersClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.users.get(
@@ -78,6 +116,92 @@ class UsersClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(UserResponse, _response.json())  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def list_user_roles(self, user_id: UserId) -> ListActorRolesResponse:
+        """
+        Lists roles assigned to a user.
+
+        Parameters:
+            - user_id: UserId. The user id
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"users/{user_id}/roles"),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(ListActorRolesResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def assign_user_role(self, user_id: UserId, *, request: AssignActorRoleRequest) -> AssignRoleResponse:
+        """
+        Assigns a role to a user.
+
+        Parameters:
+            - user_id: UserId. The user id
+
+            - request: AssignActorRoleRequest.
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"users/{user_id}/roles"),
+            json=jsonable_encoder(request),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(AssignRoleResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def delete_user_role(self, user_id: UserId, actor_role_id: ActorRoleId) -> Success:
+        """
+        Removes a role from a user.
+
+        Parameters:
+            - user_id: UserId. The user id
+
+            - actor_role_id: ActorRoleId. The actor role id
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "DELETE",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"users/{user_id}/roles/{actor_role_id}"),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
@@ -99,7 +223,6 @@ class AsyncUsersClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.users.list(
@@ -121,6 +244,33 @@ class AsyncUsersClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    async def update(self, user_id: UserId, *, name: typing.Optional[str] = OMIT) -> UserResponse:
+        """
+        Updates a user
+
+        Parameters:
+            - user_id: UserId. The user id
+
+            - name: typing.Optional[str].
+        """
+        _request: typing.Dict[str, typing.Any] = {}
+        if name is not OMIT:
+            _request["name"] = name
+        _response = await self._client_wrapper.httpx_client.request(
+            "PATCH",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"users/{user_id}"),
+            json=jsonable_encoder(_request),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(UserResponse, _response.json())  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     async def get(self, user_id: UserId) -> UserResponse:
         """
         Gets a user
@@ -131,7 +281,6 @@ class AsyncUsersClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.users.get(
@@ -146,6 +295,92 @@ class AsyncUsersClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(UserResponse, _response.json())  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def list_user_roles(self, user_id: UserId) -> ListActorRolesResponse:
+        """
+        Lists roles assigned to a user.
+
+        Parameters:
+            - user_id: UserId. The user id
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"users/{user_id}/roles"),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(ListActorRolesResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def assign_user_role(self, user_id: UserId, *, request: AssignActorRoleRequest) -> AssignRoleResponse:
+        """
+        Assigns a role to a user.
+
+        Parameters:
+            - user_id: UserId. The user id
+
+            - request: AssignActorRoleRequest.
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"users/{user_id}/roles"),
+            json=jsonable_encoder(request),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(AssignRoleResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def delete_user_role(self, user_id: UserId, actor_role_id: ActorRoleId) -> Success:
+        """
+        Removes a role from a user.
+
+        Parameters:
+            - user_id: UserId. The user id
+
+            - actor_role_id: ActorRoleId. The actor role id
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "DELETE",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"users/{user_id}/roles/{actor_role_id}"),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:

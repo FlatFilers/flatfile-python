@@ -16,6 +16,7 @@ except ImportError:
 class CellValue(pydantic.BaseModel):
     valid: typing.Optional[bool]
     messages: typing.Optional[typing.List[ValidationMessage]]
+    metadata: typing.Optional[typing.Dict[str, typing.Any]]
     value: typing.Optional[CellValueUnion]
     layer: typing.Optional[str]
     updated_at: typing.Optional[dt.datetime] = pydantic.Field(alias="updatedAt")

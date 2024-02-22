@@ -53,7 +53,6 @@ class SheetsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.sheets.list(
@@ -85,7 +84,6 @@ class SheetsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.sheets.get(
@@ -116,7 +114,6 @@ class SheetsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.sheets.delete(
@@ -151,7 +148,6 @@ class SheetsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.sheets.validate(
@@ -200,7 +196,7 @@ class SheetsClient:
 
             - version_id: typing.Optional[str]. Deprecated, use `sinceCommitId` instead.
 
-            - commit_id: typing.Optional[CommitId]. Returns records that were changed in that version  in that version and only those records.
+            - commit_id: typing.Optional[CommitId]. Returns records that were changed in that version in that version and only those records.
 
             - since_version_id: typing.Optional[VersionId]. Deprecated, use `sinceCommitId` instead.
 
@@ -219,7 +215,6 @@ class SheetsClient:
             - search_field: typing.Optional[SearchField]. The field to search for data on.
 
             - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
-
         """
         with self._client_wrapper.httpx_client.stream(
             "GET",
@@ -290,14 +285,13 @@ class SheetsClient:
 
             - search_field: typing.Optional[SearchField]. The field to search for data on.
 
-            - by_field: typing.Optional[bool]. If true, the error counts for each field will also be returned
+            - by_field: typing.Optional[bool]. If true, the counts for each field will also be returned
 
             - q: typing.Optional[str]. An FFQL query used to filter the result set to be counted
         ---
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.sheets.get_record_counts(
@@ -345,7 +339,6 @@ class SheetsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.sheets.get_sheet_commits(
@@ -377,7 +370,6 @@ class SheetsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.sheets.lock_sheet(
@@ -412,7 +404,6 @@ class SheetsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.sheets.unlock_sheet(
@@ -482,7 +473,6 @@ class SheetsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.sheets.get_cell_values(
@@ -536,7 +526,6 @@ class AsyncSheetsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.sheets.list(
@@ -568,7 +557,6 @@ class AsyncSheetsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.sheets.get(
@@ -599,7 +587,6 @@ class AsyncSheetsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.sheets.delete(
@@ -634,7 +621,6 @@ class AsyncSheetsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.sheets.validate(
@@ -683,7 +669,7 @@ class AsyncSheetsClient:
 
             - version_id: typing.Optional[str]. Deprecated, use `sinceCommitId` instead.
 
-            - commit_id: typing.Optional[CommitId]. Returns records that were changed in that version  in that version and only those records.
+            - commit_id: typing.Optional[CommitId]. Returns records that were changed in that version in that version and only those records.
 
             - since_version_id: typing.Optional[VersionId]. Deprecated, use `sinceCommitId` instead.
 
@@ -702,7 +688,6 @@ class AsyncSheetsClient:
             - search_field: typing.Optional[SearchField]. The field to search for data on.
 
             - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
-
         """
         async with self._client_wrapper.httpx_client.stream(
             "GET",
@@ -773,14 +758,13 @@ class AsyncSheetsClient:
 
             - search_field: typing.Optional[SearchField]. The field to search for data on.
 
-            - by_field: typing.Optional[bool]. If true, the error counts for each field will also be returned
+            - by_field: typing.Optional[bool]. If true, the counts for each field will also be returned
 
             - q: typing.Optional[str]. An FFQL query used to filter the result set to be counted
         ---
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.sheets.get_record_counts(
@@ -830,7 +814,6 @@ class AsyncSheetsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.sheets.get_sheet_commits(
@@ -862,7 +845,6 @@ class AsyncSheetsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.sheets.lock_sheet(
@@ -897,7 +879,6 @@ class AsyncSheetsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.sheets.unlock_sheet(
@@ -967,7 +948,6 @@ class AsyncSheetsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.sheets.get_cell_values(

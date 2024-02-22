@@ -8,9 +8,17 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
+from ..commons.errors.bad_request_error import BadRequestError
+from ..commons.errors.forbidden_error import ForbiddenError
+from ..commons.errors.not_found_error import NotFoundError
+from ..commons.types.actor_role_id import ActorRoleId
+from ..commons.types.errors import Errors
 from ..commons.types.guest_id import GuestId
 from ..commons.types.space_id import SpaceId
 from ..commons.types.success import Success
+from ..roles.types.assign_actor_role_request import AssignActorRoleRequest
+from ..roles.types.assign_role_response import AssignRoleResponse
+from ..roles.types.list_actor_roles_response import ListActorRolesResponse
 from .types.create_guest_response import CreateGuestResponse
 from .types.guest_config import GuestConfig
 from .types.guest_config_update import GuestConfigUpdate
@@ -44,7 +52,6 @@ class GuestsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.guests.list(
@@ -79,7 +86,6 @@ class GuestsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.guests.create(
@@ -130,7 +136,6 @@ class GuestsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.guests.get(
@@ -161,7 +166,6 @@ class GuestsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.guests.delete(
@@ -195,7 +199,6 @@ class GuestsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.guests.update(
@@ -233,7 +236,6 @@ class GuestsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.guests.get_guest_token(
@@ -255,6 +257,92 @@ class GuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def list_guest_roles(self, guest_id: GuestId) -> ListActorRolesResponse:
+        """
+        Lists roles assigned to a guest.
+
+        Parameters:
+            - guest_id: GuestId. The guest id
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{guest_id}/roles"),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(ListActorRolesResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def assign_guest_role(self, guest_id: GuestId, *, request: AssignActorRoleRequest) -> AssignRoleResponse:
+        """
+        Assigns a role to a guest.
+
+        Parameters:
+            - guest_id: GuestId. The guest id
+
+            - request: AssignActorRoleRequest.
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{guest_id}/roles"),
+            json=jsonable_encoder(request),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(AssignRoleResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def delete_guest_role(self, guest_id: GuestId, actor_role_id: ActorRoleId) -> Success:
+        """
+        Removes a role from a guest.
+
+        Parameters:
+            - guest_id: GuestId. The guest id
+
+            - actor_role_id: ActorRoleId. The actor role id
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "DELETE",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{guest_id}/roles/{actor_role_id}"),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     def invite(self, *, request: typing.List[Invite]) -> Success:
         """
         Guests can be created as a named guest on the Space or there’s a global link that will let anonymous guests into the space.
@@ -266,7 +354,6 @@ class GuestsClient:
         from flatfile.client import Flatfile
 
         client = Flatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         client.guests.invite(
@@ -312,7 +399,6 @@ class AsyncGuestsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.guests.list(
@@ -347,7 +433,6 @@ class AsyncGuestsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.guests.create(
@@ -398,7 +483,6 @@ class AsyncGuestsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.guests.get(
@@ -429,7 +513,6 @@ class AsyncGuestsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.guests.delete(
@@ -463,7 +546,6 @@ class AsyncGuestsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.guests.update(
@@ -503,7 +585,6 @@ class AsyncGuestsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.guests.get_guest_token(
@@ -525,6 +606,92 @@ class AsyncGuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    async def list_guest_roles(self, guest_id: GuestId) -> ListActorRolesResponse:
+        """
+        Lists roles assigned to a guest.
+
+        Parameters:
+            - guest_id: GuestId. The guest id
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{guest_id}/roles"),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(ListActorRolesResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def assign_guest_role(self, guest_id: GuestId, *, request: AssignActorRoleRequest) -> AssignRoleResponse:
+        """
+        Assigns a role to a guest.
+
+        Parameters:
+            - guest_id: GuestId. The guest id
+
+            - request: AssignActorRoleRequest.
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{guest_id}/roles"),
+            json=jsonable_encoder(request),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(AssignRoleResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def delete_guest_role(self, guest_id: GuestId, actor_role_id: ActorRoleId) -> Success:
+        """
+        Removes a role from a guest.
+
+        Parameters:
+            - guest_id: GuestId. The guest id
+
+            - actor_role_id: ActorRoleId. The actor role id
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "DELETE",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{guest_id}/roles/{actor_role_id}"),
+            headers=self._client_wrapper.get_headers(),
+            timeout=60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     async def invite(self, *, request: typing.List[Invite]) -> Success:
         """
         Guests can be created as a named guest on the Space or there’s a global link that will let anonymous guests into the space.
@@ -536,7 +703,6 @@ class AsyncGuestsClient:
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
-            x_disable_hooks="YOUR_X_DISABLE_HOOKS",
             token="YOUR_TOKEN",
         )
         await client.guests.invite(

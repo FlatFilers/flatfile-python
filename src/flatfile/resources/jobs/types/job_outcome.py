@@ -35,6 +35,7 @@ class JobOutcome(pydantic.BaseModel):
     next: typing.Optional[JobOutcomeNext]
     heading: typing.Optional[str]
     message: typing.Optional[str]
+    hide_default_button: typing.Optional[bool] = pydantic.Field(alias="hideDefaultButton")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

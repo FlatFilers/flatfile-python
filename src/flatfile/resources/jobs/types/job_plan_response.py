@@ -28,6 +28,7 @@ class JobPlanResponse(pydantic.BaseModel):
         JobSubject_Resource,
         JobType,
         Metadata,
+        Property_String,
         Trigger,
     )
 
@@ -71,6 +72,15 @@ class JobPlanResponse(pydantic.BaseModel):
             plan=JobExecutionPlan(
                 field_mapping=[
                     Edge(
+                        source_field=Property_String(
+                            type="string",
+                            key="firstName",
+                        ),
+                        destination_field=Property_String(
+                            type="string",
+                            key="firstName",
+                            label="First Name",
+                        ),
                         preview=["John", "Suzy", "Joe"],
                         metadata=Metadata(
                             certainty=Certainty.ABSOLUTE,
@@ -79,6 +89,15 @@ class JobPlanResponse(pydantic.BaseModel):
                         ),
                     ),
                     Edge(
+                        source_field=Property_String(
+                            type="string",
+                            key="lastName",
+                        ),
+                        destination_field=Property_String(
+                            type="string",
+                            key="lastName",
+                            label="Last Name",
+                        ),
                         preview=["Smith", "Que", "Montana"],
                         metadata=Metadata(
                             certainty=Certainty.ABSOLUTE,

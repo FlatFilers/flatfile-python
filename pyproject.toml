@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "flatfile"
-version = "0.0.15"
+version = "0.0.18"
 description = ""
 readme = "README.md"
 authors = []

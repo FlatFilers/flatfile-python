@@ -14,9 +14,14 @@ except ImportError:
 
 class RecordCountsResponseData(pydantic.BaseModel):
     """
-    from flatfile import RecordCountsResponseData
+    from flatfile import RecordCounts, RecordCountsResponseData
 
     RecordCountsResponseData(
+        counts=RecordCounts(
+            valid=1000,
+            error=0,
+            total=1000,
+        ),
         success=True,
     )
     """

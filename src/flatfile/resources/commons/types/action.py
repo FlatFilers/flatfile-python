@@ -5,6 +5,7 @@ import typing
 
 from ....core.datetime_utils import serialize_datetime
 from .action_constraint import ActionConstraint
+from .action_message import ActionMessage
 from .action_mode import ActionMode
 from .action_schedule import ActionSchedule
 from .input_form import InputForm
@@ -28,14 +29,15 @@ class Action(pydantic.BaseModel):
     )
     """
 
-    slug: typing.Optional[str] = pydantic.Field(description=("**This is deprecated. Use `operation` instead.**\n"))
+    slug: typing.Optional[str] = pydantic.Field(description="**This is deprecated. Use `operation` instead.**")
     operation: typing.Optional[str] = pydantic.Field(description="This will become the job operation that is triggered")
     mode: typing.Optional[ActionMode] = pydantic.Field(
         description="Foreground and toolbarBlocking action mode will prevent interacting with the resource until complete"
     )
     label: str = pydantic.Field(description="The text on the button itself.")
     tooltip: typing.Optional[str] = pydantic.Field(description="A tooltip that appears when hovering the action button")
-    type: typing.Optional[str] = pydantic.Field(description=("**This is deprecated.**\n"))
+    messages: typing.Optional[typing.List[ActionMessage]]
+    type: typing.Optional[str] = pydantic.Field(description="**This is deprecated.**")
     description: typing.Optional[str] = pydantic.Field(
         description="The text that appears in the dialog after the action is clicked."
     )
@@ -50,10 +52,10 @@ class Action(pydantic.BaseModel):
         description="Icon will work on primary actions. It will only accept an already existing Flatfile design system icon."
     )
     require_all_valid: typing.Optional[bool] = pydantic.Field(
-        alias="requireAllValid", description=("**This is deprecated. Use `constraints` instead.**\n")
+        alias="requireAllValid", description="**This is deprecated. Use `constraints` instead.**"
     )
     require_selection: typing.Optional[bool] = pydantic.Field(
-        alias="requireSelection", description=("**This is deprecated. Use `constraints` instead.**\n")
+        alias="requireSelection", description="**This is deprecated. Use `constraints` instead.**"
     )
     input_form: typing.Optional[InputForm] = pydantic.Field(
         alias="inputForm", description="Adds an input form for this action after it is clicked."

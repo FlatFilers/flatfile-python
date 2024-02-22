@@ -29,6 +29,9 @@ class SpaceResponse(pydantic.BaseModel):
             updated_at=datetime.datetime.fromisoformat(
                 "2021-01-01 00:00:00+00:00",
             ),
+            last_activity_at=datetime.datetime.fromisoformat(
+                "2021-01-01 00:00:00+00:00",
+            ),
             created_by_user_id="us_usr_YOUR_ID",
             workbooks_count=1,
             files_count=1,

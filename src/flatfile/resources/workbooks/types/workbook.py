@@ -44,6 +44,7 @@ class Workbook(pydantic.BaseModel):
                 id="us_sh_YOUR_ID",
                 workbook_id="us_wb_YOUR_ID",
                 name="Contacts",
+                slug="contacts",
                 config=SheetConfig(
                     name="Contacts",
                     slug="contacts",

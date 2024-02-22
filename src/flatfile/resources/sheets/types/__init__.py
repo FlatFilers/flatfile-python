@@ -3,7 +3,10 @@
 from .cell_value_with_counts import CellValueWithCounts
 from .cells_response import CellsResponse
 from .cells_response_data import CellsResponseData
+from .composite_unique_constraint import CompositeUniqueConstraint
+from .composite_unique_constraint_strategy import CompositeUniqueConstraintStrategy
 from .distinct import Distinct
+from .external_sheet_constraint import ExternalSheetConstraint
 from .field_key import FieldKey
 from .include_counts import IncludeCounts
 from .list_sheets_response import ListSheetsResponse
@@ -14,6 +17,7 @@ from .sheet_access import SheetAccess
 from .sheet_config import SheetConfig
 from .sheet_config_or_update import SheetConfigOrUpdate
 from .sheet_config_update import SheetConfigUpdate
+from .sheet_constraint import SheetConstraint, SheetConstraint_External, SheetConstraint_Unique
 from .sheet_response import SheetResponse
 from .sheet_update import SheetUpdate
 
@@ -21,7 +25,10 @@ __all__ = [
     "CellValueWithCounts",
     "CellsResponse",
     "CellsResponseData",
+    "CompositeUniqueConstraint",
+    "CompositeUniqueConstraintStrategy",
     "Distinct",
+    "ExternalSheetConstraint",
     "FieldKey",
     "IncludeCounts",
     "ListSheetsResponse",
@@ -32,6 +39,9 @@ __all__ = [
     "SheetConfig",
     "SheetConfigOrUpdate",
     "SheetConfigUpdate",
+    "SheetConstraint",
+    "SheetConstraint_External",
+    "SheetConstraint_Unique",
     "SheetResponse",
     "SheetUpdate",
 ]

@@ -22,6 +22,7 @@ class AgentResponse(pydantic.BaseModel):
             topics=[EventTopic.WORKBOOK_UPDATED],
             compiler=Compiler.JS,
             source="module.exports = { routeEvent: async (...args) => { console.log(args) } }",
+            slug="default",
         ),
     )
     """
