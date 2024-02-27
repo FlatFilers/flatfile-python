@@ -73,19 +73,27 @@ class CreateWorkbookConfig(pydantic.BaseModel):
 
     name: str = pydantic.Field(description="The name of the Workbook.")
     labels: typing.Optional[typing.List[str]] = pydantic.Field(
-        description="An optional list of labels for the Workbook."
+        default=None, description="An optional list of labels for the Workbook."
     )
     space_id: typing.Optional[SpaceId] = pydantic.Field(
-        alias="spaceId", description="Space to associate with the Workbook."
+        alias="spaceId", default=None, description="Space to associate with the Workbook."
     )
     environment_id: typing.Optional[EnvironmentId] = pydantic.Field(
-        alias="environmentId", description="Environment to associate with the Workbook"
+        alias="environmentId", default=None, description="Environment to associate with the Workbook"
     )
-    namespace: typing.Optional[str] = pydantic.Field(description="Optional namespace to apply to the Workbook.")
-    sheets: typing.Optional[typing.List[SheetConfig]] = pydantic.Field(description="Sheets to create on the Workbook.")
-    actions: typing.Optional[typing.List[Action]] = pydantic.Field(description="Actions to create on the Workbook.")
-    settings: typing.Optional[WorkbookConfigSettings] = pydantic.Field(description="The Workbook settings.")
-    metadata: typing.Optional[typing.Any] = pydantic.Field(description="Metadata for the workbook")
+    namespace: typing.Optional[str] = pydantic.Field(
+        default=None, description="Optional namespace to apply to the Workbook."
+    )
+    sheets: typing.Optional[typing.List[SheetConfig]] = pydantic.Field(
+        default=None, description="Sheets to create on the Workbook."
+    )
+    actions: typing.Optional[typing.List[Action]] = pydantic.Field(
+        default=None, description="Actions to create on the Workbook."
+    )
+    settings: typing.Optional[WorkbookConfigSettings] = pydantic.Field(
+        default=None, description="The Workbook settings."
+    )
+    metadata: typing.Optional[typing.Any] = pydantic.Field(default=None, description="Metadata for the workbook")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

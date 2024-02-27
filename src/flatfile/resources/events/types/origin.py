@@ -16,8 +16,8 @@ class Origin(pydantic.BaseModel):
     The origin resource of the event
     """
 
-    id: typing.Optional[str]
-    slug: typing.Optional[str]
+    id: typing.Optional[str] = None
+    slug: typing.Optional[str] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

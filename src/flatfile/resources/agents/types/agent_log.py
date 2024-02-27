@@ -31,7 +31,7 @@ class AgentLog(pydantic.BaseModel):
     success: bool = pydantic.Field(description="Whether the agent execution was successful")
     created_at: str = pydantic.Field(alias="createdAt")
     completed_at: str = pydantic.Field(alias="completedAt")
-    log: typing.Optional[str] = pydantic.Field(description="The log of the agent execution")
+    log: typing.Optional[str] = pydantic.Field(default=None, description="The log of the agent execution")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

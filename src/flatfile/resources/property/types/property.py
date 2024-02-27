@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import typing
 
-import typing_extensions
-
 from .boolean_property import BooleanProperty
 from .date_property import DateProperty
 from .enum_property import EnumProperty
@@ -15,7 +13,7 @@ from .string_property import StringProperty
 
 
 class Property_String(StringProperty):
-    type: typing_extensions.Literal["string"]
+    type: typing.Literal["string"]
 
     class Config:
         frozen = True
@@ -24,7 +22,7 @@ class Property_String(StringProperty):
 
 
 class Property_Number(NumberProperty):
-    type: typing_extensions.Literal["number"]
+    type: typing.Literal["number"]
 
     class Config:
         frozen = True
@@ -33,7 +31,7 @@ class Property_Number(NumberProperty):
 
 
 class Property_Boolean(BooleanProperty):
-    type: typing_extensions.Literal["boolean"]
+    type: typing.Literal["boolean"]
 
     class Config:
         frozen = True
@@ -42,7 +40,7 @@ class Property_Boolean(BooleanProperty):
 
 
 class Property_Date(DateProperty):
-    type: typing_extensions.Literal["date"]
+    type: typing.Literal["date"]
 
     class Config:
         frozen = True
@@ -51,7 +49,7 @@ class Property_Date(DateProperty):
 
 
 class Property_Enum(EnumProperty):
-    type: typing_extensions.Literal["enum"]
+    type: typing.Literal["enum"]
 
     class Config:
         frozen = True
@@ -60,7 +58,7 @@ class Property_Enum(EnumProperty):
 
 
 class Property_Reference(ReferenceProperty):
-    type: typing_extensions.Literal["reference"]
+    type: typing.Literal["reference"]
 
     class Config:
         frozen = True

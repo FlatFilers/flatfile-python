@@ -16,9 +16,9 @@ class Progress(pydantic.BaseModel):
     The progress of the event within a collection of iterable events
     """
 
-    current: typing.Optional[int] = pydantic.Field(description="The current progress of the event")
-    total: typing.Optional[int] = pydantic.Field(description="The total number of events in this group")
-    percent: typing.Optional[int] = pydantic.Field(description="The percent complete of the event group")
+    current: typing.Optional[int] = pydantic.Field(default=None, description="The current progress of the event")
+    total: typing.Optional[int] = pydantic.Field(default=None, description="The total number of events in this group")
+    percent: typing.Optional[int] = pydantic.Field(default=None, description="The percent complete of the event group")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

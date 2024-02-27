@@ -17,13 +17,13 @@ class GenericEvent(BaseEvent):
     id: EventId
     created_at: dt.datetime = pydantic.Field(alias="createdAt", description="Date the event was created")
     deleted_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="deletedAt", description="Date the event was deleted"
+        alias="deletedAt", default=None, description="Date the event was deleted"
     )
     acknowledged_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="acknowledgedAt", description="Date the event was acknowledged"
+        alias="acknowledgedAt", default=None, description="Date the event was acknowledged"
     )
     acknowledged_by: typing.Optional[str] = pydantic.Field(
-        alias="acknowledgedBy", description="The actor (user or system) who acknowledged the event"
+        alias="acknowledgedBy", default=None, description="The actor (user or system) who acknowledged the event"
     )
     payload: typing.Dict[str, typing.Any]
 

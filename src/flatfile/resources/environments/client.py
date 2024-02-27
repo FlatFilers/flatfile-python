@@ -8,6 +8,7 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
+from ...core.request_options import RequestOptions
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.environment_id import EnvironmentId
@@ -34,7 +35,11 @@ class EnvironmentsClient:
         self._client_wrapper = client_wrapper
 
     def list(
-        self, *, page_size: typing.Optional[int] = None, page_number: typing.Optional[int] = None
+        self,
+        *,
+        page_size: typing.Optional[int] = None,
+        page_number: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> ListEnvironmentsResponse:
         """
         Get all environments
@@ -43,6 +48,8 @@ class EnvironmentsClient:
             - page_size: typing.Optional[int]. Number of environments to return in a page (default 10)
 
             - page_number: typing.Optional[int]. Based on pageSize, which page of environments to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -54,9 +61,30 @@ class EnvironmentsClient:
         _response = self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "environments"),
-            params=remove_none_from_dict({"pageSize": page_size, "pageNumber": page_number}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListEnvironmentsResponse, _response.json())  # type: ignore
@@ -66,12 +94,16 @@ class EnvironmentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def create(self, *, request: EnvironmentConfigCreate) -> EnvironmentResponse:
+    def create(
+        self, *, request: EnvironmentConfigCreate, request_options: typing.Optional[RequestOptions] = None
+    ) -> EnvironmentResponse:
         """
         Create a new environment
 
         Parameters:
             - request: EnvironmentConfigCreate.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import EnvironmentConfigCreate, GuestAuthenticationEnum
         from flatfile.client import Flatfile
@@ -92,9 +124,26 @@ class EnvironmentsClient:
         _response = self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "environments"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(EnvironmentResponse, _response.json())  # type: ignore
@@ -104,12 +153,16 @@ class EnvironmentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get_environment_event_token(self, *, environment_id: EnvironmentId) -> EventTokenResponse:
+    def get_environment_event_token(
+        self, *, environment_id: EnvironmentId, request_options: typing.Optional[RequestOptions] = None
+    ) -> EventTokenResponse:
         """
         Get a token which can be used to subscribe to events for this environment
 
         Parameters:
             - environment_id: EnvironmentId. ID of environment to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -123,9 +176,29 @@ class EnvironmentsClient:
         _response = self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "environments/subscription-token"),
-            params=remove_none_from_dict({"environmentId": environment_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(EventTokenResponse, _response.json())  # type: ignore
@@ -139,12 +212,16 @@ class EnvironmentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get(self, environment_id: str) -> EnvironmentResponse:
+    def get(
+        self, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> EnvironmentResponse:
         """
         Returns a single environment
 
         Parameters:
             - environment_id: str. ID of the environment to return. To fetch the current environment, pass `current`
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -157,9 +234,23 @@ class EnvironmentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"environments/{environment_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"environments/{jsonable_encoder(environment_id)}"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(EnvironmentResponse, _response.json())  # type: ignore
@@ -173,7 +264,13 @@ class EnvironmentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update(self, environment_id: str, *, request: EnvironmentConfigUpdate) -> Environment:
+    def update(
+        self,
+        environment_id: str,
+        *,
+        request: EnvironmentConfigUpdate,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Environment:
         """
         Updates a single environment, to change the name for example
 
@@ -181,6 +278,8 @@ class EnvironmentsClient:
             - environment_id: str. ID of the environment to update
 
             - request: EnvironmentConfigUpdate.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import EnvironmentConfigUpdate, GuestAuthenticationEnum
         from flatfile.client import Flatfile
@@ -201,10 +300,29 @@ class EnvironmentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"environments/{environment_id}"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"environments/{jsonable_encoder(environment_id)}"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Environment, _response.json())  # type: ignore
@@ -214,18 +332,34 @@ class EnvironmentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete(self, environment_id: str) -> Success:
+    def delete(self, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Deletes a single environment
 
         Parameters:
             - environment_id: str. ID of the environment to delete
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"environments/{environment_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"environments/{jsonable_encoder(environment_id)}"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -245,7 +379,11 @@ class AsyncEnvironmentsClient:
         self._client_wrapper = client_wrapper
 
     async def list(
-        self, *, page_size: typing.Optional[int] = None, page_number: typing.Optional[int] = None
+        self,
+        *,
+        page_size: typing.Optional[int] = None,
+        page_number: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> ListEnvironmentsResponse:
         """
         Get all environments
@@ -254,6 +392,8 @@ class AsyncEnvironmentsClient:
             - page_size: typing.Optional[int]. Number of environments to return in a page (default 10)
 
             - page_number: typing.Optional[int]. Based on pageSize, which page of environments to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -265,9 +405,30 @@ class AsyncEnvironmentsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "environments"),
-            params=remove_none_from_dict({"pageSize": page_size, "pageNumber": page_number}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListEnvironmentsResponse, _response.json())  # type: ignore
@@ -277,12 +438,16 @@ class AsyncEnvironmentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def create(self, *, request: EnvironmentConfigCreate) -> EnvironmentResponse:
+    async def create(
+        self, *, request: EnvironmentConfigCreate, request_options: typing.Optional[RequestOptions] = None
+    ) -> EnvironmentResponse:
         """
         Create a new environment
 
         Parameters:
             - request: EnvironmentConfigCreate.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import EnvironmentConfigCreate, GuestAuthenticationEnum
         from flatfile.client import AsyncFlatfile
@@ -303,9 +468,26 @@ class AsyncEnvironmentsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "environments"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(EnvironmentResponse, _response.json())  # type: ignore
@@ -315,12 +497,16 @@ class AsyncEnvironmentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get_environment_event_token(self, *, environment_id: EnvironmentId) -> EventTokenResponse:
+    async def get_environment_event_token(
+        self, *, environment_id: EnvironmentId, request_options: typing.Optional[RequestOptions] = None
+    ) -> EventTokenResponse:
         """
         Get a token which can be used to subscribe to events for this environment
 
         Parameters:
             - environment_id: EnvironmentId. ID of environment to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -334,9 +520,29 @@ class AsyncEnvironmentsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "environments/subscription-token"),
-            params=remove_none_from_dict({"environmentId": environment_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(EventTokenResponse, _response.json())  # type: ignore
@@ -350,12 +556,16 @@ class AsyncEnvironmentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get(self, environment_id: str) -> EnvironmentResponse:
+    async def get(
+        self, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> EnvironmentResponse:
         """
         Returns a single environment
 
         Parameters:
             - environment_id: str. ID of the environment to return. To fetch the current environment, pass `current`
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -368,9 +578,23 @@ class AsyncEnvironmentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"environments/{environment_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"environments/{jsonable_encoder(environment_id)}"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(EnvironmentResponse, _response.json())  # type: ignore
@@ -384,7 +608,13 @@ class AsyncEnvironmentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update(self, environment_id: str, *, request: EnvironmentConfigUpdate) -> Environment:
+    async def update(
+        self,
+        environment_id: str,
+        *,
+        request: EnvironmentConfigUpdate,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Environment:
         """
         Updates a single environment, to change the name for example
 
@@ -392,6 +622,8 @@ class AsyncEnvironmentsClient:
             - environment_id: str. ID of the environment to update
 
             - request: EnvironmentConfigUpdate.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import EnvironmentConfigUpdate, GuestAuthenticationEnum
         from flatfile.client import AsyncFlatfile
@@ -412,10 +644,29 @@ class AsyncEnvironmentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"environments/{environment_id}"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"environments/{jsonable_encoder(environment_id)}"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Environment, _response.json())  # type: ignore
@@ -425,18 +676,34 @@ class AsyncEnvironmentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete(self, environment_id: str) -> Success:
+    async def delete(self, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Deletes a single environment
 
         Parameters:
             - environment_id: str. ID of the environment to delete
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"environments/{environment_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"environments/{jsonable_encoder(environment_id)}"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore

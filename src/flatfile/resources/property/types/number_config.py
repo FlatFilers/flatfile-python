@@ -21,7 +21,7 @@ class NumberConfig(pydantic.BaseModel):
     """
 
     decimal_places: typing.Optional[int] = pydantic.Field(
-        alias="decimalPlaces", description="Number of decimal places to round data to"
+        alias="decimalPlaces", default=None, description="Number of decimal places to round data to"
     )
 
     def json(self, **kwargs: typing.Any) -> str:

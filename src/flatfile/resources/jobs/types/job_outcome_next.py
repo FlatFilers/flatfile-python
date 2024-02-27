@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import typing
 
-import typing_extensions
-
 from .job_outcome_next_download import JobOutcomeNextDownload
 from .job_outcome_next_id import JobOutcomeNextId
 from .job_outcome_next_retry import JobOutcomeNextRetry
@@ -15,7 +13,7 @@ from .job_outcome_next_wait import JobOutcomeNextWait
 
 
 class JobOutcomeNext_Id(JobOutcomeNextId):
-    type: typing_extensions.Literal["id"]
+    type: typing.Literal["id"]
 
     class Config:
         frozen = True
@@ -24,7 +22,7 @@ class JobOutcomeNext_Id(JobOutcomeNextId):
 
 
 class JobOutcomeNext_Url(JobOutcomeNextUrl):
-    type: typing_extensions.Literal["url"]
+    type: typing.Literal["url"]
 
     class Config:
         frozen = True
@@ -33,7 +31,7 @@ class JobOutcomeNext_Url(JobOutcomeNextUrl):
 
 
 class JobOutcomeNext_Download(JobOutcomeNextDownload):
-    type: typing_extensions.Literal["download"]
+    type: typing.Literal["download"]
 
     class Config:
         frozen = True
@@ -42,7 +40,7 @@ class JobOutcomeNext_Download(JobOutcomeNextDownload):
 
 
 class JobOutcomeNext_Wait(JobOutcomeNextWait):
-    type: typing_extensions.Literal["wait"]
+    type: typing.Literal["wait"]
 
     class Config:
         frozen = True
@@ -51,7 +49,7 @@ class JobOutcomeNext_Wait(JobOutcomeNextWait):
 
 
 class JobOutcomeNext_Snapshot(JobOutcomeNextSnapshot):
-    type: typing_extensions.Literal["snapshot"]
+    type: typing.Literal["snapshot"]
 
     class Config:
         frozen = True
@@ -60,7 +58,7 @@ class JobOutcomeNext_Snapshot(JobOutcomeNextSnapshot):
 
 
 class JobOutcomeNext_Retry(JobOutcomeNextRetry):
-    type: typing_extensions.Literal["retry"]
+    type: typing.Literal["retry"]
 
     class Config:
         frozen = True

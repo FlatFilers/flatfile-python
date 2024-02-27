@@ -7,6 +7,8 @@ from json.decoder import JSONDecodeError
 from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
+from ...core.remove_none_from_dict import remove_none_from_dict
+from ...core.request_options import RequestOptions
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.document_id import DocumentId
@@ -30,12 +32,16 @@ class DocumentsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def list(self, space_id: SpaceId) -> ListDocumentsResponse:
+    def list(
+        self, space_id: SpaceId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> ListDocumentsResponse:
         """
         Returns all documents for a space
 
         Parameters:
             - space_id: SpaceId. ID of space to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -48,9 +54,23 @@ class DocumentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/documents"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"spaces/{jsonable_encoder(space_id)}/documents"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListDocumentsResponse, _response.json())  # type: ignore
@@ -64,7 +84,9 @@ class DocumentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def create(self, space_id: SpaceId, *, request: DocumentConfig) -> DocumentResponse:
+    def create(
+        self, space_id: SpaceId, *, request: DocumentConfig, request_options: typing.Optional[RequestOptions] = None
+    ) -> DocumentResponse:
         """
         Add a new document to the space
 
@@ -72,6 +94,8 @@ class DocumentsClient:
             - space_id: SpaceId. ID of space to return
 
             - request: DocumentConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import Action, ActionMode, DocumentConfig
         from flatfile.client import Flatfile
@@ -98,10 +122,29 @@ class DocumentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/documents"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"spaces/{jsonable_encoder(space_id)}/documents"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(DocumentResponse, _response.json())  # type: ignore
@@ -115,7 +158,9 @@ class DocumentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get(self, space_id: SpaceId, document_id: DocumentId) -> DocumentResponse:
+    def get(
+        self, space_id: SpaceId, document_id: DocumentId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> DocumentResponse:
         """
         Returns a single document
 
@@ -123,6 +168,8 @@ class DocumentsClient:
             - space_id: SpaceId. ID of space to return
 
             - document_id: DocumentId. ID of document to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -137,10 +184,23 @@ class DocumentsClient:
         _response = self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(
-                f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/documents/{document_id}"
+                f"{self._client_wrapper.get_base_url()}/",
+                f"spaces/{jsonable_encoder(space_id)}/documents/{jsonable_encoder(document_id)}",
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(DocumentResponse, _response.json())  # type: ignore
@@ -154,7 +214,14 @@ class DocumentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update(self, space_id: SpaceId, document_id: DocumentId, *, request: DocumentConfig) -> DocumentResponse:
+    def update(
+        self,
+        space_id: SpaceId,
+        document_id: DocumentId,
+        *,
+        request: DocumentConfig,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DocumentResponse:
         """
         updates a single document, for only the body and title
 
@@ -164,6 +231,8 @@ class DocumentsClient:
             - document_id: DocumentId. ID of document to return
 
             - request: DocumentConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import DocumentConfig
         from flatfile.client import Flatfile
@@ -183,11 +252,29 @@ class DocumentsClient:
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
             urllib.parse.urljoin(
-                f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/documents/{document_id}"
+                f"{self._client_wrapper.get_base_url()}/",
+                f"spaces/{jsonable_encoder(space_id)}/documents/{jsonable_encoder(document_id)}",
             ),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(DocumentResponse, _response.json())  # type: ignore
@@ -201,7 +288,9 @@ class DocumentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete(self, space_id: SpaceId, document_id: DocumentId) -> Success:
+    def delete(
+        self, space_id: SpaceId, document_id: DocumentId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
         """
         Deletes a single document
 
@@ -209,14 +298,29 @@ class DocumentsClient:
             - space_id: SpaceId. ID of space to return
 
             - document_id: DocumentId. ID of document to delete
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
             urllib.parse.urljoin(
-                f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/documents/{document_id}"
+                f"{self._client_wrapper.get_base_url()}/",
+                f"spaces/{jsonable_encoder(space_id)}/documents/{jsonable_encoder(document_id)}",
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -235,12 +339,16 @@ class AsyncDocumentsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    async def list(self, space_id: SpaceId) -> ListDocumentsResponse:
+    async def list(
+        self, space_id: SpaceId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> ListDocumentsResponse:
         """
         Returns all documents for a space
 
         Parameters:
             - space_id: SpaceId. ID of space to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -253,9 +361,23 @@ class AsyncDocumentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/documents"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"spaces/{jsonable_encoder(space_id)}/documents"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListDocumentsResponse, _response.json())  # type: ignore
@@ -269,7 +391,9 @@ class AsyncDocumentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def create(self, space_id: SpaceId, *, request: DocumentConfig) -> DocumentResponse:
+    async def create(
+        self, space_id: SpaceId, *, request: DocumentConfig, request_options: typing.Optional[RequestOptions] = None
+    ) -> DocumentResponse:
         """
         Add a new document to the space
 
@@ -277,6 +401,8 @@ class AsyncDocumentsClient:
             - space_id: SpaceId. ID of space to return
 
             - request: DocumentConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import Action, ActionMode, DocumentConfig
         from flatfile.client import AsyncFlatfile
@@ -303,10 +429,29 @@ class AsyncDocumentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/documents"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"spaces/{jsonable_encoder(space_id)}/documents"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(DocumentResponse, _response.json())  # type: ignore
@@ -320,7 +465,9 @@ class AsyncDocumentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get(self, space_id: SpaceId, document_id: DocumentId) -> DocumentResponse:
+    async def get(
+        self, space_id: SpaceId, document_id: DocumentId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> DocumentResponse:
         """
         Returns a single document
 
@@ -328,6 +475,8 @@ class AsyncDocumentsClient:
             - space_id: SpaceId. ID of space to return
 
             - document_id: DocumentId. ID of document to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -342,10 +491,23 @@ class AsyncDocumentsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(
-                f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/documents/{document_id}"
+                f"{self._client_wrapper.get_base_url()}/",
+                f"spaces/{jsonable_encoder(space_id)}/documents/{jsonable_encoder(document_id)}",
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(DocumentResponse, _response.json())  # type: ignore
@@ -359,7 +521,14 @@ class AsyncDocumentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update(self, space_id: SpaceId, document_id: DocumentId, *, request: DocumentConfig) -> DocumentResponse:
+    async def update(
+        self,
+        space_id: SpaceId,
+        document_id: DocumentId,
+        *,
+        request: DocumentConfig,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DocumentResponse:
         """
         updates a single document, for only the body and title
 
@@ -369,6 +538,8 @@ class AsyncDocumentsClient:
             - document_id: DocumentId. ID of document to return
 
             - request: DocumentConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import DocumentConfig
         from flatfile.client import AsyncFlatfile
@@ -388,11 +559,29 @@ class AsyncDocumentsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
             urllib.parse.urljoin(
-                f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/documents/{document_id}"
+                f"{self._client_wrapper.get_base_url()}/",
+                f"spaces/{jsonable_encoder(space_id)}/documents/{jsonable_encoder(document_id)}",
             ),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(DocumentResponse, _response.json())  # type: ignore
@@ -406,7 +595,9 @@ class AsyncDocumentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete(self, space_id: SpaceId, document_id: DocumentId) -> Success:
+    async def delete(
+        self, space_id: SpaceId, document_id: DocumentId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
         """
         Deletes a single document
 
@@ -414,14 +605,29 @@ class AsyncDocumentsClient:
             - space_id: SpaceId. ID of space to return
 
             - document_id: DocumentId. ID of document to delete
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
             urllib.parse.urljoin(
-                f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/documents/{document_id}"
+                f"{self._client_wrapper.get_base_url()}/",
+                f"spaces/{jsonable_encoder(space_id)}/documents/{jsonable_encoder(document_id)}",
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore

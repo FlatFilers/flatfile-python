@@ -17,7 +17,7 @@ class DestinationField(pydantic.BaseModel):
         alias="destinationField", description="The description of the destination field"
     )
     preview: typing.Optional[typing.List[str]] = pydantic.Field(
-        description="A list of preview values of the data in the destination field"
+        default=None, description="A list of preview values of the data in the destination field"
     )
 
     def json(self, **kwargs: typing.Any) -> str:

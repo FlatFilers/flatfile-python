@@ -30,12 +30,12 @@ class JobOutcome(pydantic.BaseModel):
     )
     """
 
-    acknowledge: typing.Optional[bool]
-    button_text: typing.Optional[str] = pydantic.Field(alias="buttonText")
-    next: typing.Optional[JobOutcomeNext]
-    heading: typing.Optional[str]
-    message: typing.Optional[str]
-    hide_default_button: typing.Optional[bool] = pydantic.Field(alias="hideDefaultButton")
+    acknowledge: typing.Optional[bool] = None
+    button_text: typing.Optional[str] = pydantic.Field(alias="buttonText", default=None)
+    next: typing.Optional[JobOutcomeNext] = None
+    heading: typing.Optional[str] = None
+    message: typing.Optional[str] = None
+    hide_default_button: typing.Optional[bool] = pydantic.Field(alias="hideDefaultButton", default=None)
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

@@ -13,7 +13,7 @@ except ImportError:
 
 class SummarySection(pydantic.BaseModel):
     total: int
-    by_field: typing.Optional[typing.Dict[str, int]] = pydantic.Field(alias="byField")
+    by_field: typing.Optional[typing.Dict[str, int]] = pydantic.Field(alias="byField", default=None)
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

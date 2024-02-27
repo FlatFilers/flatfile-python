@@ -28,11 +28,11 @@ class JobAckDetails(pydantic.BaseModel):
     )
     """
 
-    info: typing.Optional[str]
+    info: typing.Optional[str] = None
     progress: typing.Optional[int] = pydantic.Field(
-        description="the progress of the job. Whole number between 0 and 100"
+        default=None, description="the progress of the job. Whole number between 0 and 100"
     )
-    estimated_completion_at: typing.Optional[dt.datetime] = pydantic.Field(alias="estimatedCompletionAt")
+    estimated_completion_at: typing.Optional[dt.datetime] = pydantic.Field(alias="estimatedCompletionAt", default=None)
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

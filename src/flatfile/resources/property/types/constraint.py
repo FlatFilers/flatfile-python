@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import typing
 
-import typing_extensions
-
 from .external_constraint import ExternalConstraint
 from .unique_constraint import UniqueConstraint
 
@@ -16,7 +14,7 @@ except ImportError:
 
 
 class Constraint_Required(pydantic.BaseModel):
-    type: typing_extensions.Literal["required"]
+    type: typing.Literal["required"]
 
     class Config:
         frozen = True
@@ -24,7 +22,7 @@ class Constraint_Required(pydantic.BaseModel):
 
 
 class Constraint_Unique(UniqueConstraint):
-    type: typing_extensions.Literal["unique"]
+    type: typing.Literal["unique"]
 
     class Config:
         frozen = True
@@ -33,7 +31,7 @@ class Constraint_Unique(UniqueConstraint):
 
 
 class Constraint_Computed(pydantic.BaseModel):
-    type: typing_extensions.Literal["computed"]
+    type: typing.Literal["computed"]
 
     class Config:
         frozen = True
@@ -41,7 +39,7 @@ class Constraint_Computed(pydantic.BaseModel):
 
 
 class Constraint_External(ExternalConstraint):
-    type: typing_extensions.Literal["external"]
+    type: typing.Literal["external"]
 
     class Config:
         frozen = True

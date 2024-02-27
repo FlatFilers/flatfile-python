@@ -20,13 +20,14 @@ class Edge(pydantic.BaseModel):
         alias="destinationField", description="The description of the destination field"
     )
     preview: typing.Optional[typing.List[str]] = pydantic.Field(
-        description="A list of preview values of the data in the destination field"
+        default=None, description="A list of preview values of the data in the destination field"
     )
     enum_details: typing.Optional[EnumDetails] = pydantic.Field(
         alias="enumDetails",
+        default=None,
         description="Only available if one or more of the destination fields is of type enum. Provides category mapping.",
     )
-    metadata: typing.Optional[Metadata] = pydantic.Field(description="Metadata about the edge")
+    metadata: typing.Optional[Metadata] = pydantic.Field(default=None, description="Metadata about the edge")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

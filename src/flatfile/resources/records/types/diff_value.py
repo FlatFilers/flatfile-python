@@ -14,7 +14,7 @@ except ImportError:
 
 
 class DiffValue(CellValue):
-    snapshot_value: typing.Optional[CellValueUnion] = pydantic.Field(alias="snapshotValue")
+    snapshot_value: typing.Optional[CellValueUnion] = pydantic.Field(alias="snapshotValue", default=None)
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

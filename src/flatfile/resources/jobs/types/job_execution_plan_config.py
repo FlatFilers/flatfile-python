@@ -19,12 +19,14 @@ class JobExecutionPlanConfig(pydantic.BaseModel):
     The execution plan for a job, for example, for a map job, the execution plan is the mapping of the source sheet to the destination sheet.
     """
 
-    field_mapping: typing.Optional[typing.List[Edge]] = pydantic.Field(alias="fieldMapping")
-    unmapped_source_fields: typing.Optional[typing.List[SourceField]] = pydantic.Field(alias="unmappedSourceFields")
-    unmapped_destination_fields: typing.Optional[typing.List[DestinationField]] = pydantic.Field(
-        alias="unmappedDestinationFields"
+    field_mapping: typing.Optional[typing.List[Edge]] = pydantic.Field(alias="fieldMapping", default=None)
+    unmapped_source_fields: typing.Optional[typing.List[SourceField]] = pydantic.Field(
+        alias="unmappedSourceFields", default=None
     )
-    program_id: typing.Optional[str] = pydantic.Field(alias="programId")
+    unmapped_destination_fields: typing.Optional[typing.List[DestinationField]] = pydantic.Field(
+        alias="unmappedDestinationFields", default=None
+    )
+    program_id: typing.Optional[str] = pydantic.Field(alias="programId", default=None)
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

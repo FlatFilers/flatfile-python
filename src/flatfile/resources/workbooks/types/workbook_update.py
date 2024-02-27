@@ -36,22 +36,22 @@ class WorkbookUpdate(pydantic.BaseModel):
     )
     """
 
-    name: typing.Optional[str] = pydantic.Field(description="The name of the Workbook.")
+    name: typing.Optional[str] = pydantic.Field(default=None, description="The name of the Workbook.")
     labels: typing.Optional[typing.List[str]] = pydantic.Field(
-        description="An optional list of labels for the Workbook."
+        default=None, description="An optional list of labels for the Workbook."
     )
     space_id: typing.Optional[SpaceId] = pydantic.Field(
-        alias="spaceId", description="The Space Id associated with the Workbook."
+        alias="spaceId", default=None, description="The Space Id associated with the Workbook."
     )
     environment_id: typing.Optional[EnvironmentId] = pydantic.Field(
-        alias="environmentId", description="The Environment Id associated with the Workbook."
+        alias="environmentId", default=None, description="The Environment Id associated with the Workbook."
     )
-    namespace: typing.Optional[str] = pydantic.Field(description="The namespace of the Workbook.")
+    namespace: typing.Optional[str] = pydantic.Field(default=None, description="The namespace of the Workbook.")
     sheets: typing.Optional[typing.List[SheetConfigOrUpdate]] = pydantic.Field(
-        description="Describes shape of data as well as behavior"
+        default=None, description="Describes shape of data as well as behavior"
     )
-    actions: typing.Optional[typing.List[Action]]
-    metadata: typing.Optional[typing.Any] = pydantic.Field(description="Metadata for the workbook")
+    actions: typing.Optional[typing.List[Action]] = None
+    metadata: typing.Optional[typing.Any] = pydantic.Field(default=None, description="Metadata for the workbook")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

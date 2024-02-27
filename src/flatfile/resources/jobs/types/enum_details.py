@@ -22,10 +22,10 @@ class EnumDetails(pydantic.BaseModel):
         description="The mapping of source values to destination values"
     )
     unused_source_values: typing.Optional[typing.List[EnumValue]] = pydantic.Field(
-        alias="unusedSourceValues", description="A list of source values that are not mapped from"
+        alias="unusedSourceValues", default=None, description="A list of source values that are not mapped from"
     )
     unused_destination_values: typing.Optional[typing.List[EnumValue]] = pydantic.Field(
-        alias="unusedDestinationValues", description="A list of destination values that are not mapped to"
+        alias="unusedDestinationValues", default=None, description="A list of destination values that are not mapped to"
     )
 
     def json(self, **kwargs: typing.Any) -> str:

@@ -7,6 +7,8 @@ from json.decoder import JSONDecodeError
 from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
+from ...core.remove_none_from_dict import remove_none_from_dict
+from ...core.request_options import RequestOptions
 from ..commons.types.app_id import AppId
 from .types.app_create import AppCreate
 from .types.app_patch import AppPatch
@@ -26,15 +28,30 @@ class AppsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def list(self) -> AppsResponse:
+    def list(self, *, request_options: typing.Optional[RequestOptions] = None) -> AppsResponse:
         """
         Returns apps in an account
+
+        Parameters:
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "apps"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(AppsResponse, _response.json())  # type: ignore
@@ -44,12 +61,14 @@ class AppsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get(self, app_id: AppId) -> AppResponse:
+    def get(self, app_id: AppId, *, request_options: typing.Optional[RequestOptions] = None) -> AppResponse:
         """
         Returns an app
 
         Parameters:
             - app_id: AppId. ID of app
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -62,9 +81,21 @@ class AppsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"apps/{app_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"apps/{jsonable_encoder(app_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(AppResponse, _response.json())  # type: ignore
@@ -74,7 +105,9 @@ class AppsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update(self, app_id: AppId, *, request: AppPatch) -> AppResponse:
+    def update(
+        self, app_id: AppId, *, request: AppPatch, request_options: typing.Optional[RequestOptions] = None
+    ) -> AppResponse:
         """
         Updates an app
 
@@ -82,6 +115,8 @@ class AppsClient:
             - app_id: AppId. ID of app
 
             - request: AppPatch.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import AppPatch
         from flatfile.client import Flatfile
@@ -93,10 +128,27 @@ class AppsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"apps/{app_id}"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"apps/{jsonable_encoder(app_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(AppResponse, _response.json())  # type: ignore
@@ -106,12 +158,14 @@ class AppsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def create(self, *, request: AppCreate) -> AppResponse:
+    def create(self, *, request: AppCreate, request_options: typing.Optional[RequestOptions] = None) -> AppResponse:
         """
         Creates an app
 
         Parameters:
             - request: AppCreate.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import AppCreate, AppType
         from flatfile.client import Flatfile
@@ -124,9 +178,26 @@ class AppsClient:
         _response = self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "apps"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(AppResponse, _response.json())  # type: ignore
@@ -141,15 +212,30 @@ class AsyncAppsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    async def list(self) -> AppsResponse:
+    async def list(self, *, request_options: typing.Optional[RequestOptions] = None) -> AppsResponse:
         """
         Returns apps in an account
+
+        Parameters:
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "apps"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(AppsResponse, _response.json())  # type: ignore
@@ -159,12 +245,14 @@ class AsyncAppsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get(self, app_id: AppId) -> AppResponse:
+    async def get(self, app_id: AppId, *, request_options: typing.Optional[RequestOptions] = None) -> AppResponse:
         """
         Returns an app
 
         Parameters:
             - app_id: AppId. ID of app
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -177,9 +265,21 @@ class AsyncAppsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"apps/{app_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"apps/{jsonable_encoder(app_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(AppResponse, _response.json())  # type: ignore
@@ -189,7 +289,9 @@ class AsyncAppsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update(self, app_id: AppId, *, request: AppPatch) -> AppResponse:
+    async def update(
+        self, app_id: AppId, *, request: AppPatch, request_options: typing.Optional[RequestOptions] = None
+    ) -> AppResponse:
         """
         Updates an app
 
@@ -197,6 +299,8 @@ class AsyncAppsClient:
             - app_id: AppId. ID of app
 
             - request: AppPatch.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import AppPatch
         from flatfile.client import AsyncFlatfile
@@ -208,10 +312,27 @@ class AsyncAppsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"apps/{app_id}"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"apps/{jsonable_encoder(app_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(AppResponse, _response.json())  # type: ignore
@@ -221,12 +342,16 @@ class AsyncAppsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def create(self, *, request: AppCreate) -> AppResponse:
+    async def create(
+        self, *, request: AppCreate, request_options: typing.Optional[RequestOptions] = None
+    ) -> AppResponse:
         """
         Creates an app
 
         Parameters:
             - request: AppCreate.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import AppCreate, AppType
         from flatfile.client import AsyncFlatfile
@@ -239,9 +364,26 @@ class AsyncAppsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "apps"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(AppResponse, _response.json())  # type: ignore

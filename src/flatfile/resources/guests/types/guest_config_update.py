@@ -25,10 +25,10 @@ class GuestConfigUpdate(pydantic.BaseModel):
     )
     """
 
-    environment_id: typing.Optional[EnvironmentId] = pydantic.Field(alias="environmentId")
-    email: typing.Optional[str]
-    name: typing.Optional[str]
-    spaces: typing.Optional[typing.List[GuestSpace]]
+    environment_id: typing.Optional[EnvironmentId] = pydantic.Field(alias="environmentId", default=None)
+    email: typing.Optional[str] = None
+    name: typing.Optional[str] = None
+    spaces: typing.Optional[typing.List[GuestSpace]] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

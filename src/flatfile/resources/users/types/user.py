@@ -40,7 +40,7 @@ class User(UserConfig):
 
     id: UserId
     idp: str
-    idp_ref: typing.Optional[str] = pydantic.Field(alias="idpRef")
+    idp_ref: typing.Optional[str] = pydantic.Field(alias="idpRef", default=None)
     metadata: typing.Dict[str, typing.Any]
     created_at: dt.datetime = pydantic.Field(alias="createdAt")
     updated_at: dt.datetime = pydantic.Field(alias="updatedAt")

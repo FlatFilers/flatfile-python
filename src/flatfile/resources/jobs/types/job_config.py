@@ -39,35 +39,44 @@ class JobConfig(pydantic.BaseModel):
     type: JobType = pydantic.Field(description="The type of job")
     operation: str = pydantic.Field(description='the type of operation to perform on the data. For example, "export".')
     source: JobSource
-    destination: typing.Optional[JobDestination]
-    config: typing.Optional[JobUpdateConfig]
-    trigger: typing.Optional[Trigger] = pydantic.Field(description="the type of trigger to use for this job")
-    status: typing.Optional[JobStatus] = pydantic.Field(description="the status of the job")
+    destination: typing.Optional[JobDestination] = None
+    config: typing.Optional[JobUpdateConfig] = None
+    trigger: typing.Optional[Trigger] = pydantic.Field(
+        default=None, description="the type of trigger to use for this job"
+    )
+    status: typing.Optional[JobStatus] = pydantic.Field(default=None, description="the status of the job")
     progress: typing.Optional[int] = pydantic.Field(
-        description="the progress of the job. Whole number between 0 and 100"
+        default=None, description="the progress of the job. Whole number between 0 and 100"
     )
-    file_id: typing.Optional[FileId] = pydantic.Field(alias="fileId")
-    mode: typing.Optional[JobMode] = pydantic.Field(description="the mode of the job")
+    file_id: typing.Optional[FileId] = pydantic.Field(alias="fileId", default=None)
+    mode: typing.Optional[JobMode] = pydantic.Field(default=None, description="the mode of the job")
     input: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(
-        description="Input parameters for this job type."
+        default=None, description="Input parameters for this job type."
     )
-    subject: typing.Optional[JobSubject] = pydantic.Field(description="Subject parameters for this job type.")
-    outcome: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(description="Outcome summary of job.")
-    info: typing.Optional[str] = pydantic.Field(description="Current status of job in text")
+    subject: typing.Optional[JobSubject] = pydantic.Field(
+        default=None, description="Subject parameters for this job type."
+    )
+    outcome: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(
+        default=None, description="Outcome summary of job."
+    )
+    info: typing.Optional[str] = pydantic.Field(default=None, description="Current status of job in text")
     managed: typing.Optional[bool] = pydantic.Field(
-        description="Indicates if Flatfile is managing the control flow of this job or if it is being manually tracked."
+        default=None,
+        description="Indicates if Flatfile is managing the control flow of this job or if it is being manually tracked.",
     )
     environment_id: typing.Optional[EnvironmentId] = pydantic.Field(
-        alias="environmentId", description="The id of the environment this job belongs to"
+        alias="environmentId", default=None, description="The id of the environment this job belongs to"
     )
-    part: typing.Optional[int] = pydantic.Field(description="The part number of this job")
+    part: typing.Optional[int] = pydantic.Field(default=None, description="The part number of this job")
     part_data: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(
-        alias="partData", description="The data for this part of the job"
+        alias="partData", default=None, description="The data for this part of the job"
     )
     part_execution: typing.Optional[JobPartExecution] = pydantic.Field(
-        alias="partExecution", description="The execution mode for this part of the job"
+        alias="partExecution", default=None, description="The execution mode for this part of the job"
     )
-    parent_id: typing.Optional[JobId] = pydantic.Field(alias="parentId", description="The id of the parent job")
+    parent_id: typing.Optional[JobId] = pydantic.Field(
+        alias="parentId", default=None, description="The id of the parent job"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

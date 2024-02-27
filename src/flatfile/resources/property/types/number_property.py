@@ -14,7 +14,7 @@ class NumberProperty(BaseProperty, ArrayableProperty):
     Defines a property that should be stored and read as either an integer or floating point number. Database engines should look at the configuration to determine ideal storage format.
     """
 
-    config: typing.Optional[NumberConfig]
+    config: typing.Optional[NumberConfig] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

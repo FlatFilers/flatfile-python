@@ -20,7 +20,8 @@ class EnumProperty(BaseProperty, ArrayableProperty):
     """
 
     multi: typing.Optional[bool] = pydantic.Field(
-        description="Will allow multiple values and store / provide the values in an array if set. Not all field types support arrays."
+        default=None,
+        description="Will allow multiple values and store / provide the values in an array if set. Not all field types support arrays.",
     )
     config: EnumPropertyConfig
 

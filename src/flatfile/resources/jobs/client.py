@@ -8,6 +8,7 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
+from ...core.request_options import RequestOptions
 from ..commons.types.environment_id import EnvironmentId
 from ..commons.types.file_id import FileId
 from ..commons.types.job_id import JobId
@@ -53,6 +54,7 @@ class JobsClient:
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
         sort_direction: typing.Optional[SortDirection] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> ListJobsResponse:
         """
         Parameters:
@@ -71,6 +73,8 @@ class JobsClient:
             - page_number: typing.Optional[int]. Based on pageSize, which page of jobs to return
 
             - sort_direction: typing.Optional[SortDirection]. Sort direction - asc (ascending) or desc (descending)
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -85,20 +89,36 @@ class JobsClient:
         _response = self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "jobs"),
-            params=remove_none_from_dict(
-                {
-                    "environmentId": environment_id,
-                    "spaceId": space_id,
-                    "workbookId": workbook_id,
-                    "fileId": file_id,
-                    "parentId": parent_id,
-                    "pageSize": page_size,
-                    "pageNumber": page_number,
-                    "sortDirection": sort_direction,
-                }
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        "spaceId": space_id,
+                        "workbookId": workbook_id,
+                        "fileId": file_id,
+                        "parentId": parent_id,
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        "sortDirection": sort_direction,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListJobsResponse, _response.json())  # type: ignore
@@ -108,10 +128,12 @@ class JobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def create(self, *, request: JobConfig) -> JobResponse:
+    def create(self, *, request: JobConfig, request_options: typing.Optional[RequestOptions] = None) -> JobResponse:
         """
         Parameters:
             - request: JobConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import JobConfig, JobType
         from flatfile.client import Flatfile
@@ -130,9 +152,26 @@ class JobsClient:
         _response = self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "jobs"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
@@ -142,10 +181,12 @@ class JobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get(self, job_id: JobId) -> JobResponse:
+    def get(self, job_id: JobId, *, request_options: typing.Optional[RequestOptions] = None) -> JobResponse:
         """
         Parameters:
             - job_id: JobId. The id of the job to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -158,9 +199,21 @@ class JobsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
@@ -170,12 +223,16 @@ class JobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update(self, job_id: JobId, *, request: JobUpdate) -> JobResponse:
+    def update(
+        self, job_id: JobId, *, request: JobUpdate, request_options: typing.Optional[RequestOptions] = None
+    ) -> JobResponse:
         """
         Parameters:
             - job_id: JobId. The id of the job to patch
 
             - request: JobUpdate.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import JobStatus, JobUpdate
         from flatfile.client import Flatfile
@@ -193,10 +250,27 @@ class JobsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
@@ -206,10 +280,12 @@ class JobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete(self, job_id: JobId) -> Success:
+    def delete(self, job_id: JobId, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Parameters:
             - job_id: JobId. The id of the job to delete
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -222,9 +298,21 @@ class JobsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -234,12 +322,14 @@ class JobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def execute(self, job_id: str) -> Success:
+    def execute(self, job_id: str, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Execute a job and return the job
 
         Parameters:
             - job_id: str. ID of job to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -252,9 +342,24 @@ class JobsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/execute"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/execute"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))
+            if request_options is not None
+            else None,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -264,12 +369,16 @@ class JobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get_execution_plan(self, job_id: JobId) -> JobPlanResponse:
+    def get_execution_plan(
+        self, job_id: JobId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> JobPlanResponse:
         """
         Returns a single job's execution plan
 
         Parameters:
             - job_id: JobId. ID of job to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -282,9 +391,21 @@ class JobsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/plan"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/plan"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobPlanResponse, _response.json())  # type: ignore
@@ -294,7 +415,13 @@ class JobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update_execution_plan(self, job_id: JobId, *, request: JobExecutionPlanRequest) -> JobPlanResponse:
+    def update_execution_plan(
+        self,
+        job_id: JobId,
+        *,
+        request: JobExecutionPlanRequest,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> JobPlanResponse:
         """
         Update a job's entire execution plan
 
@@ -302,6 +429,8 @@ class JobsClient:
             - job_id: JobId. ID of job to return
 
             - request: JobExecutionPlanRequest.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import (
             DestinationField,
@@ -366,10 +495,27 @@ class JobsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "PUT",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/plan"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/plan"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobPlanResponse, _response.json())  # type: ignore
@@ -379,7 +525,13 @@ class JobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update_execution_plan_fields(self, job_id: str, *, request: JobExecutionPlanConfigRequest) -> JobPlanResponse:
+    def update_execution_plan_fields(
+        self,
+        job_id: str,
+        *,
+        request: JobExecutionPlanConfigRequest,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> JobPlanResponse:
         """
         Update one or more individual fields on a job's execution plan
 
@@ -387,13 +539,32 @@ class JobsClient:
             - job_id: str. ID of job to return
 
             - request: JobExecutionPlanConfigRequest.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/plan"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/plan"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobPlanResponse, _response.json())  # type: ignore
@@ -403,7 +574,13 @@ class JobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def ack(self, job_id: JobId, *, request: typing.Optional[JobAckDetails] = None) -> JobResponse:
+    def ack(
+        self,
+        job_id: JobId,
+        *,
+        request: typing.Optional[JobAckDetails] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> JobResponse:
         """
         Acknowledge a job and return the job
 
@@ -411,6 +588,8 @@ class JobsClient:
             - job_id: JobId. ID of job to return
 
             - request: typing.Optional[JobAckDetails].
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         import datetime
 
@@ -433,10 +612,27 @@ class JobsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/ack"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/ack"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
@@ -446,12 +642,14 @@ class JobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def ack_outcome(self, job_id: JobId) -> JobResponse:
+    def ack_outcome(self, job_id: JobId, *, request_options: typing.Optional[RequestOptions] = None) -> JobResponse:
         """
         Acknowledge a job outcome and return the job
 
         Parameters:
             - job_id: JobId. ID of job to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -464,9 +662,26 @@ class JobsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/outcome/ack"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/outcome/ack"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))
+            if request_options is not None
+            else None,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
@@ -476,7 +691,13 @@ class JobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def complete(self, job_id: JobId, *, request: typing.Optional[JobCompleteDetails] = None) -> JobResponse:
+    def complete(
+        self,
+        job_id: JobId,
+        *,
+        request: typing.Optional[JobCompleteDetails] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> JobResponse:
         """
         Complete a job and return the job
 
@@ -484,6 +705,8 @@ class JobsClient:
             - job_id: JobId. ID of job to return
 
             - request: typing.Optional[JobCompleteDetails].
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import JobCompleteDetails, JobOutcome, JobOutcomeNext_Id
         from flatfile.client import Flatfile
@@ -510,10 +733,29 @@ class JobsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/complete"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/complete"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
@@ -523,7 +765,13 @@ class JobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def fail(self, job_id: JobId, *, request: typing.Optional[JobCompleteDetails] = None) -> JobResponse:
+    def fail(
+        self,
+        job_id: JobId,
+        *,
+        request: typing.Optional[JobCompleteDetails] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> JobResponse:
         """
         Fail a job and return the job
 
@@ -531,6 +779,8 @@ class JobsClient:
             - job_id: JobId. ID of job to return
 
             - request: typing.Optional[JobCompleteDetails].
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import JobCompleteDetails, JobOutcome, JobOutcomeNext_Id
         from flatfile.client import Flatfile
@@ -557,10 +807,27 @@ class JobsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/fail"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/fail"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
@@ -570,7 +837,13 @@ class JobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def cancel(self, job_id: JobId, *, request: typing.Optional[JobCancelDetails] = None) -> JobResponse:
+    def cancel(
+        self,
+        job_id: JobId,
+        *,
+        request: typing.Optional[JobCancelDetails] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> JobResponse:
         """
         Cancel a job and return the job
 
@@ -578,6 +851,8 @@ class JobsClient:
             - job_id: JobId. ID of job to return
 
             - request: typing.Optional[JobCancelDetails].
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import JobCancelDetails
         from flatfile.client import Flatfile
@@ -594,10 +869,27 @@ class JobsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/cancel"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/cancel"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
@@ -607,18 +899,35 @@ class JobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def retry(self, job_id: JobId) -> JobResponse:
+    def retry(self, job_id: JobId, *, request_options: typing.Optional[RequestOptions] = None) -> JobResponse:
         """
         Retry a failt job and return the job
 
         Parameters:
             - job_id: JobId. ID of job to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/retry"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/retry"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))
+            if request_options is not None
+            else None,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
@@ -628,19 +937,40 @@ class JobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def preview_mutation(self, *, request: MutateJobConfig) -> DiffRecordsResponse:
+    def preview_mutation(
+        self, *, request: MutateJobConfig, request_options: typing.Optional[RequestOptions] = None
+    ) -> DiffRecordsResponse:
         """
         Preview the results of a mutation
 
         Parameters:
             - request: MutateJobConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "jobs/preview-mutation"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(DiffRecordsResponse, _response.json())  # type: ignore
@@ -650,7 +980,9 @@ class JobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def split(self, job_id: JobId, *, request: JobSplitDetails) -> JobResponse:
+    def split(
+        self, job_id: JobId, *, request: JobSplitDetails, request_options: typing.Optional[RequestOptions] = None
+    ) -> JobResponse:
         """
         Split a job and return the job
 
@@ -658,6 +990,8 @@ class JobsClient:
             - job_id: JobId. ID of job to return
 
             - request: JobSplitDetails.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import JobSplitDetails
         from flatfile.client import Flatfile
@@ -674,10 +1008,27 @@ class JobsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/split"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/split"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
@@ -703,6 +1054,7 @@ class AsyncJobsClient:
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
         sort_direction: typing.Optional[SortDirection] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> ListJobsResponse:
         """
         Parameters:
@@ -721,6 +1073,8 @@ class AsyncJobsClient:
             - page_number: typing.Optional[int]. Based on pageSize, which page of jobs to return
 
             - sort_direction: typing.Optional[SortDirection]. Sort direction - asc (ascending) or desc (descending)
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -735,20 +1089,36 @@ class AsyncJobsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "jobs"),
-            params=remove_none_from_dict(
-                {
-                    "environmentId": environment_id,
-                    "spaceId": space_id,
-                    "workbookId": workbook_id,
-                    "fileId": file_id,
-                    "parentId": parent_id,
-                    "pageSize": page_size,
-                    "pageNumber": page_number,
-                    "sortDirection": sort_direction,
-                }
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        "spaceId": space_id,
+                        "workbookId": workbook_id,
+                        "fileId": file_id,
+                        "parentId": parent_id,
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        "sortDirection": sort_direction,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListJobsResponse, _response.json())  # type: ignore
@@ -758,10 +1128,14 @@ class AsyncJobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def create(self, *, request: JobConfig) -> JobResponse:
+    async def create(
+        self, *, request: JobConfig, request_options: typing.Optional[RequestOptions] = None
+    ) -> JobResponse:
         """
         Parameters:
             - request: JobConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import JobConfig, JobType
         from flatfile.client import AsyncFlatfile
@@ -780,9 +1154,26 @@ class AsyncJobsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "jobs"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
@@ -792,10 +1183,12 @@ class AsyncJobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get(self, job_id: JobId) -> JobResponse:
+    async def get(self, job_id: JobId, *, request_options: typing.Optional[RequestOptions] = None) -> JobResponse:
         """
         Parameters:
             - job_id: JobId. The id of the job to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -808,9 +1201,21 @@ class AsyncJobsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
@@ -820,12 +1225,16 @@ class AsyncJobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update(self, job_id: JobId, *, request: JobUpdate) -> JobResponse:
+    async def update(
+        self, job_id: JobId, *, request: JobUpdate, request_options: typing.Optional[RequestOptions] = None
+    ) -> JobResponse:
         """
         Parameters:
             - job_id: JobId. The id of the job to patch
 
             - request: JobUpdate.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import JobStatus, JobUpdate
         from flatfile.client import AsyncFlatfile
@@ -843,10 +1252,27 @@ class AsyncJobsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
@@ -856,10 +1282,12 @@ class AsyncJobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete(self, job_id: JobId) -> Success:
+    async def delete(self, job_id: JobId, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Parameters:
             - job_id: JobId. The id of the job to delete
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -872,9 +1300,21 @@ class AsyncJobsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -884,12 +1324,14 @@ class AsyncJobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def execute(self, job_id: str) -> Success:
+    async def execute(self, job_id: str, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Execute a job and return the job
 
         Parameters:
             - job_id: str. ID of job to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -902,9 +1344,24 @@ class AsyncJobsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/execute"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/execute"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))
+            if request_options is not None
+            else None,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -914,12 +1371,16 @@ class AsyncJobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get_execution_plan(self, job_id: JobId) -> JobPlanResponse:
+    async def get_execution_plan(
+        self, job_id: JobId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> JobPlanResponse:
         """
         Returns a single job's execution plan
 
         Parameters:
             - job_id: JobId. ID of job to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -932,9 +1393,21 @@ class AsyncJobsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/plan"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/plan"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobPlanResponse, _response.json())  # type: ignore
@@ -944,7 +1417,13 @@ class AsyncJobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update_execution_plan(self, job_id: JobId, *, request: JobExecutionPlanRequest) -> JobPlanResponse:
+    async def update_execution_plan(
+        self,
+        job_id: JobId,
+        *,
+        request: JobExecutionPlanRequest,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> JobPlanResponse:
         """
         Update a job's entire execution plan
 
@@ -952,6 +1431,8 @@ class AsyncJobsClient:
             - job_id: JobId. ID of job to return
 
             - request: JobExecutionPlanRequest.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import (
             DestinationField,
@@ -1016,10 +1497,27 @@ class AsyncJobsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "PUT",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/plan"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/plan"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobPlanResponse, _response.json())  # type: ignore
@@ -1030,7 +1528,11 @@ class AsyncJobsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def update_execution_plan_fields(
-        self, job_id: str, *, request: JobExecutionPlanConfigRequest
+        self,
+        job_id: str,
+        *,
+        request: JobExecutionPlanConfigRequest,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> JobPlanResponse:
         """
         Update one or more individual fields on a job's execution plan
@@ -1039,13 +1541,32 @@ class AsyncJobsClient:
             - job_id: str. ID of job to return
 
             - request: JobExecutionPlanConfigRequest.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/plan"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/plan"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobPlanResponse, _response.json())  # type: ignore
@@ -1055,7 +1576,13 @@ class AsyncJobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def ack(self, job_id: JobId, *, request: typing.Optional[JobAckDetails] = None) -> JobResponse:
+    async def ack(
+        self,
+        job_id: JobId,
+        *,
+        request: typing.Optional[JobAckDetails] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> JobResponse:
         """
         Acknowledge a job and return the job
 
@@ -1063,6 +1590,8 @@ class AsyncJobsClient:
             - job_id: JobId. ID of job to return
 
             - request: typing.Optional[JobAckDetails].
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         import datetime
 
@@ -1085,10 +1614,27 @@ class AsyncJobsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/ack"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/ack"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
@@ -1098,12 +1644,16 @@ class AsyncJobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def ack_outcome(self, job_id: JobId) -> JobResponse:
+    async def ack_outcome(
+        self, job_id: JobId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> JobResponse:
         """
         Acknowledge a job outcome and return the job
 
         Parameters:
             - job_id: JobId. ID of job to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -1116,9 +1666,26 @@ class AsyncJobsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/outcome/ack"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/outcome/ack"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))
+            if request_options is not None
+            else None,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
@@ -1128,7 +1695,13 @@ class AsyncJobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def complete(self, job_id: JobId, *, request: typing.Optional[JobCompleteDetails] = None) -> JobResponse:
+    async def complete(
+        self,
+        job_id: JobId,
+        *,
+        request: typing.Optional[JobCompleteDetails] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> JobResponse:
         """
         Complete a job and return the job
 
@@ -1136,6 +1709,8 @@ class AsyncJobsClient:
             - job_id: JobId. ID of job to return
 
             - request: typing.Optional[JobCompleteDetails].
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import JobCompleteDetails, JobOutcome, JobOutcomeNext_Id
         from flatfile.client import AsyncFlatfile
@@ -1162,10 +1737,29 @@ class AsyncJobsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/complete"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/complete"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
@@ -1175,7 +1769,13 @@ class AsyncJobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def fail(self, job_id: JobId, *, request: typing.Optional[JobCompleteDetails] = None) -> JobResponse:
+    async def fail(
+        self,
+        job_id: JobId,
+        *,
+        request: typing.Optional[JobCompleteDetails] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> JobResponse:
         """
         Fail a job and return the job
 
@@ -1183,6 +1783,8 @@ class AsyncJobsClient:
             - job_id: JobId. ID of job to return
 
             - request: typing.Optional[JobCompleteDetails].
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import JobCompleteDetails, JobOutcome, JobOutcomeNext_Id
         from flatfile.client import AsyncFlatfile
@@ -1209,10 +1811,27 @@ class AsyncJobsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/fail"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/fail"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
@@ -1222,7 +1841,13 @@ class AsyncJobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def cancel(self, job_id: JobId, *, request: typing.Optional[JobCancelDetails] = None) -> JobResponse:
+    async def cancel(
+        self,
+        job_id: JobId,
+        *,
+        request: typing.Optional[JobCancelDetails] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> JobResponse:
         """
         Cancel a job and return the job
 
@@ -1230,6 +1855,8 @@ class AsyncJobsClient:
             - job_id: JobId. ID of job to return
 
             - request: typing.Optional[JobCancelDetails].
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import JobCancelDetails
         from flatfile.client import AsyncFlatfile
@@ -1246,10 +1873,27 @@ class AsyncJobsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/cancel"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/cancel"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
@@ -1259,18 +1903,35 @@ class AsyncJobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def retry(self, job_id: JobId) -> JobResponse:
+    async def retry(self, job_id: JobId, *, request_options: typing.Optional[RequestOptions] = None) -> JobResponse:
         """
         Retry a failt job and return the job
 
         Parameters:
             - job_id: JobId. ID of job to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/retry"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/retry"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))
+            if request_options is not None
+            else None,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore
@@ -1280,19 +1941,40 @@ class AsyncJobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def preview_mutation(self, *, request: MutateJobConfig) -> DiffRecordsResponse:
+    async def preview_mutation(
+        self, *, request: MutateJobConfig, request_options: typing.Optional[RequestOptions] = None
+    ) -> DiffRecordsResponse:
         """
         Preview the results of a mutation
 
         Parameters:
             - request: MutateJobConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "jobs/preview-mutation"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(DiffRecordsResponse, _response.json())  # type: ignore
@@ -1302,7 +1984,9 @@ class AsyncJobsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def split(self, job_id: JobId, *, request: JobSplitDetails) -> JobResponse:
+    async def split(
+        self, job_id: JobId, *, request: JobSplitDetails, request_options: typing.Optional[RequestOptions] = None
+    ) -> JobResponse:
         """
         Split a job and return the job
 
@@ -1310,6 +1994,8 @@ class AsyncJobsClient:
             - job_id: JobId. ID of job to return
 
             - request: JobSplitDetails.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import JobSplitDetails
         from flatfile.client import AsyncFlatfile
@@ -1326,10 +2012,27 @@ class AsyncJobsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{job_id}/split"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"jobs/{jsonable_encoder(job_id)}/split"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(JobResponse, _response.json())  # type: ignore

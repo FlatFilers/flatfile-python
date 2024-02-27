@@ -13,8 +13,8 @@ except ImportError:
 
 class JobOutcomeNextDownload(pydantic.BaseModel):
     url: str
-    label: typing.Optional[str]
-    file_name: typing.Optional[str] = pydantic.Field(alias="fileName")
+    label: typing.Optional[str] = None
+    file_name: typing.Optional[str] = pydantic.Field(alias="fileName", default=None)
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

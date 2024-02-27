@@ -4,13 +4,11 @@ from __future__ import annotations
 
 import typing
 
-import typing_extensions
-
 from .generic_event import GenericEvent
 
 
 class Event_AgentCreated(GenericEvent):
-    topic: typing_extensions.Literal["agent:created"]
+    topic: typing.Literal["agent:created"]
 
     class Config:
         frozen = True
@@ -19,7 +17,7 @@ class Event_AgentCreated(GenericEvent):
 
 
 class Event_AgentUpdated(GenericEvent):
-    topic: typing_extensions.Literal["agent:updated"]
+    topic: typing.Literal["agent:updated"]
 
     class Config:
         frozen = True
@@ -28,7 +26,7 @@ class Event_AgentUpdated(GenericEvent):
 
 
 class Event_AgentDeleted(GenericEvent):
-    topic: typing_extensions.Literal["agent:deleted"]
+    topic: typing.Literal["agent:deleted"]
 
     class Config:
         frozen = True
@@ -37,7 +35,7 @@ class Event_AgentDeleted(GenericEvent):
 
 
 class Event_SpaceCreated(GenericEvent):
-    topic: typing_extensions.Literal["space:created"]
+    topic: typing.Literal["space:created"]
 
     class Config:
         frozen = True
@@ -46,7 +44,7 @@ class Event_SpaceCreated(GenericEvent):
 
 
 class Event_SpaceUpdated(GenericEvent):
-    topic: typing_extensions.Literal["space:updated"]
+    topic: typing.Literal["space:updated"]
 
     class Config:
         frozen = True
@@ -55,7 +53,7 @@ class Event_SpaceUpdated(GenericEvent):
 
 
 class Event_SpaceDeleted(GenericEvent):
-    topic: typing_extensions.Literal["space:deleted"]
+    topic: typing.Literal["space:deleted"]
 
     class Config:
         frozen = True
@@ -64,7 +62,7 @@ class Event_SpaceDeleted(GenericEvent):
 
 
 class Event_SpaceArchived(GenericEvent):
-    topic: typing_extensions.Literal["space:archived"]
+    topic: typing.Literal["space:archived"]
 
     class Config:
         frozen = True
@@ -73,7 +71,7 @@ class Event_SpaceArchived(GenericEvent):
 
 
 class Event_SpaceExpired(GenericEvent):
-    topic: typing_extensions.Literal["space:expired"]
+    topic: typing.Literal["space:expired"]
 
     class Config:
         frozen = True
@@ -82,7 +80,7 @@ class Event_SpaceExpired(GenericEvent):
 
 
 class Event_SpaceGuestAdded(GenericEvent):
-    topic: typing_extensions.Literal["space:guestAdded"]
+    topic: typing.Literal["space:guestAdded"]
 
     class Config:
         frozen = True
@@ -91,7 +89,7 @@ class Event_SpaceGuestAdded(GenericEvent):
 
 
 class Event_SpaceGuestRemoved(GenericEvent):
-    topic: typing_extensions.Literal["space:guestRemoved"]
+    topic: typing.Literal["space:guestRemoved"]
 
     class Config:
         frozen = True
@@ -100,7 +98,7 @@ class Event_SpaceGuestRemoved(GenericEvent):
 
 
 class Event_DocumentCreated(GenericEvent):
-    topic: typing_extensions.Literal["document:created"]
+    topic: typing.Literal["document:created"]
 
     class Config:
         frozen = True
@@ -109,7 +107,7 @@ class Event_DocumentCreated(GenericEvent):
 
 
 class Event_DocumentUpdated(GenericEvent):
-    topic: typing_extensions.Literal["document:updated"]
+    topic: typing.Literal["document:updated"]
 
     class Config:
         frozen = True
@@ -118,7 +116,7 @@ class Event_DocumentUpdated(GenericEvent):
 
 
 class Event_DocumentDeleted(GenericEvent):
-    topic: typing_extensions.Literal["document:deleted"]
+    topic: typing.Literal["document:deleted"]
 
     class Config:
         frozen = True
@@ -127,7 +125,7 @@ class Event_DocumentDeleted(GenericEvent):
 
 
 class Event_WorkbookCreated(GenericEvent):
-    topic: typing_extensions.Literal["workbook:created"]
+    topic: typing.Literal["workbook:created"]
 
     class Config:
         frozen = True
@@ -136,7 +134,7 @@ class Event_WorkbookCreated(GenericEvent):
 
 
 class Event_WorkbookUpdated(GenericEvent):
-    topic: typing_extensions.Literal["workbook:updated"]
+    topic: typing.Literal["workbook:updated"]
 
     class Config:
         frozen = True
@@ -145,7 +143,7 @@ class Event_WorkbookUpdated(GenericEvent):
 
 
 class Event_WorkbookDeleted(GenericEvent):
-    topic: typing_extensions.Literal["workbook:deleted"]
+    topic: typing.Literal["workbook:deleted"]
 
     class Config:
         frozen = True
@@ -154,7 +152,7 @@ class Event_WorkbookDeleted(GenericEvent):
 
 
 class Event_WorkbookExpired(GenericEvent):
-    topic: typing_extensions.Literal["workbook:expired"]
+    topic: typing.Literal["workbook:expired"]
 
     class Config:
         frozen = True
@@ -163,7 +161,7 @@ class Event_WorkbookExpired(GenericEvent):
 
 
 class Event_SheetCreated(GenericEvent):
-    topic: typing_extensions.Literal["sheet:created"]
+    topic: typing.Literal["sheet:created"]
 
     class Config:
         frozen = True
@@ -172,7 +170,7 @@ class Event_SheetCreated(GenericEvent):
 
 
 class Event_SheetUpdated(GenericEvent):
-    topic: typing_extensions.Literal["sheet:updated"]
+    topic: typing.Literal["sheet:updated"]
 
     class Config:
         frozen = True
@@ -181,7 +179,7 @@ class Event_SheetUpdated(GenericEvent):
 
 
 class Event_SheetDeleted(GenericEvent):
-    topic: typing_extensions.Literal["sheet:deleted"]
+    topic: typing.Literal["sheet:deleted"]
 
     class Config:
         frozen = True
@@ -190,7 +188,7 @@ class Event_SheetDeleted(GenericEvent):
 
 
 class Event_SnapshotCreated(GenericEvent):
-    topic: typing_extensions.Literal["snapshot:created"]
+    topic: typing.Literal["snapshot:created"]
 
     class Config:
         frozen = True
@@ -199,7 +197,7 @@ class Event_SnapshotCreated(GenericEvent):
 
 
 class Event_RecordsCreated(GenericEvent):
-    topic: typing_extensions.Literal["records:created"]
+    topic: typing.Literal["records:created"]
 
     class Config:
         frozen = True
@@ -208,7 +206,7 @@ class Event_RecordsCreated(GenericEvent):
 
 
 class Event_RecordsUpdated(GenericEvent):
-    topic: typing_extensions.Literal["records:updated"]
+    topic: typing.Literal["records:updated"]
 
     class Config:
         frozen = True
@@ -217,7 +215,7 @@ class Event_RecordsUpdated(GenericEvent):
 
 
 class Event_RecordsDeleted(GenericEvent):
-    topic: typing_extensions.Literal["records:deleted"]
+    topic: typing.Literal["records:deleted"]
 
     class Config:
         frozen = True
@@ -226,7 +224,7 @@ class Event_RecordsDeleted(GenericEvent):
 
 
 class Event_FileCreated(GenericEvent):
-    topic: typing_extensions.Literal["file:created"]
+    topic: typing.Literal["file:created"]
 
     class Config:
         frozen = True
@@ -235,7 +233,7 @@ class Event_FileCreated(GenericEvent):
 
 
 class Event_FileUpdated(GenericEvent):
-    topic: typing_extensions.Literal["file:updated"]
+    topic: typing.Literal["file:updated"]
 
     class Config:
         frozen = True
@@ -244,7 +242,7 @@ class Event_FileUpdated(GenericEvent):
 
 
 class Event_FileDeleted(GenericEvent):
-    topic: typing_extensions.Literal["file:deleted"]
+    topic: typing.Literal["file:deleted"]
 
     class Config:
         frozen = True
@@ -253,7 +251,7 @@ class Event_FileDeleted(GenericEvent):
 
 
 class Event_FileExpired(GenericEvent):
-    topic: typing_extensions.Literal["file:expired"]
+    topic: typing.Literal["file:expired"]
 
     class Config:
         frozen = True
@@ -262,7 +260,7 @@ class Event_FileExpired(GenericEvent):
 
 
 class Event_JobCreated(GenericEvent):
-    topic: typing_extensions.Literal["job:created"]
+    topic: typing.Literal["job:created"]
 
     class Config:
         frozen = True
@@ -271,7 +269,7 @@ class Event_JobCreated(GenericEvent):
 
 
 class Event_JobUpdated(GenericEvent):
-    topic: typing_extensions.Literal["job:updated"]
+    topic: typing.Literal["job:updated"]
 
     class Config:
         frozen = True
@@ -280,7 +278,7 @@ class Event_JobUpdated(GenericEvent):
 
 
 class Event_JobDeleted(GenericEvent):
-    topic: typing_extensions.Literal["job:deleted"]
+    topic: typing.Literal["job:deleted"]
 
     class Config:
         frozen = True
@@ -289,7 +287,7 @@ class Event_JobDeleted(GenericEvent):
 
 
 class Event_JobFailed(GenericEvent):
-    topic: typing_extensions.Literal["job:failed"]
+    topic: typing.Literal["job:failed"]
 
     class Config:
         frozen = True
@@ -298,7 +296,7 @@ class Event_JobFailed(GenericEvent):
 
 
 class Event_JobCompleted(GenericEvent):
-    topic: typing_extensions.Literal["job:completed"]
+    topic: typing.Literal["job:completed"]
 
     class Config:
         frozen = True
@@ -307,7 +305,7 @@ class Event_JobCompleted(GenericEvent):
 
 
 class Event_JobReady(GenericEvent):
-    topic: typing_extensions.Literal["job:ready"]
+    topic: typing.Literal["job:ready"]
 
     class Config:
         frozen = True
@@ -316,7 +314,7 @@ class Event_JobReady(GenericEvent):
 
 
 class Event_JobScheduled(GenericEvent):
-    topic: typing_extensions.Literal["job:scheduled"]
+    topic: typing.Literal["job:scheduled"]
 
     class Config:
         frozen = True
@@ -325,7 +323,7 @@ class Event_JobScheduled(GenericEvent):
 
 
 class Event_JobOutcomeAcknowledged(GenericEvent):
-    topic: typing_extensions.Literal["job:outcome-acknowledged"]
+    topic: typing.Literal["job:outcome-acknowledged"]
 
     class Config:
         frozen = True
@@ -334,7 +332,7 @@ class Event_JobOutcomeAcknowledged(GenericEvent):
 
 
 class Event_JobPartsCompleted(GenericEvent):
-    topic: typing_extensions.Literal["job:parts-completed"]
+    topic: typing.Literal["job:parts-completed"]
 
     class Config:
         frozen = True
@@ -343,7 +341,7 @@ class Event_JobPartsCompleted(GenericEvent):
 
 
 class Event_ProgramCreated(GenericEvent):
-    topic: typing_extensions.Literal["program:created"]
+    topic: typing.Literal["program:created"]
 
     class Config:
         frozen = True
@@ -352,7 +350,7 @@ class Event_ProgramCreated(GenericEvent):
 
 
 class Event_ProgramUpdated(GenericEvent):
-    topic: typing_extensions.Literal["program:updated"]
+    topic: typing.Literal["program:updated"]
 
     class Config:
         frozen = True
@@ -361,7 +359,7 @@ class Event_ProgramUpdated(GenericEvent):
 
 
 class Event_CommitCreated(GenericEvent):
-    topic: typing_extensions.Literal["commit:created"]
+    topic: typing.Literal["commit:created"]
 
     class Config:
         frozen = True
@@ -370,7 +368,7 @@ class Event_CommitCreated(GenericEvent):
 
 
 class Event_CommitUpdated(GenericEvent):
-    topic: typing_extensions.Literal["commit:updated"]
+    topic: typing.Literal["commit:updated"]
 
     class Config:
         frozen = True
@@ -379,7 +377,7 @@ class Event_CommitUpdated(GenericEvent):
 
 
 class Event_CommitCompleted(GenericEvent):
-    topic: typing_extensions.Literal["commit:completed"]
+    topic: typing.Literal["commit:completed"]
 
     class Config:
         frozen = True
@@ -388,7 +386,7 @@ class Event_CommitCompleted(GenericEvent):
 
 
 class Event_SecretCreated(GenericEvent):
-    topic: typing_extensions.Literal["secret:created"]
+    topic: typing.Literal["secret:created"]
 
     class Config:
         frozen = True
@@ -397,7 +395,7 @@ class Event_SecretCreated(GenericEvent):
 
 
 class Event_SecretUpdated(GenericEvent):
-    topic: typing_extensions.Literal["secret:updated"]
+    topic: typing.Literal["secret:updated"]
 
     class Config:
         frozen = True
@@ -406,7 +404,7 @@ class Event_SecretUpdated(GenericEvent):
 
 
 class Event_SecretDeleted(GenericEvent):
-    topic: typing_extensions.Literal["secret:deleted"]
+    topic: typing.Literal["secret:deleted"]
 
     class Config:
         frozen = True
@@ -415,7 +413,7 @@ class Event_SecretDeleted(GenericEvent):
 
 
 class Event_LayerCreated(GenericEvent):
-    topic: typing_extensions.Literal["layer:created"]
+    topic: typing.Literal["layer:created"]
 
     class Config:
         frozen = True

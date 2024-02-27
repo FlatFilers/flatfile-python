@@ -36,7 +36,7 @@ class CreateEventConfig(BaseEvent):
     topic: EventTopic
     payload: typing.Dict[str, typing.Any]
     deleted_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="deletedAt", description="Date the event was deleted"
+        alias="deletedAt", default=None, description="Date the event was deleted"
     )
 
     def json(self, **kwargs: typing.Any) -> str:

@@ -4,14 +4,12 @@ from __future__ import annotations
 
 import typing
 
-import typing_extensions
-
 from .composite_unique_constraint import CompositeUniqueConstraint
 from .external_sheet_constraint import ExternalSheetConstraint
 
 
 class SheetConstraint_Unique(CompositeUniqueConstraint):
-    type: typing_extensions.Literal["unique"]
+    type: typing.Literal["unique"]
 
     class Config:
         frozen = True
@@ -20,7 +18,7 @@ class SheetConstraint_Unique(CompositeUniqueConstraint):
 
 
 class SheetConstraint_External(ExternalSheetConstraint):
-    type: typing_extensions.Literal["external"]
+    type: typing.Literal["external"]
 
     class Config:
         frozen = True

@@ -22,14 +22,14 @@ class DeleteRecordsJobConfig(pydantic.BaseModel):
     The configuration for a delete job
     """
 
-    filter: typing.Optional[Filter]
-    filter_field: typing.Optional[FilterField] = pydantic.Field(alias="filterField")
-    search_value: typing.Optional[SearchValue] = pydantic.Field(alias="searchValue")
-    search_field: typing.Optional[SearchField] = pydantic.Field(alias="searchField")
-    q: typing.Optional[str] = pydantic.Field(description="FFQL query to filter records")
+    filter: typing.Optional[Filter] = None
+    filter_field: typing.Optional[FilterField] = pydantic.Field(alias="filterField", default=None)
+    search_value: typing.Optional[SearchValue] = pydantic.Field(alias="searchValue", default=None)
+    search_field: typing.Optional[SearchField] = pydantic.Field(alias="searchField", default=None)
+    q: typing.Optional[str] = pydantic.Field(default=None, description="FFQL query to filter records")
     sheet: SheetId
     exceptions: typing.Optional[typing.List[RecordId]] = pydantic.Field(
-        description="List of record ids to exclude from deletion"
+        default=None, description="List of record ids to exclude from deletion"
     )
 
     def json(self, **kwargs: typing.Any) -> str:

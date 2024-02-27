@@ -8,6 +8,7 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
+from ...core.request_options import RequestOptions
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.errors import Errors
@@ -33,7 +34,13 @@ class SnapshotsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def create_snapshot(self, *, sheet_id: SheetId, label: typing.Optional[str] = OMIT) -> SnapshotResponse:
+    def create_snapshot(
+        self,
+        *,
+        sheet_id: SheetId,
+        label: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> SnapshotResponse:
         """
         Creates a snapshot of a sheet
 
@@ -41,6 +48,8 @@ class SnapshotsClient:
             - sheet_id: SheetId. ID of sheet
 
             - label: typing.Optional[str]. Label for the snapshot
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -58,9 +67,26 @@ class SnapshotsClient:
         _response = self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "snapshots"),
-            json=jsonable_encoder(_request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(_request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(_request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(SnapshotResponse, _response.json())  # type: ignore
@@ -74,12 +100,16 @@ class SnapshotsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def list_snapshots(self, *, sheet_id: SheetId) -> SnapshotsResponse:
+    def list_snapshots(
+        self, *, sheet_id: SheetId, request_options: typing.Optional[RequestOptions] = None
+    ) -> SnapshotsResponse:
         """
         List all snapshots of a sheet
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -93,9 +123,29 @@ class SnapshotsClient:
         _response = self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "snapshots"),
-            params=remove_none_from_dict({"sheetId": sheet_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "sheetId": sheet_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(SnapshotsResponse, _response.json())  # type: ignore
@@ -109,7 +159,9 @@ class SnapshotsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get_snapshot(self, snapshot_id: SnapshotId, *, include_summary: bool) -> SnapshotResponse:
+    def get_snapshot(
+        self, snapshot_id: SnapshotId, *, include_summary: bool, request_options: typing.Optional[RequestOptions] = None
+    ) -> SnapshotResponse:
         """
         Gets a snapshot of a sheet
 
@@ -117,6 +169,8 @@ class SnapshotsClient:
             - snapshot_id: SnapshotId. ID of snapshot
 
             - include_summary: bool. Whether to include a summary in the snapshot response
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -130,10 +184,32 @@ class SnapshotsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"snapshots/{snapshot_id}"),
-            params=remove_none_from_dict({"includeSummary": include_summary}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"snapshots/{jsonable_encoder(snapshot_id)}"
+            ),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "includeSummary": include_summary,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(SnapshotResponse, _response.json())  # type: ignore
@@ -147,12 +223,16 @@ class SnapshotsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete_snapshot(self, snapshot_id: SnapshotId) -> Success:
+    def delete_snapshot(
+        self, snapshot_id: SnapshotId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
         """
         Deletes a snapshot of a sheet
 
         Parameters:
             - snapshot_id: SnapshotId. ID of snapshot
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -165,9 +245,23 @@ class SnapshotsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"snapshots/{snapshot_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"snapshots/{jsonable_encoder(snapshot_id)}"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -182,7 +276,11 @@ class SnapshotsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def restore_snapshot(
-        self, snapshot_id: SnapshotId, *, request: typing.Optional[RestoreOptions] = None
+        self,
+        snapshot_id: SnapshotId,
+        *,
+        request: typing.Optional[RestoreOptions] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> SnapshotResponse:
         """
         Restores a snapshot of a sheet
@@ -191,6 +289,8 @@ class SnapshotsClient:
             - snapshot_id: SnapshotId. ID of snapshot
 
             - request: typing.Optional[RestoreOptions].
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import RestoreOptions
         from flatfile.client import Flatfile
@@ -209,10 +309,29 @@ class SnapshotsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"snapshots/{snapshot_id}/restore"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"snapshots/{jsonable_encoder(snapshot_id)}/restore"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(SnapshotResponse, _response.json())  # type: ignore
@@ -233,6 +352,7 @@ class SnapshotsClient:
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
         change_type: typing.Optional[ChangeType] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> DiffRecordsResponse:
         """
         Gets records from a snapshot of a sheet
@@ -245,6 +365,8 @@ class SnapshotsClient:
             - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
 
             - change_type: typing.Optional[ChangeType]. Filter records by change type
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import ChangeType
         from flatfile.client import Flatfile
@@ -261,10 +383,34 @@ class SnapshotsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"snapshots/{snapshot_id}/records"),
-            params=remove_none_from_dict({"pageSize": page_size, "pageNumber": page_number, "changeType": change_type}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"snapshots/{jsonable_encoder(snapshot_id)}/records"
+            ),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        "changeType": change_type,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(DiffRecordsResponse, _response.json())  # type: ignore
@@ -283,7 +429,13 @@ class AsyncSnapshotsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    async def create_snapshot(self, *, sheet_id: SheetId, label: typing.Optional[str] = OMIT) -> SnapshotResponse:
+    async def create_snapshot(
+        self,
+        *,
+        sheet_id: SheetId,
+        label: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> SnapshotResponse:
         """
         Creates a snapshot of a sheet
 
@@ -291,6 +443,8 @@ class AsyncSnapshotsClient:
             - sheet_id: SheetId. ID of sheet
 
             - label: typing.Optional[str]. Label for the snapshot
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -308,9 +462,26 @@ class AsyncSnapshotsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "snapshots"),
-            json=jsonable_encoder(_request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(_request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(_request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(SnapshotResponse, _response.json())  # type: ignore
@@ -324,12 +495,16 @@ class AsyncSnapshotsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def list_snapshots(self, *, sheet_id: SheetId) -> SnapshotsResponse:
+    async def list_snapshots(
+        self, *, sheet_id: SheetId, request_options: typing.Optional[RequestOptions] = None
+    ) -> SnapshotsResponse:
         """
         List all snapshots of a sheet
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -343,9 +518,29 @@ class AsyncSnapshotsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "snapshots"),
-            params=remove_none_from_dict({"sheetId": sheet_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "sheetId": sheet_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(SnapshotsResponse, _response.json())  # type: ignore
@@ -359,7 +554,9 @@ class AsyncSnapshotsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get_snapshot(self, snapshot_id: SnapshotId, *, include_summary: bool) -> SnapshotResponse:
+    async def get_snapshot(
+        self, snapshot_id: SnapshotId, *, include_summary: bool, request_options: typing.Optional[RequestOptions] = None
+    ) -> SnapshotResponse:
         """
         Gets a snapshot of a sheet
 
@@ -367,6 +564,8 @@ class AsyncSnapshotsClient:
             - snapshot_id: SnapshotId. ID of snapshot
 
             - include_summary: bool. Whether to include a summary in the snapshot response
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -380,10 +579,32 @@ class AsyncSnapshotsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"snapshots/{snapshot_id}"),
-            params=remove_none_from_dict({"includeSummary": include_summary}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"snapshots/{jsonable_encoder(snapshot_id)}"
+            ),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "includeSummary": include_summary,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(SnapshotResponse, _response.json())  # type: ignore
@@ -397,12 +618,16 @@ class AsyncSnapshotsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete_snapshot(self, snapshot_id: SnapshotId) -> Success:
+    async def delete_snapshot(
+        self, snapshot_id: SnapshotId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
         """
         Deletes a snapshot of a sheet
 
         Parameters:
             - snapshot_id: SnapshotId. ID of snapshot
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -415,9 +640,23 @@ class AsyncSnapshotsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"snapshots/{snapshot_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"snapshots/{jsonable_encoder(snapshot_id)}"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -432,7 +671,11 @@ class AsyncSnapshotsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def restore_snapshot(
-        self, snapshot_id: SnapshotId, *, request: typing.Optional[RestoreOptions] = None
+        self,
+        snapshot_id: SnapshotId,
+        *,
+        request: typing.Optional[RestoreOptions] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> SnapshotResponse:
         """
         Restores a snapshot of a sheet
@@ -441,6 +684,8 @@ class AsyncSnapshotsClient:
             - snapshot_id: SnapshotId. ID of snapshot
 
             - request: typing.Optional[RestoreOptions].
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import RestoreOptions
         from flatfile.client import AsyncFlatfile
@@ -459,10 +704,29 @@ class AsyncSnapshotsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"snapshots/{snapshot_id}/restore"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"snapshots/{jsonable_encoder(snapshot_id)}/restore"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(SnapshotResponse, _response.json())  # type: ignore
@@ -483,6 +747,7 @@ class AsyncSnapshotsClient:
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
         change_type: typing.Optional[ChangeType] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> DiffRecordsResponse:
         """
         Gets records from a snapshot of a sheet
@@ -495,6 +760,8 @@ class AsyncSnapshotsClient:
             - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
 
             - change_type: typing.Optional[ChangeType]. Filter records by change type
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import ChangeType
         from flatfile.client import AsyncFlatfile
@@ -511,10 +778,34 @@ class AsyncSnapshotsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"snapshots/{snapshot_id}/records"),
-            params=remove_none_from_dict({"pageSize": page_size, "pageNumber": page_number, "changeType": change_type}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"snapshots/{jsonable_encoder(snapshot_id)}/records"
+            ),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        "changeType": change_type,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(DiffRecordsResponse, _response.json())  # type: ignore

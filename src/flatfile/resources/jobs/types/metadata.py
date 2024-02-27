@@ -13,9 +13,9 @@ except ImportError:
 
 
 class Metadata(pydantic.BaseModel):
-    certainty: typing.Optional[Certainty]
-    confidence: typing.Optional[float]
-    source: typing.Optional[str]
+    certainty: typing.Optional[Certainty] = None
+    confidence: typing.Optional[float] = None
+    source: typing.Optional[str] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

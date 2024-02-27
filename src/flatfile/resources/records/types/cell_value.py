@@ -14,12 +14,12 @@ except ImportError:
 
 
 class CellValue(pydantic.BaseModel):
-    valid: typing.Optional[bool]
-    messages: typing.Optional[typing.List[ValidationMessage]]
-    metadata: typing.Optional[typing.Dict[str, typing.Any]]
-    value: typing.Optional[CellValueUnion]
-    layer: typing.Optional[str]
-    updated_at: typing.Optional[dt.datetime] = pydantic.Field(alias="updatedAt")
+    valid: typing.Optional[bool] = None
+    messages: typing.Optional[typing.List[ValidationMessage]] = None
+    metadata: typing.Optional[typing.Dict[str, typing.Any]] = None
+    value: typing.Optional[CellValueUnion] = None
+    layer: typing.Optional[str] = None
+    updated_at: typing.Optional[dt.datetime] = pydantic.Field(alias="updatedAt", default=None)
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

@@ -34,9 +34,9 @@ class DocumentConfig(pydantic.BaseModel):
     title: str
     body: str
     treatments: typing.Optional[typing.List[str]] = pydantic.Field(
-        description="Certain treatments will cause your Document to look or behave differently."
+        default=None, description="Certain treatments will cause your Document to look or behave differently."
     )
-    actions: typing.Optional[typing.List[Action]]
+    actions: typing.Optional[typing.List[Action]] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

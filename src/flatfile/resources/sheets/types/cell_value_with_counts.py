@@ -9,7 +9,7 @@ from ...records.types.record_counts import RecordCounts
 
 
 class CellValueWithCounts(CellValue):
-    counts: typing.Optional[RecordCounts]
+    counts: typing.Optional[RecordCounts] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

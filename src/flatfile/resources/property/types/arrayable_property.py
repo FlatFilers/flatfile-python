@@ -13,7 +13,7 @@ except ImportError:
 
 class ArrayableProperty(pydantic.BaseModel):
     is_array: typing.Optional[bool] = pydantic.Field(
-        alias="isArray", description="Will allow multiple values and store as an array"
+        alias="isArray", default=None, description="Will allow multiple values and store as an array"
     )
 
     def json(self, **kwargs: typing.Any) -> str:

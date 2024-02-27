@@ -37,14 +37,14 @@ class MappingRule(MappingRuleConfig):
     """
 
     id: MappingId = pydantic.Field(description="ID of the mapping rule")
-    confidence: typing.Optional[int] = pydantic.Field(description="Confidence of the mapping rule")
+    confidence: typing.Optional[int] = pydantic.Field(default=None, description="Confidence of the mapping rule")
     created_by: typing.Optional[UserId] = pydantic.Field(
-        alias="createdBy", description="User ID of the user who suggested the mapping rule"
+        alias="createdBy", default=None, description="User ID of the user who suggested the mapping rule"
     )
     created_at: dt.datetime = pydantic.Field(alias="createdAt", description="Time the mapping rule was created")
     updated_at: dt.datetime = pydantic.Field(alias="updatedAt", description="Time the mapping rule was last updated")
     deleted_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="deletedAt", description="Time the mapping rule was deleted"
+        alias="deletedAt", default=None, description="Time the mapping rule was deleted"
     )
 
     def json(self, **kwargs: typing.Any) -> str:

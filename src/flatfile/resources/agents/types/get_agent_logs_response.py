@@ -35,8 +35,8 @@ class GetAgentLogsResponse(pydantic.BaseModel):
     )
     """
 
-    pagination: typing.Optional[Pagination]
-    data: typing.Optional[typing.List[AgentLog]]
+    pagination: typing.Optional[Pagination] = None
+    data: typing.Optional[typing.List[AgentLog]] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

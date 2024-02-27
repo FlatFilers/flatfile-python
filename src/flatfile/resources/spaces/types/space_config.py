@@ -27,10 +27,12 @@ class SpaceConfig(InternalSpaceConfigBase):
     )
     """
 
-    name: typing.Optional[str] = pydantic.Field(description="The name of the space")
-    display_order: typing.Optional[int] = pydantic.Field(alias="displayOrder", description="The display order")
+    name: typing.Optional[str] = pydantic.Field(default=None, description="The name of the space")
+    display_order: typing.Optional[int] = pydantic.Field(
+        alias="displayOrder", default=None, description="The display order"
+    )
     guest_authentication: typing.Optional[typing.List[GuestAuthenticationEnum]] = pydantic.Field(
-        alias="guestAuthentication"
+        alias="guestAuthentication", default=None
     )
 
     def json(self, **kwargs: typing.Any) -> str:

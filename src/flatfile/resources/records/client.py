@@ -8,6 +8,7 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
+from ...core.request_options import RequestOptions
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.commit_id import CommitId
@@ -57,7 +58,7 @@ class RecordsClient:
         filter_field: typing.Optional[FilterField] = None,
         search_value: typing.Optional[SearchValue] = None,
         search_field: typing.Optional[SearchField] = None,
-        ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]] = None,
+        ids: typing.Optional[typing.Union[RecordId, typing.Sequence[RecordId]]] = None,
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
         include_counts: typing.Optional[bool] = None,
@@ -66,6 +67,7 @@ class RecordsClient:
         include_messages: typing.Optional[bool] = None,
         for_: typing.Optional[EventId] = None,
         q: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> GetRecordsResponse:
         """
         Returns records from a sheet in a workbook
@@ -93,7 +95,7 @@ class RecordsClient:
 
             - search_field: typing.Optional[SearchField].
 
-            - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records. Maximum of 100 allowed.
+            - ids: typing.Optional[typing.Union[RecordId, typing.Sequence[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records. Maximum of 100 allowed.
 
             - page_size: typing.Optional[int]. Number of records to return in a page (default 1000 if pageNumber included)
 
@@ -110,6 +112,8 @@ class RecordsClient:
             - for_: typing.Optional[EventId]. if "for" is provided, the query parameters will be pulled from the event payload
 
             - q: typing.Optional[str]. An FFQL query used to filter the result set
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -122,32 +126,50 @@ class RecordsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/records"),
-            params=remove_none_from_dict(
-                {
-                    "versionId": version_id,
-                    "commitId": commit_id,
-                    "sinceVersionId": since_version_id,
-                    "sinceCommitId": since_commit_id,
-                    "sortField": sort_field,
-                    "sortDirection": sort_direction,
-                    "filter": filter,
-                    "filterField": filter_field,
-                    "searchValue": search_value,
-                    "searchField": search_field,
-                    "ids": ids,
-                    "pageSize": page_size,
-                    "pageNumber": page_number,
-                    "includeCounts": include_counts,
-                    "includeLength": include_length,
-                    "includeLinks": include_links,
-                    "includeMessages": include_messages,
-                    "for": for_,
-                    "q": q,
-                }
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/records"
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "versionId": version_id,
+                        "commitId": commit_id,
+                        "sinceVersionId": since_version_id,
+                        "sinceCommitId": since_commit_id,
+                        "sortField": sort_field,
+                        "sortDirection": sort_direction,
+                        "filter": filter,
+                        "filterField": filter_field,
+                        "searchValue": search_value,
+                        "searchField": search_field,
+                        "ids": ids,
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        "includeCounts": include_counts,
+                        "includeLength": include_length,
+                        "includeLinks": include_links,
+                        "includeMessages": include_messages,
+                        "for": for_,
+                        "q": q,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(GetRecordsResponse, _response.json())  # type: ignore
@@ -161,7 +183,9 @@ class RecordsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update(self, sheet_id: SheetId, *, request: Records) -> VersionResponse:
+    def update(
+        self, sheet_id: SheetId, *, request: Records, request_options: typing.Optional[RequestOptions] = None
+    ) -> VersionResponse:
         """
         Updates existing records in a workbook sheet
 
@@ -169,6 +193,8 @@ class RecordsClient:
             - sheet_id: SheetId. ID of sheet
 
             - request: Records.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import CellValue, Record
         from flatfile.client import Flatfile
@@ -205,10 +231,29 @@ class RecordsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "PUT",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/records"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/records"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(VersionResponse, _response.json())  # type: ignore
@@ -222,14 +267,22 @@ class RecordsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def insert(self, sheet_id: SheetId, *, request: typing.List[RecordData]) -> RecordsResponse:
+    def insert(
+        self,
+        sheet_id: SheetId,
+        *,
+        request: typing.Sequence[RecordData],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> RecordsResponse:
         """
         Adds records to a workbook sheet
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
 
-            - request: typing.List[RecordData].
+            - request: typing.Sequence[RecordData].
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import CellValue
         from flatfile.client import Flatfile
@@ -259,10 +312,29 @@ class RecordsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/records"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/records"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(RecordsResponse, _response.json())  # type: ignore
@@ -276,14 +348,22 @@ class RecordsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete(self, sheet_id: SheetId, *, ids: typing.Union[RecordId, typing.List[RecordId]]) -> Success:
+    def delete(
+        self,
+        sheet_id: SheetId,
+        *,
+        ids: typing.Union[RecordId, typing.Sequence[RecordId]],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Success:
         """
         Deletes records from a workbook sheet
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
 
-            - ids: typing.Union[RecordId, typing.List[RecordId]]. A list of record IDs to delete. Maximum of 100 allowed.
+            - ids: typing.Union[RecordId, typing.Sequence[RecordId]]. A list of record IDs to delete. Maximum of 100 allowed.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -297,10 +377,32 @@ class RecordsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/records"),
-            params=remove_none_from_dict({"ids": ids}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/records"
+            ),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "ids": ids,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -322,11 +424,12 @@ class RecordsClient:
         filter_field: typing.Optional[FilterField] = None,
         search_value: typing.Optional[SearchValue] = None,
         search_field: typing.Optional[SearchField] = None,
-        ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]] = None,
+        ids: typing.Optional[typing.Union[RecordId, typing.Sequence[RecordId]]] = None,
         q: typing.Optional[str] = None,
         find: typing.Optional[CellValueUnion] = OMIT,
         replace: typing.Optional[CellValueUnion] = OMIT,
         field_key: str,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> VersionResponse:
         """
         Searches for all values that match the 'find' value (globally or for a specific field via 'fieldKey') and replaces them with the 'replace' value. Wrap 'find' value in double quotes for exact match (""). Returns a commitId for the updated records
@@ -342,7 +445,7 @@ class RecordsClient:
 
             - search_field: typing.Optional[SearchField].
 
-            - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+            - ids: typing.Optional[typing.Union[RecordId, typing.Sequence[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
 
             - q: typing.Optional[str]. An FFQL query used to filter the result set
 
@@ -351,6 +454,8 @@ class RecordsClient:
             - replace: typing.Optional[CellValueUnion]. The value to replace found values with
 
             - field_key: str. A unique key used to identify a field in a sheet
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -369,20 +474,43 @@ class RecordsClient:
             _request["replace"] = replace
         _response = self._client_wrapper.httpx_client.request(
             "PUT",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/find-replace"),
-            params=remove_none_from_dict(
-                {
-                    "filter": filter,
-                    "filterField": filter_field,
-                    "searchValue": search_value,
-                    "searchField": search_field,
-                    "ids": ids,
-                    "q": q,
-                }
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/find-replace"
             ),
-            json=jsonable_encoder(_request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "filter": filter,
+                        "filterField": filter_field,
+                        "searchValue": search_value,
+                        "searchField": search_field,
+                        "ids": ids,
+                        "q": q,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            json=jsonable_encoder(_request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(_request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(VersionResponse, _response.json())  # type: ignore
@@ -411,7 +539,7 @@ class AsyncRecordsClient:
         filter_field: typing.Optional[FilterField] = None,
         search_value: typing.Optional[SearchValue] = None,
         search_field: typing.Optional[SearchField] = None,
-        ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]] = None,
+        ids: typing.Optional[typing.Union[RecordId, typing.Sequence[RecordId]]] = None,
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
         include_counts: typing.Optional[bool] = None,
@@ -420,6 +548,7 @@ class AsyncRecordsClient:
         include_messages: typing.Optional[bool] = None,
         for_: typing.Optional[EventId] = None,
         q: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> GetRecordsResponse:
         """
         Returns records from a sheet in a workbook
@@ -447,7 +576,7 @@ class AsyncRecordsClient:
 
             - search_field: typing.Optional[SearchField].
 
-            - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records. Maximum of 100 allowed.
+            - ids: typing.Optional[typing.Union[RecordId, typing.Sequence[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records. Maximum of 100 allowed.
 
             - page_size: typing.Optional[int]. Number of records to return in a page (default 1000 if pageNumber included)
 
@@ -464,6 +593,8 @@ class AsyncRecordsClient:
             - for_: typing.Optional[EventId]. if "for" is provided, the query parameters will be pulled from the event payload
 
             - q: typing.Optional[str]. An FFQL query used to filter the result set
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -476,32 +607,50 @@ class AsyncRecordsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/records"),
-            params=remove_none_from_dict(
-                {
-                    "versionId": version_id,
-                    "commitId": commit_id,
-                    "sinceVersionId": since_version_id,
-                    "sinceCommitId": since_commit_id,
-                    "sortField": sort_field,
-                    "sortDirection": sort_direction,
-                    "filter": filter,
-                    "filterField": filter_field,
-                    "searchValue": search_value,
-                    "searchField": search_field,
-                    "ids": ids,
-                    "pageSize": page_size,
-                    "pageNumber": page_number,
-                    "includeCounts": include_counts,
-                    "includeLength": include_length,
-                    "includeLinks": include_links,
-                    "includeMessages": include_messages,
-                    "for": for_,
-                    "q": q,
-                }
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/records"
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "versionId": version_id,
+                        "commitId": commit_id,
+                        "sinceVersionId": since_version_id,
+                        "sinceCommitId": since_commit_id,
+                        "sortField": sort_field,
+                        "sortDirection": sort_direction,
+                        "filter": filter,
+                        "filterField": filter_field,
+                        "searchValue": search_value,
+                        "searchField": search_field,
+                        "ids": ids,
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        "includeCounts": include_counts,
+                        "includeLength": include_length,
+                        "includeLinks": include_links,
+                        "includeMessages": include_messages,
+                        "for": for_,
+                        "q": q,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(GetRecordsResponse, _response.json())  # type: ignore
@@ -515,7 +664,9 @@ class AsyncRecordsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update(self, sheet_id: SheetId, *, request: Records) -> VersionResponse:
+    async def update(
+        self, sheet_id: SheetId, *, request: Records, request_options: typing.Optional[RequestOptions] = None
+    ) -> VersionResponse:
         """
         Updates existing records in a workbook sheet
 
@@ -523,6 +674,8 @@ class AsyncRecordsClient:
             - sheet_id: SheetId. ID of sheet
 
             - request: Records.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import CellValue, Record
         from flatfile.client import AsyncFlatfile
@@ -559,10 +712,29 @@ class AsyncRecordsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "PUT",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/records"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/records"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(VersionResponse, _response.json())  # type: ignore
@@ -576,14 +748,22 @@ class AsyncRecordsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def insert(self, sheet_id: SheetId, *, request: typing.List[RecordData]) -> RecordsResponse:
+    async def insert(
+        self,
+        sheet_id: SheetId,
+        *,
+        request: typing.Sequence[RecordData],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> RecordsResponse:
         """
         Adds records to a workbook sheet
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
 
-            - request: typing.List[RecordData].
+            - request: typing.Sequence[RecordData].
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import CellValue
         from flatfile.client import AsyncFlatfile
@@ -613,10 +793,29 @@ class AsyncRecordsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/records"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/records"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(RecordsResponse, _response.json())  # type: ignore
@@ -630,14 +829,22 @@ class AsyncRecordsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete(self, sheet_id: SheetId, *, ids: typing.Union[RecordId, typing.List[RecordId]]) -> Success:
+    async def delete(
+        self,
+        sheet_id: SheetId,
+        *,
+        ids: typing.Union[RecordId, typing.Sequence[RecordId]],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Success:
         """
         Deletes records from a workbook sheet
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
 
-            - ids: typing.Union[RecordId, typing.List[RecordId]]. A list of record IDs to delete. Maximum of 100 allowed.
+            - ids: typing.Union[RecordId, typing.Sequence[RecordId]]. A list of record IDs to delete. Maximum of 100 allowed.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -651,10 +858,32 @@ class AsyncRecordsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/records"),
-            params=remove_none_from_dict({"ids": ids}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/records"
+            ),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "ids": ids,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -676,11 +905,12 @@ class AsyncRecordsClient:
         filter_field: typing.Optional[FilterField] = None,
         search_value: typing.Optional[SearchValue] = None,
         search_field: typing.Optional[SearchField] = None,
-        ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]] = None,
+        ids: typing.Optional[typing.Union[RecordId, typing.Sequence[RecordId]]] = None,
         q: typing.Optional[str] = None,
         find: typing.Optional[CellValueUnion] = OMIT,
         replace: typing.Optional[CellValueUnion] = OMIT,
         field_key: str,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> VersionResponse:
         """
         Searches for all values that match the 'find' value (globally or for a specific field via 'fieldKey') and replaces them with the 'replace' value. Wrap 'find' value in double quotes for exact match (""). Returns a commitId for the updated records
@@ -696,7 +926,7 @@ class AsyncRecordsClient:
 
             - search_field: typing.Optional[SearchField].
 
-            - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+            - ids: typing.Optional[typing.Union[RecordId, typing.Sequence[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
 
             - q: typing.Optional[str]. An FFQL query used to filter the result set
 
@@ -705,6 +935,8 @@ class AsyncRecordsClient:
             - replace: typing.Optional[CellValueUnion]. The value to replace found values with
 
             - field_key: str. A unique key used to identify a field in a sheet
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -723,20 +955,43 @@ class AsyncRecordsClient:
             _request["replace"] = replace
         _response = await self._client_wrapper.httpx_client.request(
             "PUT",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/find-replace"),
-            params=remove_none_from_dict(
-                {
-                    "filter": filter,
-                    "filterField": filter_field,
-                    "searchValue": search_value,
-                    "searchField": search_field,
-                    "ids": ids,
-                    "q": q,
-                }
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/find-replace"
             ),
-            json=jsonable_encoder(_request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "filter": filter,
+                        "filterField": filter_field,
+                        "searchValue": search_value,
+                        "searchField": search_field,
+                        "ids": ids,
+                        "q": q,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            json=jsonable_encoder(_request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(_request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(VersionResponse, _response.json())  # type: ignore

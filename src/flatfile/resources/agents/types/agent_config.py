@@ -27,11 +27,11 @@ class AgentConfig(pydantic.BaseModel):
     """
 
     topics: typing.Optional[typing.List[EventTopic]] = pydantic.Field(
-        description="The topics the agent should listen for"
+        default=None, description="The topics the agent should listen for"
     )
-    compiler: typing.Optional[Compiler] = pydantic.Field(description="The compiler of the agent")
-    source: typing.Optional[str] = pydantic.Field(description="The source of the agent")
-    slug: typing.Optional[str] = pydantic.Field(description="The slug of the agent")
+    compiler: typing.Optional[Compiler] = pydantic.Field(default=None, description="The compiler of the agent")
+    source: typing.Optional[str] = pydantic.Field(default=None, description="The source of the agent")
+    slug: typing.Optional[str] = pydantic.Field(default=None, description="The slug of the agent")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

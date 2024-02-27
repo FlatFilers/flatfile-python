@@ -54,9 +54,9 @@ class RecordWithLinks(pydantic.BaseModel):
 
     id: RecordId
     values: RecordDataWithLinks
-    valid: typing.Optional[bool]
-    messages: typing.Optional[typing.List[ValidationMessage]]
-    metadata: typing.Optional[typing.Dict[str, typing.Any]]
+    valid: typing.Optional[bool] = None
+    messages: typing.Optional[typing.List[ValidationMessage]] = None
+    metadata: typing.Optional[typing.Dict[str, typing.Any]] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

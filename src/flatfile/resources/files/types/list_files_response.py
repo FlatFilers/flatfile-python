@@ -54,7 +54,7 @@ class ListFilesResponse(pydantic.BaseModel):
     )
     """
 
-    pagination: typing.Optional[Pagination]
+    pagination: typing.Optional[Pagination] = None
     data: typing.List[File]
 
     def json(self, **kwargs: typing.Any) -> str:

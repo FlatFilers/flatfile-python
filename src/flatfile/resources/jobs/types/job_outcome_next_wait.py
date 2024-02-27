@@ -12,8 +12,8 @@ except ImportError:
 
 
 class JobOutcomeNextWait(pydantic.BaseModel):
-    fade: typing.Optional[bool]
-    confetti: typing.Optional[bool]
+    fade: typing.Optional[bool] = None
+    confetti: typing.Optional[bool] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

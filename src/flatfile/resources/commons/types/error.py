@@ -12,7 +12,7 @@ except ImportError:
 
 
 class Error(pydantic.BaseModel):
-    key: typing.Optional[str]
+    key: typing.Optional[str] = None
     message: str
 
     def json(self, **kwargs: typing.Any) -> str:

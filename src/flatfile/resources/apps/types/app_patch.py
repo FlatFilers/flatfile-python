@@ -22,13 +22,13 @@ class AppPatch(pydantic.BaseModel):
     </svg>', metadata={"foo": "bar"}, )
     """
 
-    name: typing.Optional[str]
-    namespace: typing.Optional[str]
-    entity: typing.Optional[str]
-    entity_plural: typing.Optional[str] = pydantic.Field(alias="entityPlural")
-    icon: typing.Optional[str]
-    metadata: typing.Optional[typing.Any]
-    activated_at: typing.Optional[dt.datetime] = pydantic.Field(alias="activatedAt")
+    name: typing.Optional[str] = None
+    namespace: typing.Optional[str] = None
+    entity: typing.Optional[str] = None
+    entity_plural: typing.Optional[str] = pydantic.Field(alias="entityPlural", default=None)
+    icon: typing.Optional[str] = None
+    metadata: typing.Optional[typing.Any] = None
+    activated_at: typing.Optional[dt.datetime] = pydantic.Field(alias="activatedAt", default=None)
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

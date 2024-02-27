@@ -14,19 +14,19 @@ except ImportError:
 
 class BaseProperty(pydantic.BaseModel):
     key: str
-    label: typing.Optional[str] = pydantic.Field(description="User friendly field name")
+    label: typing.Optional[str] = pydantic.Field(default=None, description="User friendly field name")
     description: typing.Optional[str] = pydantic.Field(
-        description="A short description of the field. Markdown syntax is supported."
+        default=None, description="A short description of the field. Markdown syntax is supported."
     )
-    constraints: typing.Optional[typing.List[Constraint]]
-    readonly: typing.Optional[bool]
+    constraints: typing.Optional[typing.List[Constraint]] = None
+    readonly: typing.Optional[bool] = None
     metadata: typing.Optional[typing.Any] = pydantic.Field(
-        description="Useful for any contextual metadata regarding the schema. Store any valid json here."
+        default=None, description="Useful for any contextual metadata regarding the schema. Store any valid json here."
     )
     treatments: typing.Optional[typing.List[str]] = pydantic.Field(
-        description="A unique presentation for a field in the UI."
+        default=None, description="A unique presentation for a field in the UI."
     )
-    alternative_names: typing.Optional[typing.List[str]] = pydantic.Field(alias="alternativeNames")
+    alternative_names: typing.Optional[typing.List[str]] = pydantic.Field(alias="alternativeNames", default=None)
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

@@ -4,14 +4,12 @@ from __future__ import annotations
 
 import typing
 
-import typing_extensions
-
 from .collection_job_subject import CollectionJobSubject
 from .resource_job_subject import ResourceJobSubject
 
 
 class JobSubject_Resource(ResourceJobSubject):
-    type: typing_extensions.Literal["resource"]
+    type: typing.Literal["resource"]
 
     class Config:
         frozen = True
@@ -20,7 +18,7 @@ class JobSubject_Resource(ResourceJobSubject):
 
 
 class JobSubject_Collection(CollectionJobSubject):
-    type: typing_extensions.Literal["collection"]
+    type: typing.Literal["collection"]
 
     class Config:
         frozen = True

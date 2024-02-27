@@ -35,11 +35,11 @@ class Commit(pydantic.BaseModel):
     sheet_id: SheetId = pydantic.Field(alias="sheetId")
     created_by: str = pydantic.Field(alias="createdBy", description="The actor (user or system) who created the commit")
     completed_by: typing.Optional[str] = pydantic.Field(
-        alias="completedBy", description="The actor (user or system) who completed the commit"
+        alias="completedBy", default=None, description="The actor (user or system) who completed the commit"
     )
     created_at: dt.datetime = pydantic.Field(alias="createdAt", description="The time the commit was created")
     completed_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="completedAt", description="The time the commit was acknowledged"
+        alias="completedAt", default=None, description="The time the commit was acknowledged"
     )
 
     def json(self, **kwargs: typing.Any) -> str:

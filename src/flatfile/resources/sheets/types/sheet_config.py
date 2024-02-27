@@ -47,30 +47,33 @@ class SheetConfig(pydantic.BaseModel):
 
     name: str = pydantic.Field(description="The name of your Sheet as it will appear to your end users.")
     description: typing.Optional[str] = pydantic.Field(
-        description="A sentence or two describing the purpose of your Sheet."
+        default=None, description="A sentence or two describing the purpose of your Sheet."
     )
-    slug: typing.Optional[str] = pydantic.Field(description="A unique identifier for your Sheet.")
+    slug: typing.Optional[str] = pydantic.Field(default=None, description="A unique identifier for your Sheet.")
     readonly: typing.Optional[bool] = pydantic.Field(
-        description="A boolean specifying whether or not this sheet is read only. Read only sheets are not editable by end users."
+        default=None,
+        description="A boolean specifying whether or not this sheet is read only. Read only sheets are not editable by end users.",
     )
     allow_additional_fields: typing.Optional[bool] = pydantic.Field(
-        alias="allowAdditionalFields", description="Allow end users to add fields during mapping."
+        alias="allowAdditionalFields", default=None, description="Allow end users to add fields during mapping."
     )
     mapping_confidence_threshold: typing.Optional[float] = pydantic.Field(
-        alias="mappingConfidenceThreshold", description="The minimum confidence required to automatically map a field"
+        alias="mappingConfidenceThreshold",
+        default=None,
+        description="The minimum confidence required to automatically map a field",
     )
     access: typing.Optional[typing.List[SheetAccess]] = pydantic.Field(
-        description="Control Sheet-level access for all users."
+        default=None, description="Control Sheet-level access for all users."
     )
     fields: typing.List[Property] = pydantic.Field(description="Where you define your Sheet’s data schema.")
     actions: typing.Optional[typing.List[Action]] = pydantic.Field(
-        description="An array of actions that end users can perform on this Sheet."
+        default=None, description="An array of actions that end users can perform on this Sheet."
     )
     metadata: typing.Optional[typing.Any] = pydantic.Field(
-        description="Useful for any contextual metadata regarding the schema. Store any valid json"
+        default=None, description="Useful for any contextual metadata regarding the schema. Store any valid json"
     )
     constraints: typing.Optional[typing.List[SheetConstraint]] = pydantic.Field(
-        description="An array of constraints that end users can perform on this Sheet."
+        default=None, description="An array of constraints that end users can perform on this Sheet."
     )
 
     def json(self, **kwargs: typing.Any) -> str:

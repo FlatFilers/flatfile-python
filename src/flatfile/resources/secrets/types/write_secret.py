@@ -32,9 +32,11 @@ class WriteSecret(pydantic.BaseModel):
     name: SecretName = pydantic.Field(description="The reference name for a secret.")
     value: SecretValue = pydantic.Field(description="The secret value. This is hidden in the UI.")
     environment_id: typing.Optional[EnvironmentId] = pydantic.Field(
-        alias="environmentId", description="The Environment of the secret."
+        alias="environmentId", default=None, description="The Environment of the secret."
     )
-    space_id: typing.Optional[SpaceId] = pydantic.Field(alias="spaceId", description="The Space of the secret.")
+    space_id: typing.Optional[SpaceId] = pydantic.Field(
+        alias="spaceId", default=None, description="The Space of the secret."
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

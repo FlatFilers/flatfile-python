@@ -13,8 +13,10 @@ except ImportError:
 
 class ExternalSheetConstraint(pydantic.BaseModel):
     validator: str
-    fields: typing.Optional[typing.List[str]] = pydantic.Field(description="The fields that must be unique together")
-    config: typing.Optional[typing.Any]
+    fields: typing.Optional[typing.List[str]] = pydantic.Field(
+        default=None, description="The fields that must be unique together"
+    )
+    config: typing.Optional[typing.Any] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

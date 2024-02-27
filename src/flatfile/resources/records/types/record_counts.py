@@ -26,9 +26,9 @@ class RecordCounts(pydantic.BaseModel):
     total: int
     valid: int
     error: int
-    errors_by_field: typing.Optional[typing.Dict[str, int]] = pydantic.Field(alias="errorsByField")
+    errors_by_field: typing.Optional[typing.Dict[str, int]] = pydantic.Field(alias="errorsByField", default=None)
     by_field: typing.Optional[typing.Dict[str, FieldRecordCounts]] = pydantic.Field(
-        alias="byField", description="Counts for valid, error, and total records grouped by field key"
+        alias="byField", default=None, description="Counts for valid, error, and total records grouped by field key"
     )
 
     def json(self, **kwargs: typing.Any) -> str:

@@ -42,7 +42,7 @@ class GetExecutionsResponse(pydantic.BaseModel):
     )
     """
 
-    pagination: typing.Optional[Pagination]
+    pagination: typing.Optional[Pagination] = None
     data: typing.List[Execution]
 
     def json(self, **kwargs: typing.Any) -> str:

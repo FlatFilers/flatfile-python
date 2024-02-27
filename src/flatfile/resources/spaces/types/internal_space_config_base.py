@@ -17,19 +17,19 @@ except ImportError:
 
 
 class InternalSpaceConfigBase(pydantic.BaseModel):
-    space_config_id: typing.Optional[SpaceConfigId] = pydantic.Field(alias="spaceConfigId")
-    environment_id: typing.Optional[EnvironmentId] = pydantic.Field(alias="environmentId")
-    primary_workbook_id: typing.Optional[WorkbookId] = pydantic.Field(alias="primaryWorkbookId")
-    metadata: typing.Optional[typing.Any] = pydantic.Field(description="Metadata for the space")
-    actions: typing.Optional[typing.List[Action]]
-    access: typing.Optional[typing.List[SpaceAccess]]
-    auto_configure: typing.Optional[bool] = pydantic.Field(alias="autoConfigure")
-    namespace: typing.Optional[str]
-    labels: typing.Optional[typing.List[str]]
-    translations_path: typing.Optional[str] = pydantic.Field(alias="translationsPath")
-    language_override: typing.Optional[str] = pydantic.Field(alias="languageOverride")
+    space_config_id: typing.Optional[SpaceConfigId] = pydantic.Field(alias="spaceConfigId", default=None)
+    environment_id: typing.Optional[EnvironmentId] = pydantic.Field(alias="environmentId", default=None)
+    primary_workbook_id: typing.Optional[WorkbookId] = pydantic.Field(alias="primaryWorkbookId", default=None)
+    metadata: typing.Optional[typing.Any] = pydantic.Field(default=None, description="Metadata for the space")
+    actions: typing.Optional[typing.List[Action]] = None
+    access: typing.Optional[typing.List[SpaceAccess]] = None
+    auto_configure: typing.Optional[bool] = pydantic.Field(alias="autoConfigure", default=None)
+    namespace: typing.Optional[str] = None
+    labels: typing.Optional[typing.List[str]] = None
+    translations_path: typing.Optional[str] = pydantic.Field(alias="translationsPath", default=None)
+    language_override: typing.Optional[str] = pydantic.Field(alias="languageOverride", default=None)
     archived_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="archivedAt", description="Date when space was archived"
+        alias="archivedAt", default=None, description="Date when space was archived"
     )
 
     def json(self, **kwargs: typing.Any) -> str:

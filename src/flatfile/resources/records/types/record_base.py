@@ -30,12 +30,12 @@ class RecordBase(pydantic.BaseModel):
 
     id: RecordId
     version_id: typing.Optional[VersionId] = pydantic.Field(
-        alias="versionId", description="Deprecated, use `commitId` instead."
+        alias="versionId", default=None, description="Deprecated, use `commitId` instead."
     )
-    commit_id: typing.Optional[CommitId] = pydantic.Field(alias="commitId")
-    valid: typing.Optional[bool]
-    messages: typing.Optional[typing.List[ValidationMessage]]
-    metadata: typing.Optional[typing.Dict[str, typing.Any]]
+    commit_id: typing.Optional[CommitId] = pydantic.Field(alias="commitId", default=None)
+    valid: typing.Optional[bool] = None
+    messages: typing.Optional[typing.List[ValidationMessage]] = None
+    metadata: typing.Optional[typing.Dict[str, typing.Any]] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

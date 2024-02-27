@@ -42,26 +42,32 @@ class Context(pydantic.BaseModel):
     )
     """
 
-    namespaces: typing.Optional[typing.List[str]] = pydantic.Field(description="The namespaces of the event")
-    slugs: typing.Optional[EventContextSlugs] = pydantic.Field(description="The slugs of related resources")
-    action_name: typing.Optional[ActionName] = pydantic.Field(alias="actionName")
+    namespaces: typing.Optional[typing.List[str]] = pydantic.Field(
+        default=None, description="The namespaces of the event"
+    )
+    slugs: typing.Optional[EventContextSlugs] = pydantic.Field(
+        default=None, description="The slugs of related resources"
+    )
+    action_name: typing.Optional[ActionName] = pydantic.Field(alias="actionName", default=None)
     account_id: AccountId = pydantic.Field(alias="accountId")
     environment_id: EnvironmentId = pydantic.Field(alias="environmentId")
-    space_id: typing.Optional[SpaceId] = pydantic.Field(alias="spaceId")
-    workbook_id: typing.Optional[WorkbookId] = pydantic.Field(alias="workbookId")
-    sheet_id: typing.Optional[SheetId] = pydantic.Field(alias="sheetId")
-    sheet_slug: typing.Optional[SheetSlug] = pydantic.Field(alias="sheetSlug")
-    snapshot_id: typing.Optional[SnapshotId] = pydantic.Field(alias="snapshotId")
+    space_id: typing.Optional[SpaceId] = pydantic.Field(alias="spaceId", default=None)
+    workbook_id: typing.Optional[WorkbookId] = pydantic.Field(alias="workbookId", default=None)
+    sheet_id: typing.Optional[SheetId] = pydantic.Field(alias="sheetId", default=None)
+    sheet_slug: typing.Optional[SheetSlug] = pydantic.Field(alias="sheetSlug", default=None)
+    snapshot_id: typing.Optional[SnapshotId] = pydantic.Field(alias="snapshotId", default=None)
     version_id: typing.Optional[VersionId] = pydantic.Field(
-        alias="versionId", description="Deprecated, use `commitId` instead."
+        alias="versionId", default=None, description="Deprecated, use `commitId` instead."
     )
-    commit_id: typing.Optional[CommitId] = pydantic.Field(alias="commitId")
-    job_id: typing.Optional[JobId] = pydantic.Field(alias="jobId")
-    program_id: typing.Optional[ProgramId] = pydantic.Field(alias="programId")
-    file_id: typing.Optional[FileId] = pydantic.Field(alias="fileId")
-    document_id: typing.Optional[DocumentId] = pydantic.Field(alias="documentId")
-    preceding_event_id: typing.Optional[EventId] = pydantic.Field(alias="precedingEventId")
-    actor_id: typing.Optional[str] = pydantic.Field(alias="actorId", description="Can be a UserId, GuestId, or AgentId")
+    commit_id: typing.Optional[CommitId] = pydantic.Field(alias="commitId", default=None)
+    job_id: typing.Optional[JobId] = pydantic.Field(alias="jobId", default=None)
+    program_id: typing.Optional[ProgramId] = pydantic.Field(alias="programId", default=None)
+    file_id: typing.Optional[FileId] = pydantic.Field(alias="fileId", default=None)
+    document_id: typing.Optional[DocumentId] = pydantic.Field(alias="documentId", default=None)
+    preceding_event_id: typing.Optional[EventId] = pydantic.Field(alias="precedingEventId", default=None)
+    actor_id: typing.Optional[str] = pydantic.Field(
+        alias="actorId", default=None, description="Can be a UserId, GuestId, or AgentId"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

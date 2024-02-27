@@ -8,6 +8,7 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
+from ...core.request_options import RequestOptions
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.environment_id import EnvironmentId
@@ -45,6 +46,7 @@ class SpacesClient:
         sort_field: typing.Optional[GetSpacesSortField] = None,
         sort_direction: typing.Optional[SortDirection] = None,
         is_collaborative: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> ListSpacesResponse:
         """
         Returns all spaces for an account or environment
@@ -67,6 +69,8 @@ class SpacesClient:
             - sort_direction: typing.Optional[SortDirection]. Direction of sorting
 
             - is_collaborative: typing.Optional[bool]. Flag for collaborative (project) spaces
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -80,21 +84,37 @@ class SpacesClient:
         _response = self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "spaces"),
-            params=remove_none_from_dict(
-                {
-                    "environmentId": environment_id,
-                    "pageSize": page_size,
-                    "pageNumber": page_number,
-                    "search": search,
-                    "namespace": namespace,
-                    "archived": archived,
-                    "sortField": sort_field,
-                    "sortDirection": sort_direction,
-                    "isCollaborative": is_collaborative,
-                }
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        "search": search,
+                        "namespace": namespace,
+                        "archived": archived,
+                        "sortField": sort_field,
+                        "sortDirection": sort_direction,
+                        "isCollaborative": is_collaborative,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListSpacesResponse, _response.json())  # type: ignore
@@ -106,12 +126,14 @@ class SpacesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def create(self, *, request: SpaceConfig) -> SpaceResponse:
+    def create(self, *, request: SpaceConfig, request_options: typing.Optional[RequestOptions] = None) -> SpaceResponse:
         """
         Creates a new space based on an existing Space Config
 
         Parameters:
             - request: SpaceConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import SpaceConfig
         from flatfile.client import Flatfile
@@ -131,9 +153,26 @@ class SpacesClient:
         _response = self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "spaces"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(SpaceResponse, _response.json())  # type: ignore
@@ -147,12 +186,14 @@ class SpacesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get(self, space_id: SpaceId) -> SpaceResponse:
+    def get(self, space_id: SpaceId, *, request_options: typing.Optional[RequestOptions] = None) -> SpaceResponse:
         """
         Returns a single space
 
         Parameters:
             - space_id: SpaceId. ID of space to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -165,9 +206,21 @@ class SpacesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{jsonable_encoder(space_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(SpaceResponse, _response.json())  # type: ignore
@@ -181,12 +234,14 @@ class SpacesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete(self, space_id: SpaceId) -> Success:
+    def delete(self, space_id: SpaceId, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Delete a space
 
         Parameters:
             - space_id: SpaceId. ID of space to delete
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -199,9 +254,21 @@ class SpacesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{jsonable_encoder(space_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -215,12 +282,19 @@ class SpacesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def bulk_delete(self, *, ids: typing.Union[SpaceId, typing.List[SpaceId]]) -> Success:
+    def bulk_delete(
+        self,
+        *,
+        ids: typing.Union[SpaceId, typing.Sequence[SpaceId]],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Success:
         """
         Delete multiple spaces by id
 
         Parameters:
-            - ids: typing.Union[SpaceId, typing.List[SpaceId]]. List of ids for the spaces to be deleted
+            - ids: typing.Union[SpaceId, typing.Sequence[SpaceId]]. List of ids for the spaces to be deleted
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -234,9 +308,29 @@ class SpacesClient:
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "spaces"),
-            params=remove_none_from_dict({"ids": ids}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "ids": ids,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -250,7 +344,9 @@ class SpacesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update(self, space_id: SpaceId, *, request: SpaceConfig) -> SpaceResponse:
+    def update(
+        self, space_id: SpaceId, *, request: SpaceConfig, request_options: typing.Optional[RequestOptions] = None
+    ) -> SpaceResponse:
         """
         Update a space, to change the name for example
 
@@ -258,6 +354,8 @@ class SpacesClient:
             - space_id: SpaceId. ID of space to update
 
             - request: SpaceConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import SpaceConfig
         from flatfile.client import Flatfile
@@ -274,10 +372,27 @@ class SpacesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{jsonable_encoder(space_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(SpaceResponse, _response.json())  # type: ignore
@@ -291,12 +406,14 @@ class SpacesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def archive_space(self, space_id: SpaceId) -> Success:
+    def archive_space(self, space_id: SpaceId, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Sets archivedAt timestamp on a space
 
         Parameters:
             - space_id: SpaceId. ID of space to archive
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -309,9 +426,26 @@ class SpacesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/archive"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"spaces/{jsonable_encoder(space_id)}/archive"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))
+            if request_options is not None
+            else None,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -342,6 +476,7 @@ class AsyncSpacesClient:
         sort_field: typing.Optional[GetSpacesSortField] = None,
         sort_direction: typing.Optional[SortDirection] = None,
         is_collaborative: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> ListSpacesResponse:
         """
         Returns all spaces for an account or environment
@@ -364,6 +499,8 @@ class AsyncSpacesClient:
             - sort_direction: typing.Optional[SortDirection]. Direction of sorting
 
             - is_collaborative: typing.Optional[bool]. Flag for collaborative (project) spaces
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -377,21 +514,37 @@ class AsyncSpacesClient:
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "spaces"),
-            params=remove_none_from_dict(
-                {
-                    "environmentId": environment_id,
-                    "pageSize": page_size,
-                    "pageNumber": page_number,
-                    "search": search,
-                    "namespace": namespace,
-                    "archived": archived,
-                    "sortField": sort_field,
-                    "sortDirection": sort_direction,
-                    "isCollaborative": is_collaborative,
-                }
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        "search": search,
+                        "namespace": namespace,
+                        "archived": archived,
+                        "sortField": sort_field,
+                        "sortDirection": sort_direction,
+                        "isCollaborative": is_collaborative,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListSpacesResponse, _response.json())  # type: ignore
@@ -403,12 +556,16 @@ class AsyncSpacesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def create(self, *, request: SpaceConfig) -> SpaceResponse:
+    async def create(
+        self, *, request: SpaceConfig, request_options: typing.Optional[RequestOptions] = None
+    ) -> SpaceResponse:
         """
         Creates a new space based on an existing Space Config
 
         Parameters:
             - request: SpaceConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import SpaceConfig
         from flatfile.client import AsyncFlatfile
@@ -428,9 +585,26 @@ class AsyncSpacesClient:
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "spaces"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(SpaceResponse, _response.json())  # type: ignore
@@ -444,12 +618,14 @@ class AsyncSpacesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get(self, space_id: SpaceId) -> SpaceResponse:
+    async def get(self, space_id: SpaceId, *, request_options: typing.Optional[RequestOptions] = None) -> SpaceResponse:
         """
         Returns a single space
 
         Parameters:
             - space_id: SpaceId. ID of space to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -462,9 +638,21 @@ class AsyncSpacesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{jsonable_encoder(space_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(SpaceResponse, _response.json())  # type: ignore
@@ -478,12 +666,14 @@ class AsyncSpacesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete(self, space_id: SpaceId) -> Success:
+    async def delete(self, space_id: SpaceId, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Delete a space
 
         Parameters:
             - space_id: SpaceId. ID of space to delete
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -496,9 +686,21 @@ class AsyncSpacesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{jsonable_encoder(space_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -512,12 +714,19 @@ class AsyncSpacesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def bulk_delete(self, *, ids: typing.Union[SpaceId, typing.List[SpaceId]]) -> Success:
+    async def bulk_delete(
+        self,
+        *,
+        ids: typing.Union[SpaceId, typing.Sequence[SpaceId]],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Success:
         """
         Delete multiple spaces by id
 
         Parameters:
-            - ids: typing.Union[SpaceId, typing.List[SpaceId]]. List of ids for the spaces to be deleted
+            - ids: typing.Union[SpaceId, typing.Sequence[SpaceId]]. List of ids for the spaces to be deleted
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -531,9 +740,29 @@ class AsyncSpacesClient:
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "spaces"),
-            params=remove_none_from_dict({"ids": ids}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "ids": ids,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -547,7 +776,9 @@ class AsyncSpacesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update(self, space_id: SpaceId, *, request: SpaceConfig) -> SpaceResponse:
+    async def update(
+        self, space_id: SpaceId, *, request: SpaceConfig, request_options: typing.Optional[RequestOptions] = None
+    ) -> SpaceResponse:
         """
         Update a space, to change the name for example
 
@@ -555,6 +786,8 @@ class AsyncSpacesClient:
             - space_id: SpaceId. ID of space to update
 
             - request: SpaceConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import SpaceConfig
         from flatfile.client import AsyncFlatfile
@@ -571,10 +804,27 @@ class AsyncSpacesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{jsonable_encoder(space_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(SpaceResponse, _response.json())  # type: ignore
@@ -588,12 +838,16 @@ class AsyncSpacesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def archive_space(self, space_id: SpaceId) -> Success:
+    async def archive_space(
+        self, space_id: SpaceId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
         """
         Sets archivedAt timestamp on a space
 
         Parameters:
             - space_id: SpaceId. ID of space to archive
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -606,9 +860,26 @@ class AsyncSpacesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"spaces/{space_id}/archive"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"spaces/{jsonable_encoder(space_id)}/archive"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))
+            if request_options is not None
+            else None,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore

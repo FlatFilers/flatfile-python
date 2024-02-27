@@ -4,10 +4,12 @@ import typing
 import urllib.parse
 from json.decoder import JSONDecodeError
 
+from ... import core
 from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
+from ...core.request_options import RequestOptions
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.action import Action
@@ -42,6 +44,7 @@ class FilesClient:
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
         mode: typing.Optional[Mode] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> ListFilesResponse:
         """
         Parameters:
@@ -52,6 +55,8 @@ class FilesClient:
             - page_number: typing.Optional[int]. Based on pageSize, which page of jobs to return
 
             - mode: typing.Optional[Mode]. The storage mode of file to fetch, defaults to "import"
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -63,11 +68,32 @@ class FilesClient:
         _response = self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "files"),
-            params=remove_none_from_dict(
-                {"spaceId": space_id, "pageSize": page_size, "pageNumber": page_number, "mode": mode}
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "spaceId": space_id,
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        "mode": mode,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListFilesResponse, _response.json())  # type: ignore
@@ -83,8 +109,9 @@ class FilesClient:
         space_id: SpaceId,
         environment_id: EnvironmentId,
         mode: typing.Optional[Mode] = None,
-        file: typing.IO,
+        file: core.File,
         actions: typing.Optional[typing.List[Action]] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> FileResponse:
         """
         Parameters:
@@ -92,21 +119,46 @@ class FilesClient:
 
             - environment_id: EnvironmentId.
 
-            - mode: typing.Optional[Mode].
+            - mode: typing.Optional[Mode]. The storage mode of file to insert, defaults to "import"
 
-            - file: typing.IO.
+            - file: core.File. See core.File for more documentation
 
-            - actions: typing.Optional[typing.List[Action]].
+            - actions: typing.Optional[typing.List[Action]]. The actions attached to the file
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "files"),
-            data=jsonable_encoder(
-                {"spaceId": space_id, "environmentId": environment_id, "mode": mode, "actions": actions}
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
             ),
-            files={"file": file},
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            data=jsonable_encoder(
+                remove_none_from_dict(
+                    {"spaceId": space_id, "environmentId": environment_id, "mode": mode, "actions": actions}
+                )
+            )
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(
+                    remove_none_from_dict(
+                        {"spaceId": space_id, "environmentId": environment_id, "mode": mode, "actions": actions}
+                    )
+                ),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            files=core.convert_file_dict_to_httpx_tuples(remove_none_from_dict({"file": file})),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(FileResponse, _response.json())  # type: ignore
@@ -118,10 +170,12 @@ class FilesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get(self, file_id: str) -> FileResponse:
+    def get(self, file_id: str, *, request_options: typing.Optional[RequestOptions] = None) -> FileResponse:
         """
         Parameters:
             - file_id: str.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -134,9 +188,21 @@ class FilesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{file_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{jsonable_encoder(file_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(FileResponse, _response.json())  # type: ignore
@@ -150,16 +216,30 @@ class FilesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete(self, file_id: str) -> Success:
+    def delete(self, file_id: str, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Parameters:
             - file_id: str.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{file_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{jsonable_encoder(file_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -181,7 +261,8 @@ class FilesClient:
         name: typing.Optional[str] = OMIT,
         mode: typing.Optional[Mode] = OMIT,
         status: typing.Optional[ModelFileStatusEnum] = OMIT,
-        actions: typing.Optional[typing.List[Action]] = OMIT,
+        actions: typing.Optional[typing.Sequence[Action]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> FileResponse:
         """
         Update a file, to change the workbook id for example
@@ -197,7 +278,9 @@ class FilesClient:
 
             - status: typing.Optional[ModelFileStatusEnum]. Status of the file
 
-            - actions: typing.Optional[typing.List[Action]]. The actions attached to the file
+            - actions: typing.Optional[typing.Sequence[Action]]. The actions attached to the file
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -215,17 +298,34 @@ class FilesClient:
         if name is not OMIT:
             _request["name"] = name
         if mode is not OMIT:
-            _request["mode"] = mode.value
+            _request["mode"] = mode.value if mode is not None else None
         if status is not OMIT:
-            _request["status"] = status.value
+            _request["status"] = status.value if status is not None else None
         if actions is not OMIT:
             _request["actions"] = actions
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{file_id}"),
-            json=jsonable_encoder(_request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{jsonable_encoder(file_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(_request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(_request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(FileResponse, _response.json())  # type: ignore
@@ -239,16 +339,34 @@ class FilesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def download(self, file_id: FileId) -> typing.Iterator[bytes]:
+    def download(
+        self, file_id: FileId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.Iterator[bytes]:
         """
         Parameters:
             - file_id: FileId.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         with self._client_wrapper.httpx_client.stream(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{file_id}/download"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"files/{jsonable_encoder(file_id)}/download"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         ) as _response:
             if 200 <= _response.status_code < 300:
                 for _chunk in _response.iter_bytes():
@@ -277,6 +395,7 @@ class AsyncFilesClient:
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
         mode: typing.Optional[Mode] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> ListFilesResponse:
         """
         Parameters:
@@ -287,6 +406,8 @@ class AsyncFilesClient:
             - page_number: typing.Optional[int]. Based on pageSize, which page of jobs to return
 
             - mode: typing.Optional[Mode]. The storage mode of file to fetch, defaults to "import"
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -298,11 +419,32 @@ class AsyncFilesClient:
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "files"),
-            params=remove_none_from_dict(
-                {"spaceId": space_id, "pageSize": page_size, "pageNumber": page_number, "mode": mode}
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "spaceId": space_id,
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        "mode": mode,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListFilesResponse, _response.json())  # type: ignore
@@ -318,8 +460,9 @@ class AsyncFilesClient:
         space_id: SpaceId,
         environment_id: EnvironmentId,
         mode: typing.Optional[Mode] = None,
-        file: typing.IO,
+        file: core.File,
         actions: typing.Optional[typing.List[Action]] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> FileResponse:
         """
         Parameters:
@@ -327,21 +470,46 @@ class AsyncFilesClient:
 
             - environment_id: EnvironmentId.
 
-            - mode: typing.Optional[Mode].
+            - mode: typing.Optional[Mode]. The storage mode of file to insert, defaults to "import"
 
-            - file: typing.IO.
+            - file: core.File. See core.File for more documentation
 
-            - actions: typing.Optional[typing.List[Action]].
+            - actions: typing.Optional[typing.List[Action]]. The actions attached to the file
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "files"),
-            data=jsonable_encoder(
-                {"spaceId": space_id, "environmentId": environment_id, "mode": mode, "actions": actions}
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
             ),
-            files={"file": file},
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            data=jsonable_encoder(
+                remove_none_from_dict(
+                    {"spaceId": space_id, "environmentId": environment_id, "mode": mode, "actions": actions}
+                )
+            )
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(
+                    remove_none_from_dict(
+                        {"spaceId": space_id, "environmentId": environment_id, "mode": mode, "actions": actions}
+                    )
+                ),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            files=core.convert_file_dict_to_httpx_tuples(remove_none_from_dict({"file": file})),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(FileResponse, _response.json())  # type: ignore
@@ -353,10 +521,12 @@ class AsyncFilesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get(self, file_id: str) -> FileResponse:
+    async def get(self, file_id: str, *, request_options: typing.Optional[RequestOptions] = None) -> FileResponse:
         """
         Parameters:
             - file_id: str.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -369,9 +539,21 @@ class AsyncFilesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{file_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{jsonable_encoder(file_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(FileResponse, _response.json())  # type: ignore
@@ -385,16 +567,30 @@ class AsyncFilesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete(self, file_id: str) -> Success:
+    async def delete(self, file_id: str, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Parameters:
             - file_id: str.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{file_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{jsonable_encoder(file_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -416,7 +612,8 @@ class AsyncFilesClient:
         name: typing.Optional[str] = OMIT,
         mode: typing.Optional[Mode] = OMIT,
         status: typing.Optional[ModelFileStatusEnum] = OMIT,
-        actions: typing.Optional[typing.List[Action]] = OMIT,
+        actions: typing.Optional[typing.Sequence[Action]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> FileResponse:
         """
         Update a file, to change the workbook id for example
@@ -432,7 +629,9 @@ class AsyncFilesClient:
 
             - status: typing.Optional[ModelFileStatusEnum]. Status of the file
 
-            - actions: typing.Optional[typing.List[Action]]. The actions attached to the file
+            - actions: typing.Optional[typing.Sequence[Action]]. The actions attached to the file
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -450,17 +649,34 @@ class AsyncFilesClient:
         if name is not OMIT:
             _request["name"] = name
         if mode is not OMIT:
-            _request["mode"] = mode.value
+            _request["mode"] = mode.value if mode is not None else None
         if status is not OMIT:
-            _request["status"] = status.value
+            _request["status"] = status.value if status is not None else None
         if actions is not OMIT:
             _request["actions"] = actions
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{file_id}"),
-            json=jsonable_encoder(_request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{jsonable_encoder(file_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(_request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(_request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(FileResponse, _response.json())  # type: ignore
@@ -474,16 +690,34 @@ class AsyncFilesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def download(self, file_id: FileId) -> typing.AsyncIterator[bytes]:
+    async def download(
+        self, file_id: FileId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.AsyncIterator[bytes]:
         """
         Parameters:
             - file_id: FileId.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         async with self._client_wrapper.httpx_client.stream(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"files/{file_id}/download"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"files/{jsonable_encoder(file_id)}/download"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         ) as _response:
             if 200 <= _response.status_code < 300:
                 async for _chunk in _response.aiter_bytes():

@@ -13,10 +13,10 @@ except ImportError:
 
 class UniqueConstraintConfig(pydantic.BaseModel):
     case_sensitive: typing.Optional[bool] = pydantic.Field(
-        alias="caseSensitive", description="Ignore casing when determining uniqueness"
+        alias="caseSensitive", default=None, description="Ignore casing when determining uniqueness"
     )
     ignore_empty: typing.Optional[bool] = pydantic.Field(
-        alias="ignoreEmpty", description="Do not flag empty values as duplicate"
+        alias="ignoreEmpty", default=None, description="Do not flag empty values as duplicate"
     )
 
     def json(self, **kwargs: typing.Any) -> str:

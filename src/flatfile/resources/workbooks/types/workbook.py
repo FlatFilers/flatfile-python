@@ -107,25 +107,29 @@ class Workbook(pydantic.BaseModel):
     """
 
     id: WorkbookId = pydantic.Field(description="ID of the Workbook.")
-    name: typing.Optional[str] = pydantic.Field(description="Name of the Workbook.")
+    name: typing.Optional[str] = pydantic.Field(default=None, description="Name of the Workbook.")
     space_id: SpaceId = pydantic.Field(alias="spaceId", description="Associated Space ID of the Workbook.")
     environment_id: EnvironmentId = pydantic.Field(
         alias="environmentId", description="Associated Environment ID of the Workbook."
     )
     sheets: typing.Optional[typing.List[Sheet]] = pydantic.Field(
-        description="A list of Sheets associated with the Workbook."
+        default=None, description="A list of Sheets associated with the Workbook."
     )
-    labels: typing.Optional[typing.List[str]] = pydantic.Field(description="A list of labels for the Workbook.")
+    labels: typing.Optional[typing.List[str]] = pydantic.Field(
+        default=None, description="A list of labels for the Workbook."
+    )
     actions: typing.Optional[typing.List[Action]] = pydantic.Field(
-        description="A list of Actions associated with the Workbook."
+        default=None, description="A list of Actions associated with the Workbook."
     )
-    settings: typing.Optional[WorkbookConfigSettings] = pydantic.Field(description="The Workbook settings.")
-    metadata: typing.Optional[typing.Any] = pydantic.Field(description="Metadata for the workbook")
-    namespace: typing.Optional[str]
+    settings: typing.Optional[WorkbookConfigSettings] = pydantic.Field(
+        default=None, description="The Workbook settings."
+    )
+    metadata: typing.Optional[typing.Any] = pydantic.Field(default=None, description="Metadata for the workbook")
+    namespace: typing.Optional[str] = None
     updated_at: dt.datetime = pydantic.Field(alias="updatedAt", description="Date the workbook was last updated")
     created_at: dt.datetime = pydantic.Field(alias="createdAt", description="Date the workbook was created")
     expired_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="expiredAt", description="Date the workbook was created"
+        alias="expiredAt", default=None, description="Date the workbook was created"
     )
 
     def json(self, **kwargs: typing.Any) -> str:

@@ -71,14 +71,16 @@ class Sheet(pydantic.BaseModel):
     slug: str = pydantic.Field(description="The slug of the Sheet.")
     config: SheetConfig = pydantic.Field(description="Describes shape of data as well as behavior")
     count_records: typing.Optional[RecordCounts] = pydantic.Field(
-        alias="countRecords", description="The amount of records in the Sheet."
+        alias="countRecords", default=None, description="The amount of records in the Sheet."
     )
-    namespace: typing.Optional[str] = pydantic.Field(description="The scoped namespace of the Sheet.")
-    locked_by: typing.Optional[str] = pydantic.Field(alias="lockedBy", description="The actor who locked the Sheet.")
+    namespace: typing.Optional[str] = pydantic.Field(default=None, description="The scoped namespace of the Sheet.")
+    locked_by: typing.Optional[str] = pydantic.Field(
+        alias="lockedBy", default=None, description="The actor who locked the Sheet."
+    )
     updated_at: dt.datetime = pydantic.Field(alias="updatedAt", description="Date the sheet was last updated")
     created_at: dt.datetime = pydantic.Field(alias="createdAt", description="Date the sheet was created")
     locked_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="lockedAt", description="The time the Sheet was locked."
+        alias="lockedAt", default=None, description="The time the Sheet was locked."
     )
 
     def json(self, **kwargs: typing.Any) -> str:

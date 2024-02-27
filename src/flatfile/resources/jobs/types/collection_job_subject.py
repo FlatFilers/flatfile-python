@@ -13,8 +13,8 @@ except ImportError:
 
 class CollectionJobSubject(pydantic.BaseModel):
     resource: str
-    params: typing.Optional[typing.Dict[str, typing.Any]]
-    query: typing.Optional[typing.Dict[str, typing.Any]]
+    params: typing.Optional[typing.Dict[str, typing.Any]] = None
+    query: typing.Optional[typing.Dict[str, typing.Any]] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

@@ -9,7 +9,7 @@ from .records import Records
 
 
 class CellValueWithLinks(CellValue):
-    links: typing.Optional[Records]
+    links: typing.Optional[Records] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

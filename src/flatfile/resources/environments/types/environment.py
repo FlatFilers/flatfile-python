@@ -39,9 +39,9 @@ class Environment(pydantic.BaseModel):
     guest_authentication: typing.List[GuestAuthenticationEnum] = pydantic.Field(alias="guestAuthentication")
     features: typing.Dict[str, typing.Any]
     metadata: typing.Dict[str, typing.Any]
-    translations_path: typing.Optional[str] = pydantic.Field(alias="translationsPath")
-    namespaces: typing.Optional[typing.List[str]]
-    language_override: typing.Optional[str] = pydantic.Field(alias="languageOverride")
+    translations_path: typing.Optional[str] = pydantic.Field(alias="translationsPath", default=None)
+    namespaces: typing.Optional[typing.List[str]] = None
+    language_override: typing.Optional[str] = pydantic.Field(alias="languageOverride", default=None)
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

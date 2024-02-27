@@ -12,7 +12,7 @@ except ImportError:
 
 
 class JobOutcomeNextRetry(pydantic.BaseModel):
-    label: typing.Optional[str]
+    label: typing.Optional[str] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

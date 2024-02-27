@@ -52,7 +52,7 @@ class File(pydantic.BaseModel):
     mimetype: str = pydantic.Field(description="MIME Type of the file")
     encoding: str = pydantic.Field(description="Text encoding of the file")
     status: ModelFileStatusEnum = pydantic.Field(description="Status of the file")
-    mode: typing.Optional[Mode] = pydantic.Field(description="The storage mode of file")
+    mode: typing.Optional[Mode] = pydantic.Field(default=None, description="The storage mode of file")
     size: int = pydantic.Field(description="Size of file in bytes")
     bytes_received: int = pydantic.Field(
         alias="bytesReceived",
@@ -61,12 +61,12 @@ class File(pydantic.BaseModel):
     created_at: dt.datetime = pydantic.Field(alias="createdAt", description="Date the file was created")
     updated_at: dt.datetime = pydantic.Field(alias="updatedAt", description="Date the file was last updated")
     expired_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="expiredAt", description="Date the file was expired"
+        alias="expiredAt", default=None, description="Date the file was expired"
     )
     space_id: SpaceId = pydantic.Field(alias="spaceId")
-    workbook_id: typing.Optional[WorkbookId] = pydantic.Field(alias="workbookId")
-    sheet_id: typing.Optional[SheetId] = pydantic.Field(alias="sheetId")
-    actions: typing.Optional[typing.List[Action]]
+    workbook_id: typing.Optional[WorkbookId] = pydantic.Field(alias="workbookId", default=None)
+    sheet_id: typing.Optional[SheetId] = pydantic.Field(alias="sheetId", default=None)
+    actions: typing.Optional[typing.List[Action]] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

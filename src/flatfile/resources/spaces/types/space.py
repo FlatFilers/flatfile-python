@@ -56,32 +56,41 @@ class Space(InternalSpaceConfigBase):
 
     id: SpaceId
     workbooks_count: typing.Optional[int] = pydantic.Field(
-        alias="workbooksCount", description="Amount of workbooks in the space"
+        alias="workbooksCount", default=None, description="Amount of workbooks in the space"
     )
-    files_count: typing.Optional[int] = pydantic.Field(alias="filesCount", description="Amount of files in the space")
-    created_by_user_id: typing.Optional[UserId] = pydantic.Field(alias="createdByUserId")
+    files_count: typing.Optional[int] = pydantic.Field(
+        alias="filesCount", default=None, description="Amount of files in the space"
+    )
+    created_by_user_id: typing.Optional[UserId] = pydantic.Field(alias="createdByUserId", default=None)
     created_by_user_name: typing.Optional[str] = pydantic.Field(
-        alias="createdByUserName", description="User name who created space"
+        alias="createdByUserName", default=None, description="User name who created space"
     )
     created_at: dt.datetime = pydantic.Field(alias="createdAt", description="Date when space was created")
     updated_at: dt.datetime = pydantic.Field(alias="updatedAt", description="Date when space was updated")
     expired_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="expiredAt", description="Date when space was expired"
+        alias="expiredAt", default=None, description="Date when space was expired"
     )
     last_activity_at: typing.Optional[dt.datetime] = pydantic.Field(
         alias="lastActivityAt",
+        default=None,
         description="Date that the last activity in the space occurred. This could include any create or update activity in the space like adding a record to a sheet, uploading a new file, or updating the configuration of a workbook. This date is only tracked to the precision of a day.",
     )
-    guest_link: typing.Optional[str] = pydantic.Field(alias="guestLink", description="Guest link to the space")
-    name: str = pydantic.Field(description="The name of the space")
-    display_order: typing.Optional[int] = pydantic.Field(alias="displayOrder", description="The display order")
-    access_token: typing.Optional[str] = pydantic.Field(alias="accessToken", description="Access token for the space")
-    is_collaborative: typing.Optional[bool] = pydantic.Field(
-        alias="isCollaborative", description="Flag for collaborative (project) spaces"
+    guest_link: typing.Optional[str] = pydantic.Field(
+        alias="guestLink", default=None, description="Guest link to the space"
     )
-    size: typing.Optional[SpaceSize] = pydantic.Field(description="Size information for the space")
+    name: str = pydantic.Field(description="The name of the space")
+    display_order: typing.Optional[int] = pydantic.Field(
+        alias="displayOrder", default=None, description="The display order"
+    )
+    access_token: typing.Optional[str] = pydantic.Field(
+        alias="accessToken", default=None, description="Access token for the space"
+    )
+    is_collaborative: typing.Optional[bool] = pydantic.Field(
+        alias="isCollaborative", default=None, description="Flag for collaborative (project) spaces"
+    )
+    size: typing.Optional[SpaceSize] = pydantic.Field(default=None, description="Size information for the space")
     upgraded_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="upgradedAt", description="Date when the space was upgraded"
+        alias="upgradedAt", default=None, description="Date when the space was upgraded"
     )
     guest_authentication: typing.List[GuestAuthenticationEnum] = pydantic.Field(
         alias="guestAuthentication", description="Type of guest authentication"

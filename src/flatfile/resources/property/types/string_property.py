@@ -13,7 +13,7 @@ class StringProperty(BaseProperty):
     Defines a property that should be stored and read as a basic string. Database engines should expect any length of text to be provided here unless explicitly defined in the config.
     """
 
-    config: typing.Optional[StringConfig]
+    config: typing.Optional[StringConfig] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

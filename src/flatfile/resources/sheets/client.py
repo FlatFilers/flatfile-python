@@ -6,7 +6,9 @@ from json.decoder import JSONDecodeError
 
 from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
+from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
+from ...core.request_options import RequestOptions
 from ..commits.types.list_commits_response import ListCommitsResponse
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
@@ -43,12 +45,16 @@ class SheetsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def list(self, *, workbook_id: WorkbookId) -> ListSheetsResponse:
+    def list(
+        self, *, workbook_id: WorkbookId, request_options: typing.Optional[RequestOptions] = None
+    ) -> ListSheetsResponse:
         """
         Returns sheets in a workbook
 
         Parameters:
             - workbook_id: WorkbookId. ID of workbook
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -62,9 +68,29 @@ class SheetsClient:
         _response = self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "sheets"),
-            params=remove_none_from_dict({"workbookId": workbook_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "workbookId": workbook_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListSheetsResponse, _response.json())  # type: ignore
@@ -74,12 +100,14 @@ class SheetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get(self, sheet_id: SheetId) -> SheetResponse:
+    def get(self, sheet_id: SheetId, *, request_options: typing.Optional[RequestOptions] = None) -> SheetResponse:
         """
         Returns a sheet in a workbook
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -92,9 +120,21 @@ class SheetsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(SheetResponse, _response.json())  # type: ignore
@@ -104,12 +144,14 @@ class SheetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete(self, sheet_id: SheetId) -> Success:
+    def delete(self, sheet_id: SheetId, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Deletes a specific sheet from a workbook
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -122,9 +164,21 @@ class SheetsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -138,12 +192,14 @@ class SheetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def validate(self, sheet_id: SheetId) -> Success:
+    def validate(self, sheet_id: SheetId, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Trigger data hooks and validation to run on a sheet
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -156,9 +212,26 @@ class SheetsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/validate"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/validate"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))
+            if request_options is not None
+            else None,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -186,7 +259,8 @@ class SheetsClient:
         filter_field: typing.Optional[FilterField] = None,
         search_value: typing.Optional[SearchValue] = None,
         search_field: typing.Optional[SearchField] = None,
-        ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]] = None,
+        ids: typing.Optional[typing.Union[RecordId, typing.Sequence[RecordId]]] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Iterator[bytes]:
         """
         Returns records from a sheet in a workbook as a csv file
@@ -214,28 +288,48 @@ class SheetsClient:
 
             - search_field: typing.Optional[SearchField]. The field to search for data on.
 
-            - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+            - ids: typing.Optional[typing.Union[RecordId, typing.Sequence[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         with self._client_wrapper.httpx_client.stream(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/download"),
-            params=remove_none_from_dict(
-                {
-                    "versionId": version_id,
-                    "commitId": commit_id,
-                    "sinceVersionId": since_version_id,
-                    "sinceCommitId": since_commit_id,
-                    "sortField": sort_field,
-                    "sortDirection": sort_direction,
-                    "filter": filter,
-                    "filterField": filter_field,
-                    "searchValue": search_value,
-                    "searchField": search_field,
-                    "ids": ids,
-                }
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/download"
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "versionId": version_id,
+                        "commitId": commit_id,
+                        "sinceVersionId": since_version_id,
+                        "sinceCommitId": since_commit_id,
+                        "sortField": sort_field,
+                        "sortDirection": sort_direction,
+                        "filter": filter,
+                        "filterField": filter_field,
+                        "searchValue": search_value,
+                        "searchField": search_field,
+                        "ids": ids,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         ) as _response:
             if 200 <= _response.status_code < 300:
                 for _chunk in _response.iter_bytes():
@@ -262,6 +356,7 @@ class SheetsClient:
         search_field: typing.Optional[SearchField] = None,
         by_field: typing.Optional[bool] = None,
         q: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> RecordCountsResponse:
         """
         Returns counts of records from a sheet
@@ -288,6 +383,8 @@ class SheetsClient:
             - by_field: typing.Optional[bool]. If true, the counts for each field will also be returned
 
             - q: typing.Optional[str]. An FFQL query used to filter the result set to be counted
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -301,23 +398,41 @@ class SheetsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/counts"),
-            params=remove_none_from_dict(
-                {
-                    "versionId": version_id,
-                    "sinceVersionId": since_version_id,
-                    "commitId": commit_id,
-                    "sinceCommitId": since_commit_id,
-                    "filter": filter,
-                    "filterField": filter_field,
-                    "searchValue": search_value,
-                    "searchField": search_field,
-                    "byField": by_field,
-                    "q": q,
-                }
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/counts"
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "versionId": version_id,
+                        "sinceVersionId": since_version_id,
+                        "commitId": commit_id,
+                        "sinceCommitId": since_commit_id,
+                        "filter": filter,
+                        "filterField": filter_field,
+                        "searchValue": search_value,
+                        "searchField": search_field,
+                        "byField": by_field,
+                        "q": q,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(RecordCountsResponse, _response.json())  # type: ignore
@@ -327,7 +442,13 @@ class SheetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get_sheet_commits(self, sheet_id: SheetId, *, completed: typing.Optional[bool] = None) -> ListCommitsResponse:
+    def get_sheet_commits(
+        self,
+        sheet_id: SheetId,
+        *,
+        completed: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> ListCommitsResponse:
         """
         Returns the commit versions for a sheet
 
@@ -335,6 +456,8 @@ class SheetsClient:
             - sheet_id: SheetId. ID of sheet
 
             - completed: typing.Optional[bool]. If true, only return commits that have been completed. If false, only return commits that have not been completed. If not provided, return all commits.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -347,10 +470,32 @@ class SheetsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/commits"),
-            params=remove_none_from_dict({"completed": completed}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/commits"
+            ),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "completed": completed,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListCommitsResponse, _response.json())  # type: ignore
@@ -360,12 +505,14 @@ class SheetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def lock_sheet(self, sheet_id: SheetId) -> Success:
+    def lock_sheet(self, sheet_id: SheetId, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Locks a sheet
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -378,9 +525,26 @@ class SheetsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/lock"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/lock"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))
+            if request_options is not None
+            else None,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -394,12 +558,14 @@ class SheetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def unlock_sheet(self, sheet_id: SheetId) -> Success:
+    def unlock_sheet(self, sheet_id: SheetId, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Removes a lock from a sheet
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -412,9 +578,26 @@ class SheetsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/unlock"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/unlock"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))
+            if request_options is not None
+            else None,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -442,6 +625,7 @@ class SheetsClient:
         distinct: typing.Optional[Distinct] = None,
         include_counts: typing.Optional[IncludeCounts] = None,
         search_value: typing.Optional[SearchValue] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> CellsResponse:
         """
         Returns record cell values grouped by all fields in the sheet
@@ -468,6 +652,8 @@ class SheetsClient:
             - include_counts: typing.Optional[IncludeCounts].
 
             - search_value: typing.Optional[SearchValue]. A value to find for a given field in a sheet. Wrap the value in "" for exact match
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import Filter, SortDirection
         from flatfile.client import Flatfile
@@ -485,23 +671,41 @@ class SheetsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/cells"),
-            params=remove_none_from_dict(
-                {
-                    "fieldKey": field_key,
-                    "sortField": sort_field,
-                    "sortDirection": sort_direction,
-                    "filter": filter,
-                    "filterField": filter_field,
-                    "pageSize": page_size,
-                    "pageNumber": page_number,
-                    "distinct": distinct,
-                    "includeCounts": include_counts,
-                    "searchValue": search_value,
-                }
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/cells"
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "fieldKey": field_key,
+                        "sortField": sort_field,
+                        "sortDirection": sort_direction,
+                        "filter": filter,
+                        "filterField": filter_field,
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        "distinct": distinct,
+                        "includeCounts": include_counts,
+                        "searchValue": search_value,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(CellsResponse, _response.json())  # type: ignore
@@ -516,12 +720,16 @@ class AsyncSheetsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    async def list(self, *, workbook_id: WorkbookId) -> ListSheetsResponse:
+    async def list(
+        self, *, workbook_id: WorkbookId, request_options: typing.Optional[RequestOptions] = None
+    ) -> ListSheetsResponse:
         """
         Returns sheets in a workbook
 
         Parameters:
             - workbook_id: WorkbookId. ID of workbook
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -535,9 +743,29 @@ class AsyncSheetsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "sheets"),
-            params=remove_none_from_dict({"workbookId": workbook_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "workbookId": workbook_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListSheetsResponse, _response.json())  # type: ignore
@@ -547,12 +775,14 @@ class AsyncSheetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get(self, sheet_id: SheetId) -> SheetResponse:
+    async def get(self, sheet_id: SheetId, *, request_options: typing.Optional[RequestOptions] = None) -> SheetResponse:
         """
         Returns a sheet in a workbook
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -565,9 +795,21 @@ class AsyncSheetsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(SheetResponse, _response.json())  # type: ignore
@@ -577,12 +819,14 @@ class AsyncSheetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete(self, sheet_id: SheetId) -> Success:
+    async def delete(self, sheet_id: SheetId, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Deletes a specific sheet from a workbook
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -595,9 +839,21 @@ class AsyncSheetsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -611,12 +867,14 @@ class AsyncSheetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def validate(self, sheet_id: SheetId) -> Success:
+    async def validate(self, sheet_id: SheetId, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Trigger data hooks and validation to run on a sheet
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -629,9 +887,26 @@ class AsyncSheetsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/validate"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/validate"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))
+            if request_options is not None
+            else None,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -659,7 +934,8 @@ class AsyncSheetsClient:
         filter_field: typing.Optional[FilterField] = None,
         search_value: typing.Optional[SearchValue] = None,
         search_field: typing.Optional[SearchField] = None,
-        ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]] = None,
+        ids: typing.Optional[typing.Union[RecordId, typing.Sequence[RecordId]]] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.AsyncIterator[bytes]:
         """
         Returns records from a sheet in a workbook as a csv file
@@ -687,28 +963,48 @@ class AsyncSheetsClient:
 
             - search_field: typing.Optional[SearchField]. The field to search for data on.
 
-            - ids: typing.Optional[typing.Union[RecordId, typing.List[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+            - ids: typing.Optional[typing.Union[RecordId, typing.Sequence[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         async with self._client_wrapper.httpx_client.stream(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/download"),
-            params=remove_none_from_dict(
-                {
-                    "versionId": version_id,
-                    "commitId": commit_id,
-                    "sinceVersionId": since_version_id,
-                    "sinceCommitId": since_commit_id,
-                    "sortField": sort_field,
-                    "sortDirection": sort_direction,
-                    "filter": filter,
-                    "filterField": filter_field,
-                    "searchValue": search_value,
-                    "searchField": search_field,
-                    "ids": ids,
-                }
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/download"
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "versionId": version_id,
+                        "commitId": commit_id,
+                        "sinceVersionId": since_version_id,
+                        "sinceCommitId": since_commit_id,
+                        "sortField": sort_field,
+                        "sortDirection": sort_direction,
+                        "filter": filter,
+                        "filterField": filter_field,
+                        "searchValue": search_value,
+                        "searchField": search_field,
+                        "ids": ids,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         ) as _response:
             if 200 <= _response.status_code < 300:
                 async for _chunk in _response.aiter_bytes():
@@ -735,6 +1031,7 @@ class AsyncSheetsClient:
         search_field: typing.Optional[SearchField] = None,
         by_field: typing.Optional[bool] = None,
         q: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> RecordCountsResponse:
         """
         Returns counts of records from a sheet
@@ -761,6 +1058,8 @@ class AsyncSheetsClient:
             - by_field: typing.Optional[bool]. If true, the counts for each field will also be returned
 
             - q: typing.Optional[str]. An FFQL query used to filter the result set to be counted
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -774,23 +1073,41 @@ class AsyncSheetsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/counts"),
-            params=remove_none_from_dict(
-                {
-                    "versionId": version_id,
-                    "sinceVersionId": since_version_id,
-                    "commitId": commit_id,
-                    "sinceCommitId": since_commit_id,
-                    "filter": filter,
-                    "filterField": filter_field,
-                    "searchValue": search_value,
-                    "searchField": search_field,
-                    "byField": by_field,
-                    "q": q,
-                }
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/counts"
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "versionId": version_id,
+                        "sinceVersionId": since_version_id,
+                        "commitId": commit_id,
+                        "sinceCommitId": since_commit_id,
+                        "filter": filter,
+                        "filterField": filter_field,
+                        "searchValue": search_value,
+                        "searchField": search_field,
+                        "byField": by_field,
+                        "q": q,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(RecordCountsResponse, _response.json())  # type: ignore
@@ -801,7 +1118,11 @@ class AsyncSheetsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def get_sheet_commits(
-        self, sheet_id: SheetId, *, completed: typing.Optional[bool] = None
+        self,
+        sheet_id: SheetId,
+        *,
+        completed: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> ListCommitsResponse:
         """
         Returns the commit versions for a sheet
@@ -810,6 +1131,8 @@ class AsyncSheetsClient:
             - sheet_id: SheetId. ID of sheet
 
             - completed: typing.Optional[bool]. If true, only return commits that have been completed. If false, only return commits that have not been completed. If not provided, return all commits.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -822,10 +1145,32 @@ class AsyncSheetsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/commits"),
-            params=remove_none_from_dict({"completed": completed}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/commits"
+            ),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "completed": completed,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListCommitsResponse, _response.json())  # type: ignore
@@ -835,12 +1180,16 @@ class AsyncSheetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def lock_sheet(self, sheet_id: SheetId) -> Success:
+    async def lock_sheet(
+        self, sheet_id: SheetId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
         """
         Locks a sheet
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -853,9 +1202,26 @@ class AsyncSheetsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/lock"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/lock"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))
+            if request_options is not None
+            else None,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -869,12 +1235,16 @@ class AsyncSheetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def unlock_sheet(self, sheet_id: SheetId) -> Success:
+    async def unlock_sheet(
+        self, sheet_id: SheetId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
         """
         Removes a lock from a sheet
 
         Parameters:
             - sheet_id: SheetId. ID of sheet
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -887,9 +1257,26 @@ class AsyncSheetsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/unlock"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/unlock"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))
+            if request_options is not None
+            else None,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -917,6 +1304,7 @@ class AsyncSheetsClient:
         distinct: typing.Optional[Distinct] = None,
         include_counts: typing.Optional[IncludeCounts] = None,
         search_value: typing.Optional[SearchValue] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> CellsResponse:
         """
         Returns record cell values grouped by all fields in the sheet
@@ -943,6 +1331,8 @@ class AsyncSheetsClient:
             - include_counts: typing.Optional[IncludeCounts].
 
             - search_value: typing.Optional[SearchValue]. A value to find for a given field in a sheet. Wrap the value in "" for exact match
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import Filter, SortDirection
         from flatfile.client import AsyncFlatfile
@@ -960,23 +1350,41 @@ class AsyncSheetsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{sheet_id}/cells"),
-            params=remove_none_from_dict(
-                {
-                    "fieldKey": field_key,
-                    "sortField": sort_field,
-                    "sortDirection": sort_direction,
-                    "filter": filter,
-                    "filterField": filter_field,
-                    "pageSize": page_size,
-                    "pageNumber": page_number,
-                    "distinct": distinct,
-                    "includeCounts": include_counts,
-                    "searchValue": search_value,
-                }
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/cells"
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "fieldKey": field_key,
+                        "sortField": sort_field,
+                        "sortDirection": sort_direction,
+                        "filter": filter,
+                        "filterField": filter_field,
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        "distinct": distinct,
+                        "includeCounts": include_counts,
+                        "searchValue": search_value,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(CellsResponse, _response.json())  # type: ignore

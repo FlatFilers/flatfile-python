@@ -43,7 +43,7 @@ class DetailedAgentLog(pydantic.BaseModel):
     duration: int = pydantic.Field(description="The duration of the agent execution")
     topic: str = pydantic.Field(description="The topics of the agent execution")
     context: typing.Dict[str, typing.Any] = pydantic.Field(description="The context of the agent execution")
-    log: typing.Optional[str] = pydantic.Field(description="The log of the agent execution")
+    log: typing.Optional[str] = pydantic.Field(default=None, description="The log of the agent execution")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

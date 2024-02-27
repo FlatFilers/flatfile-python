@@ -49,8 +49,8 @@ class Document(DocumentConfig):
     """
 
     id: DocumentId
-    space_id: typing.Optional[SpaceId] = pydantic.Field(alias="spaceId")
-    environment_id: typing.Optional[EnvironmentId] = pydantic.Field(alias="environmentId")
+    space_id: typing.Optional[SpaceId] = pydantic.Field(alias="spaceId", default=None)
+    environment_id: typing.Optional[EnvironmentId] = pydantic.Field(alias="environmentId", default=None)
     created_at: dt.datetime = pydantic.Field(alias="createdAt", description="Date the document was created")
     updated_at: dt.datetime = pydantic.Field(alias="updatedAt", description="Date the document was last updated")
 

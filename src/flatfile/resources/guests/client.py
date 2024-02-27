@@ -8,6 +8,7 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
+from ...core.request_options import RequestOptions
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.forbidden_error import ForbiddenError
 from ..commons.errors.not_found_error import NotFoundError
@@ -40,7 +41,13 @@ class GuestsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def list(self, *, space_id: SpaceId, email: typing.Optional[str] = None) -> ListGuestsResponse:
+    def list(
+        self,
+        *,
+        space_id: SpaceId,
+        email: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> ListGuestsResponse:
         """
         Returns all guests
 
@@ -48,6 +55,8 @@ class GuestsClient:
             - space_id: SpaceId. ID of space to return
 
             - email: typing.Optional[str]. Email of guest to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -61,9 +70,30 @@ class GuestsClient:
         _response = self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "guests"),
-            params=remove_none_from_dict({"spaceId": space_id, "email": email}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "spaceId": space_id,
+                        "email": email,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListGuestsResponse, _response.json())  # type: ignore
@@ -73,12 +103,16 @@ class GuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def create(self, *, request: typing.List[GuestConfig]) -> CreateGuestResponse:
+    def create(
+        self, *, request: typing.Sequence[GuestConfig], request_options: typing.Optional[RequestOptions] = None
+    ) -> CreateGuestResponse:
         """
         Guests are only there to upload, edit, and download files and perform their tasks in a specific Space.
 
         Parameters:
-            - request: typing.List[GuestConfig].
+            - request: typing.Sequence[GuestConfig].
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         import datetime
 
@@ -114,9 +148,26 @@ class GuestsClient:
         _response = self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "guests"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(CreateGuestResponse, _response.json())  # type: ignore
@@ -126,12 +177,14 @@ class GuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get(self, guest_id: GuestId) -> GuestResponse:
+    def get(self, guest_id: GuestId, *, request_options: typing.Optional[RequestOptions] = None) -> GuestResponse:
         """
         Returns a single guest
 
         Parameters:
             - guest_id: GuestId. ID of guest to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -144,9 +197,21 @@ class GuestsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{guest_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{jsonable_encoder(guest_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(GuestResponse, _response.json())  # type: ignore
@@ -156,12 +221,14 @@ class GuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete(self, guest_id: GuestId) -> Success:
+    def delete(self, guest_id: GuestId, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Deletes a single guest
 
         Parameters:
             - guest_id: GuestId. ID of guest to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -174,9 +241,21 @@ class GuestsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{guest_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{jsonable_encoder(guest_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -186,7 +265,9 @@ class GuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update(self, guest_id: GuestId, *, request: GuestConfigUpdate) -> GuestResponse:
+    def update(
+        self, guest_id: GuestId, *, request: GuestConfigUpdate, request_options: typing.Optional[RequestOptions] = None
+    ) -> GuestResponse:
         """
         Updates a single guest, for example to change name or email
 
@@ -194,6 +275,8 @@ class GuestsClient:
             - guest_id: GuestId. ID of guest to return
 
             - request: GuestConfigUpdate.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import GuestConfigUpdate
         from flatfile.client import Flatfile
@@ -211,10 +294,27 @@ class GuestsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{guest_id}"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{jsonable_encoder(guest_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(GuestResponse, _response.json())  # type: ignore
@@ -224,7 +324,13 @@ class GuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get_guest_token(self, guest_id: GuestId, *, space_id: typing.Optional[SpaceId] = None) -> GuestTokenResponse:
+    def get_guest_token(
+        self,
+        guest_id: GuestId,
+        *,
+        space_id: typing.Optional[SpaceId] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GuestTokenResponse:
         """
         Returns a single guest token
 
@@ -232,6 +338,8 @@ class GuestsClient:
             - guest_id: GuestId. ID of guest to return
 
             - space_id: typing.Optional[SpaceId]. ID of space to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -244,10 +352,32 @@ class GuestsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{guest_id}/token"),
-            params=remove_none_from_dict({"spaceId": space_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"guests/{jsonable_encoder(guest_id)}/token"
+            ),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "spaceId": space_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(GuestTokenResponse, _response.json())  # type: ignore
@@ -257,18 +387,36 @@ class GuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def list_guest_roles(self, guest_id: GuestId) -> ListActorRolesResponse:
+    def list_guest_roles(
+        self, guest_id: GuestId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> ListActorRolesResponse:
         """
         Lists roles assigned to a guest.
 
         Parameters:
             - guest_id: GuestId. The guest id
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{guest_id}/roles"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"guests/{jsonable_encoder(guest_id)}/roles"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListActorRolesResponse, _response.json())  # type: ignore
@@ -284,7 +432,13 @@ class GuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def assign_guest_role(self, guest_id: GuestId, *, request: AssignActorRoleRequest) -> AssignRoleResponse:
+    def assign_guest_role(
+        self,
+        guest_id: GuestId,
+        *,
+        request: AssignActorRoleRequest,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AssignRoleResponse:
         """
         Assigns a role to a guest.
 
@@ -292,13 +446,34 @@ class GuestsClient:
             - guest_id: GuestId. The guest id
 
             - request: AssignActorRoleRequest.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{guest_id}/roles"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"guests/{jsonable_encoder(guest_id)}/roles"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(AssignRoleResponse, _response.json())  # type: ignore
@@ -314,7 +489,9 @@ class GuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete_guest_role(self, guest_id: GuestId, actor_role_id: ActorRoleId) -> Success:
+    def delete_guest_role(
+        self, guest_id: GuestId, actor_role_id: ActorRoleId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
         """
         Removes a role from a guest.
 
@@ -322,12 +499,29 @@ class GuestsClient:
             - guest_id: GuestId. The guest id
 
             - actor_role_id: ActorRoleId. The actor role id
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{guest_id}/roles/{actor_role_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"guests/{jsonable_encoder(guest_id)}/roles/{jsonable_encoder(actor_role_id)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -343,12 +537,16 @@ class GuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def invite(self, *, request: typing.List[Invite]) -> Success:
+    def invite(
+        self, *, request: typing.Sequence[Invite], request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
         """
         Guests can be created as a named guest on the Space or there’s a global link that will let anonymous guests into the space.
 
         Parameters:
-            - request: typing.List[Invite].
+            - request: typing.Sequence[Invite].
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import Invite
         from flatfile.client import Flatfile
@@ -370,9 +568,26 @@ class GuestsClient:
         _response = self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "invitations"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -387,7 +602,13 @@ class AsyncGuestsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    async def list(self, *, space_id: SpaceId, email: typing.Optional[str] = None) -> ListGuestsResponse:
+    async def list(
+        self,
+        *,
+        space_id: SpaceId,
+        email: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> ListGuestsResponse:
         """
         Returns all guests
 
@@ -395,6 +616,8 @@ class AsyncGuestsClient:
             - space_id: SpaceId. ID of space to return
 
             - email: typing.Optional[str]. Email of guest to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -408,9 +631,30 @@ class AsyncGuestsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "guests"),
-            params=remove_none_from_dict({"spaceId": space_id, "email": email}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "spaceId": space_id,
+                        "email": email,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListGuestsResponse, _response.json())  # type: ignore
@@ -420,12 +664,16 @@ class AsyncGuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def create(self, *, request: typing.List[GuestConfig]) -> CreateGuestResponse:
+    async def create(
+        self, *, request: typing.Sequence[GuestConfig], request_options: typing.Optional[RequestOptions] = None
+    ) -> CreateGuestResponse:
         """
         Guests are only there to upload, edit, and download files and perform their tasks in a specific Space.
 
         Parameters:
-            - request: typing.List[GuestConfig].
+            - request: typing.Sequence[GuestConfig].
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         import datetime
 
@@ -461,9 +709,26 @@ class AsyncGuestsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "guests"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(CreateGuestResponse, _response.json())  # type: ignore
@@ -473,12 +738,14 @@ class AsyncGuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get(self, guest_id: GuestId) -> GuestResponse:
+    async def get(self, guest_id: GuestId, *, request_options: typing.Optional[RequestOptions] = None) -> GuestResponse:
         """
         Returns a single guest
 
         Parameters:
             - guest_id: GuestId. ID of guest to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -491,9 +758,21 @@ class AsyncGuestsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{guest_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{jsonable_encoder(guest_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(GuestResponse, _response.json())  # type: ignore
@@ -503,12 +782,14 @@ class AsyncGuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete(self, guest_id: GuestId) -> Success:
+    async def delete(self, guest_id: GuestId, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Deletes a single guest
 
         Parameters:
             - guest_id: GuestId. ID of guest to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -521,9 +802,21 @@ class AsyncGuestsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{guest_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{jsonable_encoder(guest_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -533,7 +826,9 @@ class AsyncGuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update(self, guest_id: GuestId, *, request: GuestConfigUpdate) -> GuestResponse:
+    async def update(
+        self, guest_id: GuestId, *, request: GuestConfigUpdate, request_options: typing.Optional[RequestOptions] = None
+    ) -> GuestResponse:
         """
         Updates a single guest, for example to change name or email
 
@@ -541,6 +836,8 @@ class AsyncGuestsClient:
             - guest_id: GuestId. ID of guest to return
 
             - request: GuestConfigUpdate.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import GuestConfigUpdate
         from flatfile.client import AsyncFlatfile
@@ -558,10 +855,27 @@ class AsyncGuestsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{guest_id}"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{jsonable_encoder(guest_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(GuestResponse, _response.json())  # type: ignore
@@ -572,7 +886,11 @@ class AsyncGuestsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def get_guest_token(
-        self, guest_id: GuestId, *, space_id: typing.Optional[SpaceId] = None
+        self,
+        guest_id: GuestId,
+        *,
+        space_id: typing.Optional[SpaceId] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> GuestTokenResponse:
         """
         Returns a single guest token
@@ -581,6 +899,8 @@ class AsyncGuestsClient:
             - guest_id: GuestId. ID of guest to return
 
             - space_id: typing.Optional[SpaceId]. ID of space to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -593,10 +913,32 @@ class AsyncGuestsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{guest_id}/token"),
-            params=remove_none_from_dict({"spaceId": space_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"guests/{jsonable_encoder(guest_id)}/token"
+            ),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "spaceId": space_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(GuestTokenResponse, _response.json())  # type: ignore
@@ -606,18 +948,36 @@ class AsyncGuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def list_guest_roles(self, guest_id: GuestId) -> ListActorRolesResponse:
+    async def list_guest_roles(
+        self, guest_id: GuestId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> ListActorRolesResponse:
         """
         Lists roles assigned to a guest.
 
         Parameters:
             - guest_id: GuestId. The guest id
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{guest_id}/roles"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"guests/{jsonable_encoder(guest_id)}/roles"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListActorRolesResponse, _response.json())  # type: ignore
@@ -633,7 +993,13 @@ class AsyncGuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def assign_guest_role(self, guest_id: GuestId, *, request: AssignActorRoleRequest) -> AssignRoleResponse:
+    async def assign_guest_role(
+        self,
+        guest_id: GuestId,
+        *,
+        request: AssignActorRoleRequest,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AssignRoleResponse:
         """
         Assigns a role to a guest.
 
@@ -641,13 +1007,34 @@ class AsyncGuestsClient:
             - guest_id: GuestId. The guest id
 
             - request: AssignActorRoleRequest.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{guest_id}/roles"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"guests/{jsonable_encoder(guest_id)}/roles"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(AssignRoleResponse, _response.json())  # type: ignore
@@ -663,7 +1050,9 @@ class AsyncGuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete_guest_role(self, guest_id: GuestId, actor_role_id: ActorRoleId) -> Success:
+    async def delete_guest_role(
+        self, guest_id: GuestId, actor_role_id: ActorRoleId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
         """
         Removes a role from a guest.
 
@@ -671,12 +1060,29 @@ class AsyncGuestsClient:
             - guest_id: GuestId. The guest id
 
             - actor_role_id: ActorRoleId. The actor role id
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"guests/{guest_id}/roles/{actor_role_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"guests/{jsonable_encoder(guest_id)}/roles/{jsonable_encoder(actor_role_id)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -692,12 +1098,16 @@ class AsyncGuestsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def invite(self, *, request: typing.List[Invite]) -> Success:
+    async def invite(
+        self, *, request: typing.Sequence[Invite], request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
         """
         Guests can be created as a named guest on the Space or there’s a global link that will let anonymous guests into the space.
 
         Parameters:
-            - request: typing.List[Invite].
+            - request: typing.Sequence[Invite].
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import Invite
         from flatfile.client import AsyncFlatfile
@@ -719,9 +1129,26 @@ class AsyncGuestsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "invitations"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore

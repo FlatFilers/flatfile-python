@@ -18,6 +18,7 @@ class WorkbookConfigSettings(pydantic.BaseModel):
 
     track_changes: typing.Optional[bool] = pydantic.Field(
         alias="trackChanges",
+        default=None,
         description="Whether to track changes for this workbook. Defaults to false. Tracking changes on a workbook allows for disabling workbook and sheet actions while data in the workbook is still being processed. You must run a recordHook listener if you enable this feature.",
     )
 

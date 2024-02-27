@@ -18,16 +18,18 @@ except ImportError:
 class BaseEvent(pydantic.BaseModel):
     domain: Domain = pydantic.Field(description="The domain of the event")
     context: Context = pydantic.Field(description="The context of the event")
-    attributes: typing.Optional[EventAttributes] = pydantic.Field(description="The attributes of the event")
+    attributes: typing.Optional[EventAttributes] = pydantic.Field(
+        default=None, description="The attributes of the event"
+    )
     callback_url: typing.Optional[str] = pydantic.Field(
-        alias="callbackUrl", description="The callback url to acknowledge the event"
+        alias="callbackUrl", default=None, description="The callback url to acknowledge the event"
     )
     data_url: typing.Optional[str] = pydantic.Field(
-        alias="dataUrl", description="The url to retrieve the data associated with the event"
+        alias="dataUrl", default=None, description="The url to retrieve the data associated with the event"
     )
-    target: typing.Optional[str]
-    origin: typing.Optional[Origin]
-    namespaces: typing.Optional[typing.List[str]]
+    target: typing.Optional[str] = None
+    origin: typing.Optional[Origin] = None
+    namespaces: typing.Optional[typing.List[str]] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

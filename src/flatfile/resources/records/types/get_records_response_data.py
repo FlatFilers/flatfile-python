@@ -72,11 +72,11 @@ class GetRecordsResponseData(SuccessData):
     """
 
     records: RecordsWithLinks
-    counts: typing.Optional[RecordCounts]
+    counts: typing.Optional[RecordCounts] = None
     version_id: typing.Optional[VersionId] = pydantic.Field(
-        alias="versionId", description="Deprecated, use `commitId` instead."
+        alias="versionId", default=None, description="Deprecated, use `commitId` instead."
     )
-    commit_id: typing.Optional[CommitId] = pydantic.Field(alias="commitId")
+    commit_id: typing.Optional[CommitId] = pydantic.Field(alias="commitId", default=None)
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

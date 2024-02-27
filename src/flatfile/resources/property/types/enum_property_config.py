@@ -14,7 +14,7 @@ except ImportError:
 
 class EnumPropertyConfig(pydantic.BaseModel):
     allow_custom: typing.Optional[bool] = pydantic.Field(
-        alias="allowCustom", description="Permit the user to create new options for this specific field."
+        alias="allowCustom", default=None, description="Permit the user to create new options for this specific field."
     )
     options: typing.List[EnumPropertyOption]
 

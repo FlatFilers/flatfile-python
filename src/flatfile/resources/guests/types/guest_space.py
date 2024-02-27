@@ -33,8 +33,8 @@ class GuestSpace(pydantic.BaseModel):
     """
 
     id: SpaceId
-    workbooks: typing.Optional[typing.List[GuestWorkbook]]
-    last_accessed: typing.Optional[dt.datetime] = pydantic.Field(alias="lastAccessed")
+    workbooks: typing.Optional[typing.List[GuestWorkbook]] = None
+    last_accessed: typing.Optional[dt.datetime] = pydantic.Field(alias="lastAccessed", default=None)
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

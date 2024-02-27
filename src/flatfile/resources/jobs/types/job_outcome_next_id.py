@@ -21,9 +21,9 @@ class JobOutcomeNextId(pydantic.BaseModel):
     """
 
     id: str
-    label: typing.Optional[str]
-    path: typing.Optional[str]
-    query: typing.Optional[str]
+    label: typing.Optional[str] = None
+    path: typing.Optional[str] = None
+    query: typing.Optional[str] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

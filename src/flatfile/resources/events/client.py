@@ -10,6 +10,7 @@ from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.datetime_utils import serialize_datetime
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
+from ...core.request_options import RequestOptions
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.environment_id import EnvironmentId
@@ -46,6 +47,7 @@ class EventsClient:
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
         include_acknowledged: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> ListAllEventsResponse:
         """
         Event topics that the Flatfile Platform emits.
@@ -66,6 +68,8 @@ class EventsClient:
             - page_number: typing.Optional[int]. Based on pageSize, which page of results to return
 
             - include_acknowledged: typing.Optional[bool]. Include acknowledged events
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -77,20 +81,36 @@ class EventsClient:
         _response = self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "events"),
-            params=remove_none_from_dict(
-                {
-                    "environmentId": environment_id,
-                    "spaceId": space_id,
-                    "domain": domain,
-                    "topic": topic,
-                    "since": serialize_datetime(since) if since is not None else None,
-                    "pageSize": page_size,
-                    "pageNumber": page_number,
-                    "includeAcknowledged": include_acknowledged,
-                }
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        "spaceId": space_id,
+                        "domain": domain,
+                        "topic": topic,
+                        "since": serialize_datetime(since) if since is not None else None,
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        "includeAcknowledged": include_acknowledged,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListAllEventsResponse, _response.json())  # type: ignore
@@ -100,10 +120,14 @@ class EventsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def create(self, *, request: CreateEventConfig) -> EventResponse:
+    def create(
+        self, *, request: CreateEventConfig, request_options: typing.Optional[RequestOptions] = None
+    ) -> EventResponse:
         """
         Parameters:
             - request: CreateEventConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import Context, CreateEventConfig, Domain, EventTopic
         from flatfile.client import Flatfile
@@ -129,9 +153,26 @@ class EventsClient:
         _response = self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "events"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(EventResponse, _response.json())  # type: ignore
@@ -145,10 +186,12 @@ class EventsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get(self, event_id: EventId) -> EventResponse:
+    def get(self, event_id: EventId, *, request_options: typing.Optional[RequestOptions] = None) -> EventResponse:
         """
         Parameters:
             - event_id: EventId. The event id
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -161,9 +204,21 @@ class EventsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"events/{event_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"events/{jsonable_encoder(event_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(EventResponse, _response.json())  # type: ignore
@@ -173,16 +228,33 @@ class EventsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def ack(self, event_id: EventId) -> Success:
+    def ack(self, event_id: EventId, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Parameters:
             - event_id: EventId. The event id
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"events/{event_id}/ack"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"events/{jsonable_encoder(event_id)}/ack"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))
+            if request_options is not None
+            else None,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -193,7 +265,11 @@ class EventsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def get_event_token(
-        self, *, scope: typing.Optional[str] = None, space_id: typing.Optional[SpaceId] = None
+        self,
+        *,
+        scope: typing.Optional[str] = None,
+        space_id: typing.Optional[SpaceId] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> EventTokenResponse:
         """
         Get a token which can be used to subscribe to events for this space
@@ -202,6 +278,8 @@ class EventsClient:
             - scope: typing.Optional[str]. The resource ID of the event stream (space or environment id)
 
             - space_id: typing.Optional[SpaceId]. The space ID of the event stream
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -213,9 +291,30 @@ class EventsClient:
         _response = self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "subscription"),
-            params=remove_none_from_dict({"scope": scope, "spaceId": space_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "scope": scope,
+                        "spaceId": space_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(EventTokenResponse, _response.json())  # type: ignore
@@ -245,6 +344,7 @@ class AsyncEventsClient:
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
         include_acknowledged: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> ListAllEventsResponse:
         """
         Event topics that the Flatfile Platform emits.
@@ -265,6 +365,8 @@ class AsyncEventsClient:
             - page_number: typing.Optional[int]. Based on pageSize, which page of results to return
 
             - include_acknowledged: typing.Optional[bool]. Include acknowledged events
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -276,20 +378,36 @@ class AsyncEventsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "events"),
-            params=remove_none_from_dict(
-                {
-                    "environmentId": environment_id,
-                    "spaceId": space_id,
-                    "domain": domain,
-                    "topic": topic,
-                    "since": serialize_datetime(since) if since is not None else None,
-                    "pageSize": page_size,
-                    "pageNumber": page_number,
-                    "includeAcknowledged": include_acknowledged,
-                }
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        "spaceId": space_id,
+                        "domain": domain,
+                        "topic": topic,
+                        "since": serialize_datetime(since) if since is not None else None,
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        "includeAcknowledged": include_acknowledged,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListAllEventsResponse, _response.json())  # type: ignore
@@ -299,10 +417,14 @@ class AsyncEventsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def create(self, *, request: CreateEventConfig) -> EventResponse:
+    async def create(
+        self, *, request: CreateEventConfig, request_options: typing.Optional[RequestOptions] = None
+    ) -> EventResponse:
         """
         Parameters:
             - request: CreateEventConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import Context, CreateEventConfig, Domain, EventTopic
         from flatfile.client import AsyncFlatfile
@@ -328,9 +450,26 @@ class AsyncEventsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "events"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(EventResponse, _response.json())  # type: ignore
@@ -344,10 +483,12 @@ class AsyncEventsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get(self, event_id: EventId) -> EventResponse:
+    async def get(self, event_id: EventId, *, request_options: typing.Optional[RequestOptions] = None) -> EventResponse:
         """
         Parameters:
             - event_id: EventId. The event id
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -360,9 +501,21 @@ class AsyncEventsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"events/{event_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"events/{jsonable_encoder(event_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(EventResponse, _response.json())  # type: ignore
@@ -372,16 +525,33 @@ class AsyncEventsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def ack(self, event_id: EventId) -> Success:
+    async def ack(self, event_id: EventId, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Parameters:
             - event_id: EventId. The event id
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"events/{event_id}/ack"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"events/{jsonable_encoder(event_id)}/ack"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))
+            if request_options is not None
+            else None,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -392,7 +562,11 @@ class AsyncEventsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def get_event_token(
-        self, *, scope: typing.Optional[str] = None, space_id: typing.Optional[SpaceId] = None
+        self,
+        *,
+        scope: typing.Optional[str] = None,
+        space_id: typing.Optional[SpaceId] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> EventTokenResponse:
         """
         Get a token which can be used to subscribe to events for this space
@@ -401,6 +575,8 @@ class AsyncEventsClient:
             - scope: typing.Optional[str]. The resource ID of the event stream (space or environment id)
 
             - space_id: typing.Optional[SpaceId]. The space ID of the event stream
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -412,9 +588,30 @@ class AsyncEventsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "subscription"),
-            params=remove_none_from_dict({"scope": scope, "spaceId": space_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "scope": scope,
+                        "spaceId": space_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(EventTokenResponse, _response.json())  # type: ignore

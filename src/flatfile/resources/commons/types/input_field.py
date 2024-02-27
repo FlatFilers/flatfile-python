@@ -16,14 +16,18 @@ except ImportError:
 class InputField(pydantic.BaseModel):
     key: str = pydantic.Field(description="Unique key for a Field.")
     label: str = pydantic.Field(description="Visible name of a Field.")
-    description: typing.Optional[str] = pydantic.Field(description="Brief description below the name of the Field.")
+    description: typing.Optional[str] = pydantic.Field(
+        default=None, description="Brief description below the name of the Field."
+    )
     type: str = pydantic.Field(description="Field Types inform the user interface how to sort and display data.")
     default_value: typing.Optional[typing.Any] = pydantic.Field(
-        alias="defaultValue", description="Default value for a Field."
+        alias="defaultValue", default=None, description="Default value for a Field."
     )
-    config: typing.Optional[InputConfig] = pydantic.Field(description="Additional configuration for enum Fields.")
+    config: typing.Optional[InputConfig] = pydantic.Field(
+        default=None, description="Additional configuration for enum Fields."
+    )
     constraints: typing.Optional[typing.List[InputConstraint]] = pydantic.Field(
-        description="Indicate additional validations that will be applied to the Field."
+        default=None, description="Indicate additional validations that will be applied to the Field."
     )
 
     def json(self, **kwargs: typing.Any) -> str:

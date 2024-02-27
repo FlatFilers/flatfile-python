@@ -13,13 +13,16 @@ except ImportError:
 
 class InputEnumPropertyOption(pydantic.BaseModel):
     label: typing.Optional[str] = pydantic.Field(
-        description="A visual label for this option, defaults to value if not provided"
+        default=None, description="A visual label for this option, defaults to value if not provided"
     )
-    description: typing.Optional[str] = pydantic.Field(description="A short description for this option")
-    color: typing.Optional[str] = pydantic.Field(description="An optional color to assign this option")
-    icon: typing.Optional[str] = pydantic.Field(description="A reference pointer to a previously registered icon")
+    description: typing.Optional[str] = pydantic.Field(default=None, description="A short description for this option")
+    color: typing.Optional[str] = pydantic.Field(default=None, description="An optional color to assign this option")
+    icon: typing.Optional[str] = pydantic.Field(
+        default=None, description="A reference pointer to a previously registered icon"
+    )
     meta: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(
-        description="An arbitrary JSON object to be associated with this option and made available to hooks"
+        default=None,
+        description="An arbitrary JSON object to be associated with this option and made available to hooks",
     )
     value: typing.Any = pydantic.Field(
         description=(

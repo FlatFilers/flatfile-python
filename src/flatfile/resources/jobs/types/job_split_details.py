@@ -24,7 +24,7 @@ class JobSplitDetails(pydantic.BaseModel):
     """
 
     parts: JobParts
-    run_in_parallel: typing.Optional[bool] = pydantic.Field(alias="runInParallel")
+    run_in_parallel: typing.Optional[bool] = pydantic.Field(alias="runInParallel", default=None)
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

@@ -28,9 +28,9 @@ class Invite(pydantic.BaseModel):
     guest_id: GuestId = pydantic.Field(alias="guestId")
     space_id: SpaceId = pydantic.Field(alias="spaceId")
     from_name: typing.Optional[str] = pydantic.Field(
-        alias="fromName", description="The name of the person or company sending the invitation"
+        alias="fromName", default=None, description="The name of the person or company sending the invitation"
     )
-    message: typing.Optional[str] = pydantic.Field(description="Message to send with the invite")
+    message: typing.Optional[str] = pydantic.Field(default=None, description="Message to send with the invite")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

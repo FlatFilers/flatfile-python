@@ -8,6 +8,7 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
+from ...core.request_options import RequestOptions
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.forbidden_error import ForbiddenError
 from ..commons.errors.not_found_error import NotFoundError
@@ -45,10 +46,14 @@ class AgentsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def list(self, *, environment_id: EnvironmentId) -> ListAgentsResponse:
+    def list(
+        self, *, environment_id: EnvironmentId, request_options: typing.Optional[RequestOptions] = None
+    ) -> ListAgentsResponse:
         """
         Parameters:
             - environment_id: EnvironmentId.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -62,9 +67,29 @@ class AgentsClient:
         _response = self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "agents"),
-            params=remove_none_from_dict({"environmentId": environment_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListAgentsResponse, _response.json())  # type: ignore
@@ -74,12 +99,20 @@ class AgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def create(self, *, environment_id: EnvironmentId, request: AgentConfig) -> AgentResponse:
+    def create(
+        self,
+        *,
+        environment_id: EnvironmentId,
+        request: AgentConfig,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AgentResponse:
         """
         Parameters:
             - environment_id: EnvironmentId.
 
             - request: AgentConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import AgentConfig, Compiler, EventTopic
         from flatfile.client import Flatfile
@@ -99,10 +132,35 @@ class AgentsClient:
         _response = self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "agents"),
-            params=remove_none_from_dict({"environmentId": environment_id}),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(AgentResponse, _response.json())  # type: ignore
@@ -114,12 +172,20 @@ class AgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get(self, agent_id: AgentId, *, environment_id: EnvironmentId) -> AgentResponse:
+    def get(
+        self,
+        agent_id: AgentId,
+        *,
+        environment_id: EnvironmentId,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AgentResponse:
         """
         Parameters:
             - agent_id: AgentId.
 
             - environment_id: EnvironmentId.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -133,10 +199,30 @@ class AgentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}"),
-            params=remove_none_from_dict({"environmentId": environment_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{jsonable_encoder(agent_id)}"),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(AgentResponse, _response.json())  # type: ignore
@@ -150,18 +236,36 @@ class AgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def list_agent_roles(self, agent_id: AgentId) -> ListActorRolesResponse:
+    def list_agent_roles(
+        self, agent_id: AgentId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> ListActorRolesResponse:
         """
         Lists roles assigned to an agent.
 
         Parameters:
             - agent_id: AgentId. The agent id
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}/roles"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"agents/{jsonable_encoder(agent_id)}/roles"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListActorRolesResponse, _response.json())  # type: ignore
@@ -177,7 +281,13 @@ class AgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def assign_agent_role(self, agent_id: AgentId, *, request: AssignActorRoleRequest) -> AssignRoleResponse:
+    def assign_agent_role(
+        self,
+        agent_id: AgentId,
+        *,
+        request: AssignActorRoleRequest,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AssignRoleResponse:
         """
         Assigns a role to a agent.
 
@@ -185,13 +295,34 @@ class AgentsClient:
             - agent_id: AgentId. The agent id
 
             - request: AssignActorRoleRequest.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}/roles"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"agents/{jsonable_encoder(agent_id)}/roles"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(AssignRoleResponse, _response.json())  # type: ignore
@@ -207,7 +338,9 @@ class AgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete_agent_role(self, agent_id: AgentId, actor_role_id: ActorRoleId) -> Success:
+    def delete_agent_role(
+        self, agent_id: AgentId, actor_role_id: ActorRoleId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
         """
         Removes a role from an agent.
 
@@ -215,12 +348,29 @@ class AgentsClient:
             - agent_id: AgentId. The agent id
 
             - actor_role_id: ActorRoleId. The actor role id
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}/roles/{actor_role_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"agents/{jsonable_encoder(agent_id)}/roles/{jsonable_encoder(actor_role_id)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -236,12 +386,20 @@ class AgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get_agent_logs(self, agent_id: AgentId, *, environment_id: EnvironmentId) -> GetAgentLogsResponse:
+    def get_agent_logs(
+        self,
+        agent_id: AgentId,
+        *,
+        environment_id: EnvironmentId,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetAgentLogsResponse:
         """
         Parameters:
             - agent_id: AgentId.
 
             - environment_id: EnvironmentId.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -255,10 +413,32 @@ class AgentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}/logs"),
-            params=remove_none_from_dict({"environmentId": environment_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"agents/{jsonable_encoder(agent_id)}/logs"
+            ),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(GetAgentLogsResponse, _response.json())  # type: ignore
@@ -272,12 +452,20 @@ class AgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get_agent_log(self, event_id: EventId, *, environment_id: EnvironmentId) -> GetDetailedAgentLogResponse:
+    def get_agent_log(
+        self,
+        event_id: EventId,
+        *,
+        environment_id: EnvironmentId,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetDetailedAgentLogResponse:
         """
         Parameters:
             - event_id: EventId.
 
             - environment_id: EnvironmentId.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -291,10 +479,30 @@ class AgentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/log/{event_id}"),
-            params=remove_none_from_dict({"environmentId": environment_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/log/{jsonable_encoder(event_id)}"),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(GetDetailedAgentLogResponse, _response.json())  # type: ignore
@@ -316,6 +524,7 @@ class AgentsClient:
         success: typing.Optional[SuccessQueryParameter] = None,
         page_size: typing.Optional[PageSize] = None,
         page_number: typing.Optional[PageNumber] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> GetDetailedAgentLogsResponse:
         """
         Parameters:
@@ -328,6 +537,8 @@ class AgentsClient:
             - page_size: typing.Optional[PageSize].
 
             - page_number: typing.Optional[PageNumber].
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -345,17 +556,33 @@ class AgentsClient:
         _response = self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "agents/logs"),
-            params=remove_none_from_dict(
-                {
-                    "environmentId": environment_id,
-                    "spaceId": space_id,
-                    "success": success,
-                    "pageSize": page_size,
-                    "pageNumber": page_number,
-                }
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        "spaceId": space_id,
+                        "success": success,
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(GetDetailedAgentLogsResponse, _response.json())  # type: ignore
@@ -377,6 +604,7 @@ class AgentsClient:
         success: typing.Optional[SuccessQueryParameter] = None,
         page_size: typing.Optional[PageSize] = None,
         page_number: typing.Optional[PageNumber] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> GetExecutionsResponse:
         """
         Parameters:
@@ -389,6 +617,8 @@ class AgentsClient:
             - page_size: typing.Optional[PageSize].
 
             - page_number: typing.Optional[PageNumber].
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -406,17 +636,33 @@ class AgentsClient:
         _response = self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "agents/executions"),
-            params=remove_none_from_dict(
-                {
-                    "environmentId": environment_id,
-                    "spaceId": space_id,
-                    "success": success,
-                    "pageSize": page_size,
-                    "pageNumber": page_number,
-                }
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        "spaceId": space_id,
+                        "success": success,
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(GetExecutionsResponse, _response.json())  # type: ignore
@@ -430,7 +676,13 @@ class AgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete(self, agent_id: AgentId, *, environment_id: EnvironmentId) -> Success:
+    def delete(
+        self,
+        agent_id: AgentId,
+        *,
+        environment_id: EnvironmentId,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Success:
         """
         Deletes a single agent
 
@@ -438,6 +690,8 @@ class AgentsClient:
             - agent_id: AgentId.
 
             - environment_id: EnvironmentId.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -451,10 +705,30 @@ class AgentsClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}"),
-            params=remove_none_from_dict({"environmentId": environment_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{jsonable_encoder(agent_id)}"),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -473,10 +747,14 @@ class AsyncAgentsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    async def list(self, *, environment_id: EnvironmentId) -> ListAgentsResponse:
+    async def list(
+        self, *, environment_id: EnvironmentId, request_options: typing.Optional[RequestOptions] = None
+    ) -> ListAgentsResponse:
         """
         Parameters:
             - environment_id: EnvironmentId.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -490,9 +768,29 @@ class AsyncAgentsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "agents"),
-            params=remove_none_from_dict({"environmentId": environment_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListAgentsResponse, _response.json())  # type: ignore
@@ -502,12 +800,20 @@ class AsyncAgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def create(self, *, environment_id: EnvironmentId, request: AgentConfig) -> AgentResponse:
+    async def create(
+        self,
+        *,
+        environment_id: EnvironmentId,
+        request: AgentConfig,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AgentResponse:
         """
         Parameters:
             - environment_id: EnvironmentId.
 
             - request: AgentConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import AgentConfig, Compiler, EventTopic
         from flatfile.client import AsyncFlatfile
@@ -527,10 +833,35 @@ class AsyncAgentsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "agents"),
-            params=remove_none_from_dict({"environmentId": environment_id}),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(AgentResponse, _response.json())  # type: ignore
@@ -542,12 +873,20 @@ class AsyncAgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get(self, agent_id: AgentId, *, environment_id: EnvironmentId) -> AgentResponse:
+    async def get(
+        self,
+        agent_id: AgentId,
+        *,
+        environment_id: EnvironmentId,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AgentResponse:
         """
         Parameters:
             - agent_id: AgentId.
 
             - environment_id: EnvironmentId.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -561,10 +900,30 @@ class AsyncAgentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}"),
-            params=remove_none_from_dict({"environmentId": environment_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{jsonable_encoder(agent_id)}"),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(AgentResponse, _response.json())  # type: ignore
@@ -578,18 +937,36 @@ class AsyncAgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def list_agent_roles(self, agent_id: AgentId) -> ListActorRolesResponse:
+    async def list_agent_roles(
+        self, agent_id: AgentId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> ListActorRolesResponse:
         """
         Lists roles assigned to an agent.
 
         Parameters:
             - agent_id: AgentId. The agent id
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}/roles"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"agents/{jsonable_encoder(agent_id)}/roles"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListActorRolesResponse, _response.json())  # type: ignore
@@ -605,7 +982,13 @@ class AsyncAgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def assign_agent_role(self, agent_id: AgentId, *, request: AssignActorRoleRequest) -> AssignRoleResponse:
+    async def assign_agent_role(
+        self,
+        agent_id: AgentId,
+        *,
+        request: AssignActorRoleRequest,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AssignRoleResponse:
         """
         Assigns a role to a agent.
 
@@ -613,13 +996,34 @@ class AsyncAgentsClient:
             - agent_id: AgentId. The agent id
 
             - request: AssignActorRoleRequest.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}/roles"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"agents/{jsonable_encoder(agent_id)}/roles"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(AssignRoleResponse, _response.json())  # type: ignore
@@ -635,7 +1039,9 @@ class AsyncAgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete_agent_role(self, agent_id: AgentId, actor_role_id: ActorRoleId) -> Success:
+    async def delete_agent_role(
+        self, agent_id: AgentId, actor_role_id: ActorRoleId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
         """
         Removes a role from an agent.
 
@@ -643,12 +1049,29 @@ class AsyncAgentsClient:
             - agent_id: AgentId. The agent id
 
             - actor_role_id: ActorRoleId. The actor role id
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}/roles/{actor_role_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"agents/{jsonable_encoder(agent_id)}/roles/{jsonable_encoder(actor_role_id)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -664,12 +1087,20 @@ class AsyncAgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get_agent_logs(self, agent_id: AgentId, *, environment_id: EnvironmentId) -> GetAgentLogsResponse:
+    async def get_agent_logs(
+        self,
+        agent_id: AgentId,
+        *,
+        environment_id: EnvironmentId,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetAgentLogsResponse:
         """
         Parameters:
             - agent_id: AgentId.
 
             - environment_id: EnvironmentId.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -683,10 +1114,32 @@ class AsyncAgentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}/logs"),
-            params=remove_none_from_dict({"environmentId": environment_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"agents/{jsonable_encoder(agent_id)}/logs"
+            ),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(GetAgentLogsResponse, _response.json())  # type: ignore
@@ -700,12 +1153,20 @@ class AsyncAgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get_agent_log(self, event_id: EventId, *, environment_id: EnvironmentId) -> GetDetailedAgentLogResponse:
+    async def get_agent_log(
+        self,
+        event_id: EventId,
+        *,
+        environment_id: EnvironmentId,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetDetailedAgentLogResponse:
         """
         Parameters:
             - event_id: EventId.
 
             - environment_id: EnvironmentId.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -719,10 +1180,30 @@ class AsyncAgentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/log/{event_id}"),
-            params=remove_none_from_dict({"environmentId": environment_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/log/{jsonable_encoder(event_id)}"),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(GetDetailedAgentLogResponse, _response.json())  # type: ignore
@@ -744,6 +1225,7 @@ class AsyncAgentsClient:
         success: typing.Optional[SuccessQueryParameter] = None,
         page_size: typing.Optional[PageSize] = None,
         page_number: typing.Optional[PageNumber] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> GetDetailedAgentLogsResponse:
         """
         Parameters:
@@ -756,6 +1238,8 @@ class AsyncAgentsClient:
             - page_size: typing.Optional[PageSize].
 
             - page_number: typing.Optional[PageNumber].
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -773,17 +1257,33 @@ class AsyncAgentsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "agents/logs"),
-            params=remove_none_from_dict(
-                {
-                    "environmentId": environment_id,
-                    "spaceId": space_id,
-                    "success": success,
-                    "pageSize": page_size,
-                    "pageNumber": page_number,
-                }
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        "spaceId": space_id,
+                        "success": success,
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(GetDetailedAgentLogsResponse, _response.json())  # type: ignore
@@ -805,6 +1305,7 @@ class AsyncAgentsClient:
         success: typing.Optional[SuccessQueryParameter] = None,
         page_size: typing.Optional[PageSize] = None,
         page_number: typing.Optional[PageNumber] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> GetExecutionsResponse:
         """
         Parameters:
@@ -817,6 +1318,8 @@ class AsyncAgentsClient:
             - page_size: typing.Optional[PageSize].
 
             - page_number: typing.Optional[PageNumber].
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -834,17 +1337,33 @@ class AsyncAgentsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "agents/executions"),
-            params=remove_none_from_dict(
-                {
-                    "environmentId": environment_id,
-                    "spaceId": space_id,
-                    "success": success,
-                    "pageSize": page_size,
-                    "pageNumber": page_number,
-                }
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        "spaceId": space_id,
+                        "success": success,
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(GetExecutionsResponse, _response.json())  # type: ignore
@@ -858,7 +1377,13 @@ class AsyncAgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete(self, agent_id: AgentId, *, environment_id: EnvironmentId) -> Success:
+    async def delete(
+        self,
+        agent_id: AgentId,
+        *,
+        environment_id: EnvironmentId,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Success:
         """
         Deletes a single agent
 
@@ -866,6 +1391,8 @@ class AsyncAgentsClient:
             - agent_id: AgentId.
 
             - environment_id: EnvironmentId.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -879,10 +1406,30 @@ class AsyncAgentsClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{agent_id}"),
-            params=remove_none_from_dict({"environmentId": environment_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"agents/{jsonable_encoder(agent_id)}"),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore

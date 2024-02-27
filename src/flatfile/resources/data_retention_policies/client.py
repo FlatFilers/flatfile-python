@@ -8,6 +8,7 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
+from ...core.request_options import RequestOptions
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.data_retention_policy_id import DataRetentionPolicyId
@@ -31,12 +32,19 @@ class DataRetentionPoliciesClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def list(self, *, environment_id: typing.Optional[EnvironmentId] = None) -> ListDataRetentionPoliciesResponse:
+    def list(
+        self,
+        *,
+        environment_id: typing.Optional[EnvironmentId] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> ListDataRetentionPoliciesResponse:
         """
         Returns all data retention policies on an account matching a filter for environmentId
 
         Parameters:
             - environment_id: typing.Optional[EnvironmentId]. The associated Environment ID of the policy.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -50,9 +58,29 @@ class DataRetentionPoliciesClient:
         _response = self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "data-retention-policies"),
-            params=remove_none_from_dict({"environmentId": environment_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListDataRetentionPoliciesResponse, _response.json())  # type: ignore
@@ -66,12 +94,16 @@ class DataRetentionPoliciesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def create(self, *, request: DataRetentionPolicyConfig) -> DataRetentionPolicyResponse:
+    def create(
+        self, *, request: DataRetentionPolicyConfig, request_options: typing.Optional[RequestOptions] = None
+    ) -> DataRetentionPolicyResponse:
         """
         Add a new data retention policy to the space
 
         Parameters:
             - request: DataRetentionPolicyConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import DataRetentionPolicyConfig, DataRetentionPolicyEnum
         from flatfile.client import Flatfile
@@ -90,9 +122,26 @@ class DataRetentionPoliciesClient:
         _response = self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "data-retention-policies"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(DataRetentionPolicyResponse, _response.json())  # type: ignore
@@ -106,12 +155,16 @@ class DataRetentionPoliciesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get(self, id: DataRetentionPolicyId) -> DataRetentionPolicyResponse:
+    def get(
+        self, id: DataRetentionPolicyId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> DataRetentionPolicyResponse:
         """
         Returns a single data retention policy
 
         Parameters:
             - id: DataRetentionPolicyId. ID of data retention policy to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -124,9 +177,23 @@ class DataRetentionPoliciesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"data-retention-policies/{id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"data-retention-policies/{jsonable_encoder(id)}"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(DataRetentionPolicyResponse, _response.json())  # type: ignore
@@ -140,7 +207,13 @@ class DataRetentionPoliciesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update(self, id: DataRetentionPolicyId, *, request: DataRetentionPolicyConfig) -> DataRetentionPolicyResponse:
+    def update(
+        self,
+        id: DataRetentionPolicyId,
+        *,
+        request: DataRetentionPolicyConfig,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DataRetentionPolicyResponse:
         """
         Updates a single data retention policy
 
@@ -148,6 +221,8 @@ class DataRetentionPoliciesClient:
             - id: DataRetentionPolicyId. ID of data retention policy to update
 
             - request: DataRetentionPolicyConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import DataRetentionPolicyConfig, DataRetentionPolicyEnum
         from flatfile.client import Flatfile
@@ -166,10 +241,29 @@ class DataRetentionPoliciesClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"data-retention-policies/{id}"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"data-retention-policies/{jsonable_encoder(id)}"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(DataRetentionPolicyResponse, _response.json())  # type: ignore
@@ -183,18 +277,34 @@ class DataRetentionPoliciesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete(self, id: DataRetentionPolicyId) -> Success:
+    def delete(self, id: DataRetentionPolicyId, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Deletes a single data retention policy
 
         Parameters:
             - id: DataRetentionPolicyId. ID of data retention policy to delete
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"data-retention-policies/{id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"data-retention-policies/{jsonable_encoder(id)}"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -213,12 +323,19 @@ class AsyncDataRetentionPoliciesClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    async def list(self, *, environment_id: typing.Optional[EnvironmentId] = None) -> ListDataRetentionPoliciesResponse:
+    async def list(
+        self,
+        *,
+        environment_id: typing.Optional[EnvironmentId] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> ListDataRetentionPoliciesResponse:
         """
         Returns all data retention policies on an account matching a filter for environmentId
 
         Parameters:
             - environment_id: typing.Optional[EnvironmentId]. The associated Environment ID of the policy.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -232,9 +349,29 @@ class AsyncDataRetentionPoliciesClient:
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "data-retention-policies"),
-            params=remove_none_from_dict({"environmentId": environment_id}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "environmentId": environment_id,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListDataRetentionPoliciesResponse, _response.json())  # type: ignore
@@ -248,12 +385,16 @@ class AsyncDataRetentionPoliciesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def create(self, *, request: DataRetentionPolicyConfig) -> DataRetentionPolicyResponse:
+    async def create(
+        self, *, request: DataRetentionPolicyConfig, request_options: typing.Optional[RequestOptions] = None
+    ) -> DataRetentionPolicyResponse:
         """
         Add a new data retention policy to the space
 
         Parameters:
             - request: DataRetentionPolicyConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import DataRetentionPolicyConfig, DataRetentionPolicyEnum
         from flatfile.client import AsyncFlatfile
@@ -272,9 +413,26 @@ class AsyncDataRetentionPoliciesClient:
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "data-retention-policies"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(DataRetentionPolicyResponse, _response.json())  # type: ignore
@@ -288,12 +446,16 @@ class AsyncDataRetentionPoliciesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get(self, id: DataRetentionPolicyId) -> DataRetentionPolicyResponse:
+    async def get(
+        self, id: DataRetentionPolicyId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> DataRetentionPolicyResponse:
         """
         Returns a single data retention policy
 
         Parameters:
             - id: DataRetentionPolicyId. ID of data retention policy to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -306,9 +468,23 @@ class AsyncDataRetentionPoliciesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"data-retention-policies/{id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"data-retention-policies/{jsonable_encoder(id)}"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(DataRetentionPolicyResponse, _response.json())  # type: ignore
@@ -323,7 +499,11 @@ class AsyncDataRetentionPoliciesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def update(
-        self, id: DataRetentionPolicyId, *, request: DataRetentionPolicyConfig
+        self,
+        id: DataRetentionPolicyId,
+        *,
+        request: DataRetentionPolicyConfig,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> DataRetentionPolicyResponse:
         """
         Updates a single data retention policy
@@ -332,6 +512,8 @@ class AsyncDataRetentionPoliciesClient:
             - id: DataRetentionPolicyId. ID of data retention policy to update
 
             - request: DataRetentionPolicyConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import DataRetentionPolicyConfig, DataRetentionPolicyEnum
         from flatfile.client import AsyncFlatfile
@@ -350,10 +532,29 @@ class AsyncDataRetentionPoliciesClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"data-retention-policies/{id}"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"data-retention-policies/{jsonable_encoder(id)}"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(DataRetentionPolicyResponse, _response.json())  # type: ignore
@@ -367,18 +568,36 @@ class AsyncDataRetentionPoliciesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete(self, id: DataRetentionPolicyId) -> Success:
+    async def delete(
+        self, id: DataRetentionPolicyId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
         """
         Deletes a single data retention policy
 
         Parameters:
             - id: DataRetentionPolicyId. ID of data retention policy to delete
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"data-retention-policies/{id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"data-retention-policies/{jsonable_encoder(id)}"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore

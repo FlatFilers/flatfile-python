@@ -25,12 +25,12 @@ class MappingRuleConfig(pydantic.BaseModel):
 
     name: str = pydantic.Field(description="Name of the mapping rule")
     type: str
-    config: typing.Optional[typing.Any]
+    config: typing.Optional[typing.Any] = None
     accepted_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="acceptedAt", description="Time the mapping rule was last updated"
+        alias="acceptedAt", default=None, description="Time the mapping rule was last updated"
     )
     accepted_by: typing.Optional[UserId] = pydantic.Field(
-        alias="acceptedBy", description="User ID of the contributor of the mapping rule"
+        alias="acceptedBy", default=None, description="User ID of the contributor of the mapping rule"
     )
 
     def json(self, **kwargs: typing.Any) -> str:

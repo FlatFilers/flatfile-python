@@ -32,12 +32,12 @@ class EnvironmentConfigCreate(pydantic.BaseModel):
         alias="isProd", description="Whether or not the environment is a production environment"
     )
     guest_authentication: typing.Optional[typing.List[GuestAuthenticationEnum]] = pydantic.Field(
-        alias="guestAuthentication"
+        alias="guestAuthentication", default=None
     )
-    metadata: typing.Optional[typing.Dict[str, typing.Any]]
-    translations_path: typing.Optional[str] = pydantic.Field(alias="translationsPath")
-    namespaces: typing.Optional[typing.List[str]]
-    language_override: typing.Optional[str] = pydantic.Field(alias="languageOverride")
+    metadata: typing.Optional[typing.Dict[str, typing.Any]] = None
+    translations_path: typing.Optional[str] = pydantic.Field(alias="translationsPath", default=None)
+    namespaces: typing.Optional[typing.List[str]] = None
+    language_override: typing.Optional[str] = pydantic.Field(alias="languageOverride", default=None)
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

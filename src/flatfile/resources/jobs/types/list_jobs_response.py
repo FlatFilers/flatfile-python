@@ -74,7 +74,7 @@ class ListJobsResponse(pydantic.BaseModel):
     )
     """
 
-    pagination: typing.Optional[Pagination]
+    pagination: typing.Optional[Pagination] = None
     data: typing.List[Job]
 
     def json(self, **kwargs: typing.Any) -> str:

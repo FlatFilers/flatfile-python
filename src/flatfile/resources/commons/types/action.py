@@ -29,39 +29,49 @@ class Action(pydantic.BaseModel):
     )
     """
 
-    slug: typing.Optional[str] = pydantic.Field(description="**This is deprecated. Use `operation` instead.**")
-    operation: typing.Optional[str] = pydantic.Field(description="This will become the job operation that is triggered")
+    slug: typing.Optional[str] = pydantic.Field(
+        default=None, description="**This is deprecated. Use `operation` instead.**"
+    )
+    operation: typing.Optional[str] = pydantic.Field(
+        default=None, description="This will become the job operation that is triggered"
+    )
     mode: typing.Optional[ActionMode] = pydantic.Field(
-        description="Foreground and toolbarBlocking action mode will prevent interacting with the resource until complete"
+        default=None,
+        description="Foreground and toolbarBlocking action mode will prevent interacting with the resource until complete",
     )
     label: str = pydantic.Field(description="The text on the button itself.")
-    tooltip: typing.Optional[str] = pydantic.Field(description="A tooltip that appears when hovering the action button")
-    messages: typing.Optional[typing.List[ActionMessage]]
-    type: typing.Optional[str] = pydantic.Field(description="**This is deprecated.**")
+    tooltip: typing.Optional[str] = pydantic.Field(
+        default=None, description="A tooltip that appears when hovering the action button"
+    )
+    messages: typing.Optional[typing.List[ActionMessage]] = None
+    type: typing.Optional[str] = pydantic.Field(default=None, description="**This is deprecated.**")
     description: typing.Optional[str] = pydantic.Field(
-        description="The text that appears in the dialog after the action is clicked."
+        default=None, description="The text that appears in the dialog after the action is clicked."
     )
     schedule: typing.Optional[ActionSchedule] = pydantic.Field(
-        description="Determines if the action should happen on a regular cadence."
+        default=None, description="Determines if the action should happen on a regular cadence."
     )
     primary: typing.Optional[bool] = pydantic.Field(
-        description="A primary action will be more visibly present, whether in Sheet or Workbook."
+        default=None, description="A primary action will be more visibly present, whether in Sheet or Workbook."
     )
-    confirm: typing.Optional[bool] = pydantic.Field(description="Whether to show a modal to confirm the action")
+    confirm: typing.Optional[bool] = pydantic.Field(
+        default=None, description="Whether to show a modal to confirm the action"
+    )
     icon: typing.Optional[str] = pydantic.Field(
-        description="Icon will work on primary actions. It will only accept an already existing Flatfile design system icon."
+        default=None,
+        description="Icon will work on primary actions. It will only accept an already existing Flatfile design system icon.",
     )
     require_all_valid: typing.Optional[bool] = pydantic.Field(
-        alias="requireAllValid", description="**This is deprecated. Use `constraints` instead.**"
+        alias="requireAllValid", default=None, description="**This is deprecated. Use `constraints` instead.**"
     )
     require_selection: typing.Optional[bool] = pydantic.Field(
-        alias="requireSelection", description="**This is deprecated. Use `constraints` instead.**"
+        alias="requireSelection", default=None, description="**This is deprecated. Use `constraints` instead.**"
     )
     input_form: typing.Optional[InputForm] = pydantic.Field(
-        alias="inputForm", description="Adds an input form for this action after it is clicked."
+        alias="inputForm", default=None, description="Adds an input form for this action after it is clicked."
     )
     constraints: typing.Optional[typing.List[ActionConstraint]] = pydantic.Field(
-        description="A limitation or restriction on the action."
+        default=None, description="A limitation or restriction on the action."
     )
 
     def json(self, **kwargs: typing.Any) -> str:

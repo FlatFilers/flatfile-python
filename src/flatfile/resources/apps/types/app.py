@@ -32,12 +32,12 @@ class App(pydantic.BaseModel):
     type: AppType
     entity: str
     entity_plural: str = pydantic.Field(alias="entityPlural")
-    icon: typing.Optional[str]
+    icon: typing.Optional[str] = None
     metadata: typing.Any
     created_at: dt.datetime = pydantic.Field(alias="createdAt")
     updated_at: dt.datetime = pydantic.Field(alias="updatedAt")
-    deleted_at: typing.Optional[dt.datetime] = pydantic.Field(alias="deletedAt")
-    activated_at: typing.Optional[dt.datetime] = pydantic.Field(alias="activatedAt")
+    deleted_at: typing.Optional[dt.datetime] = pydantic.Field(alias="deletedAt", default=None)
+    activated_at: typing.Optional[dt.datetime] = pydantic.Field(alias="activatedAt", default=None)
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

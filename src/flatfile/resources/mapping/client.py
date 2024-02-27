@@ -10,6 +10,7 @@ from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.datetime_utils import serialize_datetime
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
+from ...core.request_options import RequestOptions
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.environment_id import EnvironmentId
@@ -41,19 +42,40 @@ class MappingClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def create_mapping_program(self, *, request: ProgramConfig) -> ProgramResponse:
+    def create_mapping_program(
+        self, *, request: ProgramConfig, request_options: typing.Optional[RequestOptions] = None
+    ) -> ProgramResponse:
         """
         Creates a list of mapping rules based on two provided schemas
 
         Parameters:
             - request: ProgramConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "mapping"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ProgramResponse, _response.json())  # type: ignore
@@ -67,15 +89,30 @@ class MappingClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete_all_history_for_user(self) -> Success:
+    def delete_all_history_for_user(self, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Deletes all history for the authenticated user
+
+        Parameters:
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "mapping"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -102,6 +139,7 @@ class MappingClient:
         namespace: typing.Optional[str] = None,
         source_keys: typing.Optional[str] = None,
         destination_keys: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> ProgramsResponse:
         """
         List all mapping programs
@@ -126,26 +164,44 @@ class MappingClient:
             - source_keys: typing.Optional[str]. Filter by source keys
 
             - destination_keys: typing.Optional[str]. Filter by destination keys
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "mapping"),
-            params=remove_none_from_dict(
-                {
-                    "pageSize": page_size,
-                    "pageNumber": page_number,
-                    "createdBy": created_by,
-                    "createdAfter": serialize_datetime(created_after) if created_after is not None else None,
-                    "createdBefore": serialize_datetime(created_before) if created_before is not None else None,
-                    "environmentId": environment_id,
-                    "familyId": family_id,
-                    "namespace": namespace,
-                    "sourceKeys": source_keys,
-                    "destinationKeys": destination_keys,
-                }
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        "createdBy": created_by,
+                        "createdAfter": serialize_datetime(created_after) if created_after is not None else None,
+                        "createdBefore": serialize_datetime(created_before) if created_before is not None else None,
+                        "environmentId": environment_id,
+                        "familyId": family_id,
+                        "namespace": namespace,
+                        "sourceKeys": source_keys,
+                        "destinationKeys": destination_keys,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ProgramsResponse, _response.json())  # type: ignore
@@ -157,18 +213,34 @@ class MappingClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get_mapping_program(self, program_id: ProgramId) -> ProgramResponse:
+    def get_mapping_program(
+        self, program_id: ProgramId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> ProgramResponse:
         """
         Get a mapping program
 
         Parameters:
             - program_id: ProgramId. ID of the program
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{program_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{jsonable_encoder(program_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ProgramResponse, _response.json())  # type: ignore
@@ -182,7 +254,9 @@ class MappingClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update_mapping_program(self, program_id: ProgramId, *, request: ProgramConfig) -> ProgramResponse:
+    def update_mapping_program(
+        self, program_id: ProgramId, *, request: ProgramConfig, request_options: typing.Optional[RequestOptions] = None
+    ) -> ProgramResponse:
         """
         Updates a mapping program
 
@@ -190,13 +264,32 @@ class MappingClient:
             - program_id: ProgramId. ID of the program
 
             - request: ProgramConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{program_id}"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{jsonable_encoder(program_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ProgramResponse, _response.json())  # type: ignore
@@ -210,18 +303,34 @@ class MappingClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete_mapping_program(self, program_id: ProgramId) -> Success:
+    def delete_mapping_program(
+        self, program_id: ProgramId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
         """
         Deletes a mapping program
 
         Parameters:
             - program_id: ProgramId. ID of the program
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{program_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{jsonable_encoder(program_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -235,7 +344,13 @@ class MappingClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def create_rules(self, program_id: ProgramId, *, request: CreateMappingRulesRequest) -> MappingRulesResponse:
+    def create_rules(
+        self,
+        program_id: ProgramId,
+        *,
+        request: CreateMappingRulesRequest,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> MappingRulesResponse:
         """
         Add mapping rules to a program
 
@@ -243,13 +358,34 @@ class MappingClient:
             - program_id: ProgramId. ID of the program
 
             - request: CreateMappingRulesRequest.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{program_id}/rules"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"mapping/{jsonable_encoder(program_id)}/rules"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(MappingRulesResponse, _response.json())  # type: ignore
@@ -263,12 +399,16 @@ class MappingClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def list_rules(self, program_id: ProgramId) -> MappingRulesResponse:
+    def list_rules(
+        self, program_id: ProgramId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> MappingRulesResponse:
         """
         List all mapping rules in a program
 
         Parameters:
             - program_id: ProgramId. ID of the program
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -281,9 +421,23 @@ class MappingClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{program_id}/rules"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"mapping/{jsonable_encoder(program_id)}/rules"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(MappingRulesResponse, _response.json())  # type: ignore
@@ -297,7 +451,9 @@ class MappingClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get_rule(self, program_id: ProgramId, mapping_id: MappingId) -> MappingRuleResponse:
+    def get_rule(
+        self, program_id: ProgramId, mapping_id: MappingId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> MappingRuleResponse:
         """
         Get a mapping rule from a program
 
@@ -305,6 +461,8 @@ class MappingClient:
             - program_id: ProgramId. ID of the program
 
             - mapping_id: MappingId. ID of mapping rule
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -318,9 +476,24 @@ class MappingClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{program_id}/rules/{mapping_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"mapping/{jsonable_encoder(program_id)}/rules/{jsonable_encoder(mapping_id)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(MappingRuleResponse, _response.json())  # type: ignore
@@ -335,7 +508,12 @@ class MappingClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def update_rule(
-        self, program_id: ProgramId, mapping_id: MappingId, *, request: MappingRuleConfig
+        self,
+        program_id: ProgramId,
+        mapping_id: MappingId,
+        *,
+        request: MappingRuleConfig,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> MappingRuleResponse:
         """
         Updates a mapping rule in a program
@@ -346,6 +524,8 @@ class MappingClient:
             - mapping_id: MappingId. ID of mapping rule
 
             - request: MappingRuleConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import MappingRuleConfig
         from flatfile.client import Flatfile
@@ -365,10 +545,30 @@ class MappingClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{program_id}/rules/{mapping_id}"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"mapping/{jsonable_encoder(program_id)}/rules/{jsonable_encoder(mapping_id)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(MappingRuleResponse, _response.json())  # type: ignore
@@ -382,7 +582,13 @@ class MappingClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update_rules(self, program_id: ProgramId, *, request: UpdateMappingRulesRequest) -> MappingRulesResponse:
+    def update_rules(
+        self,
+        program_id: ProgramId,
+        *,
+        request: UpdateMappingRulesRequest,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> MappingRulesResponse:
         """
         Updates a list of mapping rules in a program
 
@@ -390,13 +596,34 @@ class MappingClient:
             - program_id: ProgramId. ID of the program
 
             - request: UpdateMappingRulesRequest.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{program_id}/rules"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"mapping/{jsonable_encoder(program_id)}/rules"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(MappingRulesResponse, _response.json())  # type: ignore
@@ -410,7 +637,9 @@ class MappingClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete_rule(self, program_id: ProgramId, mapping_id: MappingId) -> Success:
+    def delete_rule(
+        self, program_id: ProgramId, mapping_id: MappingId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
         """
         Deletes a mapping rule from a program
 
@@ -418,6 +647,8 @@ class MappingClient:
             - program_id: ProgramId. ID of the program
 
             - mapping_id: MappingId. ID of mapping rule
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -431,9 +662,24 @@ class MappingClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{program_id}/rules/{mapping_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"mapping/{jsonable_encoder(program_id)}/rules/{jsonable_encoder(mapping_id)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -452,19 +698,40 @@ class AsyncMappingClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    async def create_mapping_program(self, *, request: ProgramConfig) -> ProgramResponse:
+    async def create_mapping_program(
+        self, *, request: ProgramConfig, request_options: typing.Optional[RequestOptions] = None
+    ) -> ProgramResponse:
         """
         Creates a list of mapping rules based on two provided schemas
 
         Parameters:
             - request: ProgramConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "mapping"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ProgramResponse, _response.json())  # type: ignore
@@ -478,15 +745,30 @@ class AsyncMappingClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete_all_history_for_user(self) -> Success:
+    async def delete_all_history_for_user(self, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Deletes all history for the authenticated user
+
+        Parameters:
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "mapping"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -513,6 +795,7 @@ class AsyncMappingClient:
         namespace: typing.Optional[str] = None,
         source_keys: typing.Optional[str] = None,
         destination_keys: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> ProgramsResponse:
         """
         List all mapping programs
@@ -537,26 +820,44 @@ class AsyncMappingClient:
             - source_keys: typing.Optional[str]. Filter by source keys
 
             - destination_keys: typing.Optional[str]. Filter by destination keys
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "mapping"),
-            params=remove_none_from_dict(
-                {
-                    "pageSize": page_size,
-                    "pageNumber": page_number,
-                    "createdBy": created_by,
-                    "createdAfter": serialize_datetime(created_after) if created_after is not None else None,
-                    "createdBefore": serialize_datetime(created_before) if created_before is not None else None,
-                    "environmentId": environment_id,
-                    "familyId": family_id,
-                    "namespace": namespace,
-                    "sourceKeys": source_keys,
-                    "destinationKeys": destination_keys,
-                }
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
+                        "createdBy": created_by,
+                        "createdAfter": serialize_datetime(created_after) if created_after is not None else None,
+                        "createdBefore": serialize_datetime(created_before) if created_before is not None else None,
+                        "environmentId": environment_id,
+                        "familyId": family_id,
+                        "namespace": namespace,
+                        "sourceKeys": source_keys,
+                        "destinationKeys": destination_keys,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
             ),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ProgramsResponse, _response.json())  # type: ignore
@@ -568,18 +869,34 @@ class AsyncMappingClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get_mapping_program(self, program_id: ProgramId) -> ProgramResponse:
+    async def get_mapping_program(
+        self, program_id: ProgramId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> ProgramResponse:
         """
         Get a mapping program
 
         Parameters:
             - program_id: ProgramId. ID of the program
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{program_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{jsonable_encoder(program_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ProgramResponse, _response.json())  # type: ignore
@@ -593,7 +910,9 @@ class AsyncMappingClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update_mapping_program(self, program_id: ProgramId, *, request: ProgramConfig) -> ProgramResponse:
+    async def update_mapping_program(
+        self, program_id: ProgramId, *, request: ProgramConfig, request_options: typing.Optional[RequestOptions] = None
+    ) -> ProgramResponse:
         """
         Updates a mapping program
 
@@ -601,13 +920,32 @@ class AsyncMappingClient:
             - program_id: ProgramId. ID of the program
 
             - request: ProgramConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{program_id}"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{jsonable_encoder(program_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ProgramResponse, _response.json())  # type: ignore
@@ -621,18 +959,34 @@ class AsyncMappingClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete_mapping_program(self, program_id: ProgramId) -> Success:
+    async def delete_mapping_program(
+        self, program_id: ProgramId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
         """
         Deletes a mapping program
 
         Parameters:
             - program_id: ProgramId. ID of the program
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{program_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{jsonable_encoder(program_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -646,7 +1000,13 @@ class AsyncMappingClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def create_rules(self, program_id: ProgramId, *, request: CreateMappingRulesRequest) -> MappingRulesResponse:
+    async def create_rules(
+        self,
+        program_id: ProgramId,
+        *,
+        request: CreateMappingRulesRequest,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> MappingRulesResponse:
         """
         Add mapping rules to a program
 
@@ -654,13 +1014,34 @@ class AsyncMappingClient:
             - program_id: ProgramId. ID of the program
 
             - request: CreateMappingRulesRequest.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{program_id}/rules"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"mapping/{jsonable_encoder(program_id)}/rules"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(MappingRulesResponse, _response.json())  # type: ignore
@@ -674,12 +1055,16 @@ class AsyncMappingClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def list_rules(self, program_id: ProgramId) -> MappingRulesResponse:
+    async def list_rules(
+        self, program_id: ProgramId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> MappingRulesResponse:
         """
         List all mapping rules in a program
 
         Parameters:
             - program_id: ProgramId. ID of the program
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -692,9 +1077,23 @@ class AsyncMappingClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{program_id}/rules"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"mapping/{jsonable_encoder(program_id)}/rules"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(MappingRulesResponse, _response.json())  # type: ignore
@@ -708,7 +1107,9 @@ class AsyncMappingClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get_rule(self, program_id: ProgramId, mapping_id: MappingId) -> MappingRuleResponse:
+    async def get_rule(
+        self, program_id: ProgramId, mapping_id: MappingId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> MappingRuleResponse:
         """
         Get a mapping rule from a program
 
@@ -716,6 +1117,8 @@ class AsyncMappingClient:
             - program_id: ProgramId. ID of the program
 
             - mapping_id: MappingId. ID of mapping rule
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -729,9 +1132,24 @@ class AsyncMappingClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{program_id}/rules/{mapping_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"mapping/{jsonable_encoder(program_id)}/rules/{jsonable_encoder(mapping_id)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(MappingRuleResponse, _response.json())  # type: ignore
@@ -746,7 +1164,12 @@ class AsyncMappingClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def update_rule(
-        self, program_id: ProgramId, mapping_id: MappingId, *, request: MappingRuleConfig
+        self,
+        program_id: ProgramId,
+        mapping_id: MappingId,
+        *,
+        request: MappingRuleConfig,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> MappingRuleResponse:
         """
         Updates a mapping rule in a program
@@ -757,6 +1180,8 @@ class AsyncMappingClient:
             - mapping_id: MappingId. ID of mapping rule
 
             - request: MappingRuleConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import MappingRuleConfig
         from flatfile.client import AsyncFlatfile
@@ -776,10 +1201,30 @@ class AsyncMappingClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{program_id}/rules/{mapping_id}"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"mapping/{jsonable_encoder(program_id)}/rules/{jsonable_encoder(mapping_id)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(MappingRuleResponse, _response.json())  # type: ignore
@@ -793,7 +1238,13 @@ class AsyncMappingClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update_rules(self, program_id: ProgramId, *, request: UpdateMappingRulesRequest) -> MappingRulesResponse:
+    async def update_rules(
+        self,
+        program_id: ProgramId,
+        *,
+        request: UpdateMappingRulesRequest,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> MappingRulesResponse:
         """
         Updates a list of mapping rules in a program
 
@@ -801,13 +1252,34 @@ class AsyncMappingClient:
             - program_id: ProgramId. ID of the program
 
             - request: UpdateMappingRulesRequest.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{program_id}/rules"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"mapping/{jsonable_encoder(program_id)}/rules"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(MappingRulesResponse, _response.json())  # type: ignore
@@ -821,7 +1293,9 @@ class AsyncMappingClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete_rule(self, program_id: ProgramId, mapping_id: MappingId) -> Success:
+    async def delete_rule(
+        self, program_id: ProgramId, mapping_id: MappingId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
         """
         Deletes a mapping rule from a program
 
@@ -829,6 +1303,8 @@ class AsyncMappingClient:
             - program_id: ProgramId. ID of the program
 
             - mapping_id: MappingId. ID of mapping rule
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -842,9 +1318,24 @@ class AsyncMappingClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"mapping/{program_id}/rules/{mapping_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"mapping/{jsonable_encoder(program_id)}/rules/{jsonable_encoder(mapping_id)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore

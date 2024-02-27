@@ -25,15 +25,17 @@ class JobUpdate(pydantic.BaseModel):
     )
     """
 
-    config: typing.Optional[JobUpdateConfig]
-    status: typing.Optional[JobStatus] = pydantic.Field(description="the status of the job")
+    config: typing.Optional[JobUpdateConfig] = None
+    status: typing.Optional[JobStatus] = pydantic.Field(default=None, description="the status of the job")
     progress: typing.Optional[int] = pydantic.Field(
-        description="the progress of the job. Whole number between 0 and 100"
+        default=None, description="the progress of the job. Whole number between 0 and 100"
     )
     outcome_acknowledged_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="outcomeAcknowledgedAt", description="the time that the job's outcome has been acknowledged by a user"
+        alias="outcomeAcknowledgedAt",
+        default=None,
+        description="the time that the job's outcome has been acknowledged by a user",
     )
-    info: typing.Optional[str] = pydantic.Field(description="Current status of job in text")
+    info: typing.Optional[str] = pydantic.Field(default=None, description="Current status of job in text")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

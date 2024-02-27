@@ -20,18 +20,22 @@ class SheetUpdate(pydantic.BaseModel):
     Changes to make to an existing sheet
     """
 
-    id: typing.Optional[SheetId] = pydantic.Field(description="The ID of the Sheet.")
-    workbook_id: typing.Optional[WorkbookId] = pydantic.Field(alias="workbookId", description="The ID of the Workbook.")
-    config: typing.Optional[SheetConfig] = pydantic.Field(description="Describes shape of data as well as behavior.")
-    count_records: typing.Optional[RecordCounts] = pydantic.Field(
-        alias="countRecords", description="The amount of records in the Sheet."
+    id: typing.Optional[SheetId] = pydantic.Field(default=None, description="The ID of the Sheet.")
+    workbook_id: typing.Optional[WorkbookId] = pydantic.Field(
+        alias="workbookId", default=None, description="The ID of the Workbook."
     )
-    namespace: typing.Optional[str] = pydantic.Field(description="The scoped namespace of the Sheet.")
+    config: typing.Optional[SheetConfig] = pydantic.Field(
+        default=None, description="Describes shape of data as well as behavior."
+    )
+    count_records: typing.Optional[RecordCounts] = pydantic.Field(
+        alias="countRecords", default=None, description="The amount of records in the Sheet."
+    )
+    namespace: typing.Optional[str] = pydantic.Field(default=None, description="The scoped namespace of the Sheet.")
     updated_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="updatedAt", description="Date the sheet was last updated"
+        alias="updatedAt", default=None, description="Date the sheet was last updated"
     )
     created_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="createdAt", description="Date the sheet was created"
+        alias="createdAt", default=None, description="Date the sheet was created"
     )
 
     def json(self, **kwargs: typing.Any) -> str:

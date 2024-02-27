@@ -18,10 +18,10 @@ class EventAttributes(pydantic.BaseModel):
     """
 
     target_updated_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="targetUpdatedAt", description="Date the related entity was last updated"
+        alias="targetUpdatedAt", default=None, description="Date the related entity was last updated"
     )
     progress: typing.Optional[Progress] = pydantic.Field(
-        description="The progress of the event within a collection of iterable events"
+        default=None, description="The progress of the event within a collection of iterable events"
     )
 
     def json(self, **kwargs: typing.Any) -> str:

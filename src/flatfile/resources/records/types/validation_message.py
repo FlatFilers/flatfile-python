@@ -18,9 +18,9 @@ class ValidationMessage(pydantic.BaseModel):
     Record data validation messages
     """
 
-    type: typing.Optional[ValidationType]
-    source: typing.Optional[ValidationSource]
-    message: typing.Optional[str]
+    type: typing.Optional[ValidationType] = None
+    source: typing.Optional[ValidationSource] = None
+    message: typing.Optional[str] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

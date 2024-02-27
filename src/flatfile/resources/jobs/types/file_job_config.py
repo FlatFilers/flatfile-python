@@ -15,7 +15,7 @@ except ImportError:
 class FileJobConfig(pydantic.BaseModel):
     driver: Driver = pydantic.Field(description="The driver to use for extracting data from the file")
     options: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(
-        description="The options to use for extracting data from the file"
+        default=None, description="The options to use for extracting data from the file"
     )
 
     def json(self, **kwargs: typing.Any) -> str:

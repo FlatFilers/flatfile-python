@@ -8,6 +8,7 @@ from ...core.api_error import ApiError
 from ...core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
+from ...core.request_options import RequestOptions
 from ..commits.types.list_commits_response import ListCommitsResponse
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
@@ -34,7 +35,11 @@ class WorkbooksClient:
         self._client_wrapper = client_wrapper
 
     def list(
-        self, *, space_id: typing.Optional[SpaceId] = None, include_counts: typing.Optional[bool] = None
+        self,
+        *,
+        space_id: typing.Optional[SpaceId] = None,
+        include_counts: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> ListWorkbooksResponse:
         """
         Returns all workbooks matching a filter for an account or space
@@ -43,6 +48,8 @@ class WorkbooksClient:
             - space_id: typing.Optional[SpaceId]. The associated Space ID of the Workbook.
 
             - include_counts: typing.Optional[bool]. Include counts for the workbook
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -57,9 +64,30 @@ class WorkbooksClient:
         _response = self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "workbooks"),
-            params=remove_none_from_dict({"spaceId": space_id, "includeCounts": include_counts}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "spaceId": space_id,
+                        "includeCounts": include_counts,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListWorkbooksResponse, _response.json())  # type: ignore
@@ -71,12 +99,16 @@ class WorkbooksClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def create(self, *, request: CreateWorkbookConfig) -> WorkbookResponse:
+    def create(
+        self, *, request: CreateWorkbookConfig, request_options: typing.Optional[RequestOptions] = None
+    ) -> WorkbookResponse:
         """
         Creates a workbook and adds it to a space
 
         Parameters:
             - request: CreateWorkbookConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import (
             Action,
@@ -137,9 +169,26 @@ class WorkbooksClient:
         _response = self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "workbooks"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(WorkbookResponse, _response.json())  # type: ignore
@@ -151,12 +200,16 @@ class WorkbooksClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get(self, workbook_id: WorkbookId) -> WorkbookResponse:
+    def get(
+        self, workbook_id: WorkbookId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> WorkbookResponse:
         """
         Returns a single workbook
 
         Parameters:
             - workbook_id: WorkbookId. ID of workbook to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -169,9 +222,23 @@ class WorkbooksClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"workbooks/{jsonable_encoder(workbook_id)}"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(WorkbookResponse, _response.json())  # type: ignore
@@ -185,12 +252,14 @@ class WorkbooksClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete(self, workbook_id: WorkbookId) -> Success:
+    def delete(self, workbook_id: WorkbookId, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
         """
         Deletes a workbook and all of its record data permanently
 
         Parameters:
             - workbook_id: WorkbookId. ID of workbook to delete
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -203,9 +272,23 @@ class WorkbooksClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"workbooks/{jsonable_encoder(workbook_id)}"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -219,7 +302,13 @@ class WorkbooksClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update(self, workbook_id: WorkbookId, *, request: WorkbookUpdate) -> WorkbookResponse:
+    def update(
+        self,
+        workbook_id: WorkbookId,
+        *,
+        request: WorkbookUpdate,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> WorkbookResponse:
         """
         Updates a workbook
 
@@ -227,6 +316,8 @@ class WorkbooksClient:
             - workbook_id: WorkbookId. ID of workbook to update
 
             - request: WorkbookUpdate.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import Action, ActionMode, WorkbookUpdate
         from flatfile.client import Flatfile
@@ -253,10 +344,29 @@ class WorkbooksClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"workbooks/{jsonable_encoder(workbook_id)}"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(WorkbookResponse, _response.json())  # type: ignore
@@ -271,7 +381,11 @@ class WorkbooksClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def get_workbook_commits(
-        self, workbook_id: WorkbookId, *, completed: typing.Optional[bool] = None
+        self,
+        workbook_id: WorkbookId,
+        *,
+        completed: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> ListCommitsResponse:
         """
         Returns the commits for a workbook
@@ -280,6 +394,8 @@ class WorkbooksClient:
             - workbook_id: WorkbookId. ID of workbook
 
             - completed: typing.Optional[bool]. If true, only return commits that have been completed. If false, only return commits that have not been completed. If not provided, return all commits.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import Flatfile
 
@@ -292,10 +408,32 @@ class WorkbooksClient:
         """
         _response = self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/commits"),
-            params=remove_none_from_dict({"completed": completed}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"workbooks/{jsonable_encoder(workbook_id)}/commits"
+            ),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "completed": completed,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListCommitsResponse, _response.json())  # type: ignore
@@ -311,7 +449,11 @@ class AsyncWorkbooksClient:
         self._client_wrapper = client_wrapper
 
     async def list(
-        self, *, space_id: typing.Optional[SpaceId] = None, include_counts: typing.Optional[bool] = None
+        self,
+        *,
+        space_id: typing.Optional[SpaceId] = None,
+        include_counts: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> ListWorkbooksResponse:
         """
         Returns all workbooks matching a filter for an account or space
@@ -320,6 +462,8 @@ class AsyncWorkbooksClient:
             - space_id: typing.Optional[SpaceId]. The associated Space ID of the Workbook.
 
             - include_counts: typing.Optional[bool]. Include counts for the workbook
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -334,9 +478,30 @@ class AsyncWorkbooksClient:
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "workbooks"),
-            params=remove_none_from_dict({"spaceId": space_id, "includeCounts": include_counts}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "spaceId": space_id,
+                        "includeCounts": include_counts,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListWorkbooksResponse, _response.json())  # type: ignore
@@ -348,12 +513,16 @@ class AsyncWorkbooksClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def create(self, *, request: CreateWorkbookConfig) -> WorkbookResponse:
+    async def create(
+        self, *, request: CreateWorkbookConfig, request_options: typing.Optional[RequestOptions] = None
+    ) -> WorkbookResponse:
         """
         Creates a workbook and adds it to a space
 
         Parameters:
             - request: CreateWorkbookConfig.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import (
             Action,
@@ -414,9 +583,26 @@ class AsyncWorkbooksClient:
         _response = await self._client_wrapper.httpx_client.request(
             "POST",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "workbooks"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(WorkbookResponse, _response.json())  # type: ignore
@@ -428,12 +614,16 @@ class AsyncWorkbooksClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get(self, workbook_id: WorkbookId) -> WorkbookResponse:
+    async def get(
+        self, workbook_id: WorkbookId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> WorkbookResponse:
         """
         Returns a single workbook
 
         Parameters:
             - workbook_id: WorkbookId. ID of workbook to return
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -446,9 +636,23 @@ class AsyncWorkbooksClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"workbooks/{jsonable_encoder(workbook_id)}"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(WorkbookResponse, _response.json())  # type: ignore
@@ -462,12 +666,16 @@ class AsyncWorkbooksClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete(self, workbook_id: WorkbookId) -> Success:
+    async def delete(
+        self, workbook_id: WorkbookId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
         """
         Deletes a workbook and all of its record data permanently
 
         Parameters:
             - workbook_id: WorkbookId. ID of workbook to delete
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -480,9 +688,23 @@ class AsyncWorkbooksClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}"),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"workbooks/{jsonable_encoder(workbook_id)}"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
@@ -496,7 +718,13 @@ class AsyncWorkbooksClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update(self, workbook_id: WorkbookId, *, request: WorkbookUpdate) -> WorkbookResponse:
+    async def update(
+        self,
+        workbook_id: WorkbookId,
+        *,
+        request: WorkbookUpdate,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> WorkbookResponse:
         """
         Updates a workbook
 
@@ -504,6 +732,8 @@ class AsyncWorkbooksClient:
             - workbook_id: WorkbookId. ID of workbook to update
 
             - request: WorkbookUpdate.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile import Action, ActionMode, WorkbookUpdate
         from flatfile.client import AsyncFlatfile
@@ -530,10 +760,29 @@ class AsyncWorkbooksClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "PATCH",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}"),
-            json=jsonable_encoder(request),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"workbooks/{jsonable_encoder(workbook_id)}"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(WorkbookResponse, _response.json())  # type: ignore
@@ -548,7 +797,11 @@ class AsyncWorkbooksClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def get_workbook_commits(
-        self, workbook_id: WorkbookId, *, completed: typing.Optional[bool] = None
+        self,
+        workbook_id: WorkbookId,
+        *,
+        completed: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> ListCommitsResponse:
         """
         Returns the commits for a workbook
@@ -557,6 +810,8 @@ class AsyncWorkbooksClient:
             - workbook_id: WorkbookId. ID of workbook
 
             - completed: typing.Optional[bool]. If true, only return commits that have been completed. If false, only return commits that have not been completed. If not provided, return all commits.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
         from flatfile.client import AsyncFlatfile
 
@@ -569,10 +824,32 @@ class AsyncWorkbooksClient:
         """
         _response = await self._client_wrapper.httpx_client.request(
             "GET",
-            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"workbooks/{workbook_id}/commits"),
-            params=remove_none_from_dict({"completed": completed}),
-            headers=self._client_wrapper.get_headers(),
-            timeout=60,
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"workbooks/{jsonable_encoder(workbook_id)}/commits"
+            ),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "completed": completed,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(ListCommitsResponse, _response.json())  # type: ignore

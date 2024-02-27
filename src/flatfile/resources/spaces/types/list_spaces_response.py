@@ -65,7 +65,7 @@ class ListSpacesResponse(pydantic.BaseModel):
     )
     """
 
-    pagination: typing.Optional[Pagination]
+    pagination: typing.Optional[Pagination] = None
     data: typing.List[Space]
 
     def json(self, **kwargs: typing.Any) -> str:

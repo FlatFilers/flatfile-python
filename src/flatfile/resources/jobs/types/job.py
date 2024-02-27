@@ -69,13 +69,15 @@ class Job(JobConfig):
     created_at: dt.datetime = pydantic.Field(alias="createdAt", description="Date the item was created")
     updated_at: dt.datetime = pydantic.Field(alias="updatedAt", description="Date the item was last updated")
     started_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="startedAt", description="the time that the job started at"
+        alias="startedAt", default=None, description="the time that the job started at"
     )
     finished_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="finishedAt", description="the time that the job finished at"
+        alias="finishedAt", default=None, description="the time that the job finished at"
     )
     outcome_acknowledged_at: typing.Optional[dt.datetime] = pydantic.Field(
-        alias="outcomeAcknowledgedAt", description="the time that the job's outcome has been acknowledged by a user"
+        alias="outcomeAcknowledgedAt",
+        default=None,
+        description="the time that the job's outcome has been acknowledged by a user",
     )
 
     def json(self, **kwargs: typing.Any) -> str:

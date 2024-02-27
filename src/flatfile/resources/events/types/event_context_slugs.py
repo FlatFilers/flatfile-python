@@ -12,9 +12,9 @@ except ImportError:
 
 
 class EventContextSlugs(pydantic.BaseModel):
-    space: typing.Optional[str] = pydantic.Field(description="The slug of the space")
-    workbook: typing.Optional[str] = pydantic.Field(description="The slug of the workbook")
-    sheet: typing.Optional[str] = pydantic.Field(description="The slug of the sheet")
+    space: typing.Optional[str] = pydantic.Field(default=None, description="The slug of the space")
+    workbook: typing.Optional[str] = pydantic.Field(default=None, description="The slug of the workbook")
+    sheet: typing.Optional[str] = pydantic.Field(default=None, description="The slug of the sheet")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

@@ -17,11 +17,12 @@ class ProgramConfig(pydantic.BaseModel):
     source: SheetConfig = pydantic.Field(description="Source schema")
     destination: SheetConfig = pydantic.Field(description="Destination schema")
     family_id: typing.Optional[FamilyId] = pydantic.Field(
-        alias="familyId", description="ID of the family to add the program to"
+        alias="familyId", default=None, description="ID of the family to add the program to"
     )
-    namespace: typing.Optional[str] = pydantic.Field(description="Namespace of the program")
+    namespace: typing.Optional[str] = pydantic.Field(default=None, description="Namespace of the program")
     save: typing.Optional[bool] = pydantic.Field(
-        description="Whether to save the program for editing later. Defaults to false. If true, the response will contain an ID and access token."
+        default=None,
+        description="Whether to save the program for editing later. Defaults to false. If true, the response will contain an ID and access token.",
     )
 
     def json(self, **kwargs: typing.Any) -> str:
