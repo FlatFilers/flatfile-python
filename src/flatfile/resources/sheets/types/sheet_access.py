@@ -15,14 +15,14 @@ class SheetAccess(str, enum.Enum):
 
     def visit(
         self,
-        all: typing.Callable[[], T_Result],
+        all_: typing.Callable[[], T_Result],
         add: typing.Callable[[], T_Result],
         edit: typing.Callable[[], T_Result],
         delete: typing.Callable[[], T_Result],
         import_: typing.Callable[[], T_Result],
     ) -> T_Result:
         if self is SheetAccess.ALL:
-            return all()
+            return all_()
         if self is SheetAccess.ADD:
             return add()
         if self is SheetAccess.EDIT:

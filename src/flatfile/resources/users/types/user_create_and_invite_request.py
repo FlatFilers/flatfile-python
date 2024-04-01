@@ -4,8 +4,7 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
-from ...environments.types.guest_authentication_enum import GuestAuthenticationEnum
-from .internal_space_config_base import InternalSpaceConfigBase
+from ...roles.types.assign_actor_role_request import AssignActorRoleRequest
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -13,27 +12,29 @@ except ImportError:
     import pydantic  # type: ignore
 
 
-class SpaceConfig(InternalSpaceConfigBase):
+class UserCreateAndInviteRequest(pydantic.BaseModel):
     """
-    Properties used to create a new Space
+    Properties used to create a new user
     ---
-    from flatfile import SpaceConfig
+    from flatfile import AssignActorRoleRequest, UserCreateAndInviteRequest
 
-    SpaceConfig(
-        name="My First Workbook",
-        display_order=1,
-        environment_id="us_env_YOUR_ID",
-        primary_workbook_id="us_wb_YOUR_ID",
+    UserCreateAndInviteRequest(
+        email="john.smith@example.com",
+        name="John Smith",
+        actor_roles=[
+            AssignActorRoleRequest(
+                role_id="us_rol_YOUR_ID",
+            ),
+            AssignActorRoleRequest(
+                role_id="us_rol_YOUR_ID",
+            ),
+        ],
     )
     """
 
-    name: typing.Optional[str] = pydantic.Field(default=None, description="The name of the space")
-    display_order: typing.Optional[int] = pydantic.Field(
-        alias="displayOrder", default=None, description="The display order"
-    )
-    guest_authentication: typing.Optional[typing.List[GuestAuthenticationEnum]] = pydantic.Field(
-        alias="guestAuthentication", default=None
-    )
+    email: str
+    name: str
+    actor_roles: typing.List[AssignActorRoleRequest] = pydantic.Field(alias="actorRoles")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

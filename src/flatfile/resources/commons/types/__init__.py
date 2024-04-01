@@ -36,6 +36,7 @@ from .page_number import PageNumber
 from .page_size import PageSize
 from .pagination import Pagination
 from .program_id import ProgramId
+from .prompt_id import PromptId
 from .record_id import RecordId
 from .role_id import RoleId
 from .search_field import SearchField
@@ -91,6 +92,7 @@ __all__ = [
     "PageSize",
     "Pagination",
     "ProgramId",
+    "PromptId",
     "RecordId",
     "RoleId",
     "SearchField",

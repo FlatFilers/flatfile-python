@@ -4,8 +4,7 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
-from ...commons.types.role_id import RoleId
-from .resource_id_union import ResourceIdUnion
+from .account import Account
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -13,17 +12,28 @@ except ImportError:
     import pydantic  # type: ignore
 
 
-class AssignActorRoleRequest(pydantic.BaseModel):
+class AccountResponse(pydantic.BaseModel):
     """
-    from flatfile import AssignActorRoleRequest
+    import datetime
 
-    AssignActorRoleRequest(
-        role_id="us_rol_YOUR_ID",
+    from flatfile import Account, AccountResponse
+
+    AccountResponse(
+        data=Account(
+            id="us_acc_YOUR_ID",
+            name="MyAccountName",
+            metadata={},
+            created_at=datetime.datetime.fromisoformat(
+                "2023-10-30 16:59:45.735000+00:00",
+            ),
+            updated_at=datetime.datetime.fromisoformat(
+                "2023-10-30 16:59:45.735000+00:00",
+            ),
+        ),
     )
     """
 
-    role_id: RoleId = pydantic.Field(alias="roleId")
-    resource_id: ResourceIdUnion = pydantic.Field(alias="resourceId")
+    data: Account
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -36,5 +46,4 @@ class AssignActorRoleRequest(pydantic.BaseModel):
     class Config:
         frozen = True
         smart_union = True
-        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

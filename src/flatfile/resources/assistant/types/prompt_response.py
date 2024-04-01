@@ -4,8 +4,7 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
-from ...commons.types.role_id import RoleId
-from .resource_id_union import ResourceIdUnion
+from .prompt import Prompt
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -13,17 +12,29 @@ except ImportError:
     import pydantic  # type: ignore
 
 
-class AssignActorRoleRequest(pydantic.BaseModel):
+class PromptResponse(pydantic.BaseModel):
     """
-    from flatfile import AssignActorRoleRequest
+    import datetime
 
-    AssignActorRoleRequest(
-        role_id="us_rol_YOUR_ID",
+    from flatfile import Prompt, PromptResponse
+
+    PromptResponse(
+        data=Prompt(
+            id="us_pr_YOUR_ID",
+            created_by_id="us_usr_YOUR_ID",
+            account_id="us_acc_YOUR_ID",
+            prompt="Combine first name and last name into a new column called Full Name",
+            created_at=datetime.datetime.fromisoformat(
+                "2021-01-01 00:00:00+00:00",
+            ),
+            updated_at=datetime.datetime.fromisoformat(
+                "2021-01-01 00:00:00+00:00",
+            ),
+        ),
     )
     """
 
-    role_id: RoleId = pydantic.Field(alias="roleId")
-    resource_id: ResourceIdUnion = pydantic.Field(alias="resourceId")
+    data: Prompt
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -36,5 +47,4 @@ class AssignActorRoleRequest(pydantic.BaseModel):
     class Config:
         frozen = True
         smart_union = True
-        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

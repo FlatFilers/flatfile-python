@@ -73,7 +73,7 @@ class Space(InternalSpaceConfigBase):
     last_activity_at: typing.Optional[dt.datetime] = pydantic.Field(
         alias="lastActivityAt",
         default=None,
-        description="Date that the last activity in the space occurred. This could include any create or update activity in the space like adding a record to a sheet, uploading a new file, or updating the configuration of a workbook. This date is only tracked to the precision of a day.",
+        description="This date marks the most recent activity within the space, tracking actions to the second. Activities include creating or updating records in a sheet, uploading files, or modifying a workbook's configuration.",
     )
     guest_link: typing.Optional[str] = pydantic.Field(
         alias="guestLink", default=None, description="Guest link to the space"

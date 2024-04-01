@@ -35,6 +35,7 @@ class EventTopic(str, enum.Enum):
     SHEET_CREATED = "sheet:created"
     SHEET_UPDATED = "sheet:updated"
     SHEET_DELETED = "sheet:deleted"
+    SHEET_COUNTS_UPDATED = "sheet:counts-updated"
     SNAPSHOT_CREATED = "snapshot:created"
     RECORDS_CREATED = "records:created"
     RECORDS_UPDATED = "records:updated"
@@ -88,6 +89,7 @@ class EventTopic(str, enum.Enum):
         sheet_created: typing.Callable[[], T_Result],
         sheet_updated: typing.Callable[[], T_Result],
         sheet_deleted: typing.Callable[[], T_Result],
+        sheet_counts_updated: typing.Callable[[], T_Result],
         snapshot_created: typing.Callable[[], T_Result],
         records_created: typing.Callable[[], T_Result],
         records_updated: typing.Callable[[], T_Result],
@@ -159,6 +161,8 @@ class EventTopic(str, enum.Enum):
             return sheet_updated()
         if self is EventTopic.SHEET_DELETED:
             return sheet_deleted()
+        if self is EventTopic.SHEET_COUNTS_UPDATED:
+            return sheet_counts_updated()
         if self is EventTopic.SNAPSHOT_CREATED:
             return snapshot_created()
         if self is EventTopic.RECORDS_CREATED:

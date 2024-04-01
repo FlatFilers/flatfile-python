@@ -6,7 +6,6 @@ import typing
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.sheet_id import SheetId
 from ...commons.types.workbook_id import WorkbookId
-from ...records.types.record_counts import RecordCounts
 from .sheet_config import SheetConfig
 
 try:
@@ -26,9 +25,6 @@ class SheetUpdate(pydantic.BaseModel):
     )
     config: typing.Optional[SheetConfig] = pydantic.Field(
         default=None, description="Describes shape of data as well as behavior."
-    )
-    count_records: typing.Optional[RecordCounts] = pydantic.Field(
-        alias="countRecords", default=None, description="The amount of records in the Sheet."
     )
     namespace: typing.Optional[str] = pydantic.Field(default=None, description="The scoped namespace of the Sheet.")
     updated_at: typing.Optional[dt.datetime] = pydantic.Field(

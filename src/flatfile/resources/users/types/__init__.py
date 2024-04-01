@@ -3,6 +3,7 @@
 from .list_users_response import ListUsersResponse
 from .user import User
 from .user_config import UserConfig
+from .user_create_and_invite_request import UserCreateAndInviteRequest
 from .user_response import UserResponse
 
-__all__ = ["ListUsersResponse", "User", "UserConfig", "UserResponse"]
+__all__ = ["ListUsersResponse", "User", "UserConfig", "UserCreateAndInviteRequest", "UserResponse"]

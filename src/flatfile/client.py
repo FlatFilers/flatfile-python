@@ -6,8 +6,10 @@ import httpx
 
 from .core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from .environment import FlatfileEnvironment
+from .resources.accounts.client import AccountsClient, AsyncAccountsClient
 from .resources.agents.client import AgentsClient, AsyncAgentsClient
 from .resources.apps.client import AppsClient, AsyncAppsClient
+from .resources.assistant.client import AssistantClient, AsyncAssistantClient
 from .resources.commits.client import AsyncCommitsClient, CommitsClient
 from .resources.data_retention_policies.client import AsyncDataRetentionPoliciesClient, DataRetentionPoliciesClient
 from .resources.documents.client import AsyncDocumentsClient, DocumentsClient
@@ -67,8 +69,10 @@ class Flatfile:
             token=token,
             httpx_client=httpx.Client(timeout=timeout) if httpx_client is None else httpx_client,
         )
+        self.accounts = AccountsClient(client_wrapper=self._client_wrapper)
         self.agents = AgentsClient(client_wrapper=self._client_wrapper)
         self.apps = AppsClient(client_wrapper=self._client_wrapper)
+        self.assistant = AssistantClient(client_wrapper=self._client_wrapper)
         self.commits = CommitsClient(client_wrapper=self._client_wrapper)
         self.data_retention_policies = DataRetentionPoliciesClient(client_wrapper=self._client_wrapper)
         self.documents = DocumentsClient(client_wrapper=self._client_wrapper)
@@ -128,8 +132,10 @@ class AsyncFlatfile:
             token=token,
             httpx_client=httpx.AsyncClient(timeout=timeout) if httpx_client is None else httpx_client,
         )
+        self.accounts = AsyncAccountsClient(client_wrapper=self._client_wrapper)
         self.agents = AsyncAgentsClient(client_wrapper=self._client_wrapper)
         self.apps = AsyncAppsClient(client_wrapper=self._client_wrapper)
+        self.assistant = AsyncAssistantClient(client_wrapper=self._client_wrapper)
         self.commits = AsyncCommitsClient(client_wrapper=self._client_wrapper)
         self.data_retention_policies = AsyncDataRetentionPoliciesClient(client_wrapper=self._client_wrapper)
         self.documents = AsyncDocumentsClient(client_wrapper=self._client_wrapper)

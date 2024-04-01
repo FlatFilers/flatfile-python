@@ -20,7 +20,7 @@ class AppResponse(pydantic.BaseModel):
 
     AppResponse(data=App(id="us_app_YOUR_ID", name="Nightly Data Loads", namespace="nightly-data", type=AppType.CUSTOM, entity="Sync", entity_plural="Syncs", icon='<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-bar-chart-fill" viewBox="0 0 16 16">
       <path d="M1 11a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"/>
-    </svg>', metadata={"foo": "bar"}, created_at=datetime.datetime.fromisoformat("2023-10-30 16:59:45.735000+00:00", ), updated_at=datetime.datetime.fromisoformat("2023-10-30 16:59:45.735000+00:00", ), ), )
+    </svg>', metadata={"foo": "bar"}, environment_filters={"type": ["PROD", "DEV"], "exclude_ids": ["us_env_123456"]}, created_at=datetime.datetime.fromisoformat("2023-10-30 16:59:45.735000+00:00", ), updated_at=datetime.datetime.fromisoformat("2023-10-30 16:59:45.735000+00:00", ), ), )
     """
 
     data: App

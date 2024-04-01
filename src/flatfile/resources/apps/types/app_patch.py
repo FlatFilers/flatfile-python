@@ -28,6 +28,7 @@ class AppPatch(pydantic.BaseModel):
     entity_plural: typing.Optional[str] = pydantic.Field(alias="entityPlural", default=None)
     icon: typing.Optional[str] = None
     metadata: typing.Optional[typing.Any] = None
+    environment_filters: typing.Optional[typing.Any] = pydantic.Field(alias="environmentFilters", default=None)
     activated_at: typing.Optional[dt.datetime] = pydantic.Field(alias="activatedAt", default=None)
 
     def json(self, **kwargs: typing.Any) -> str:

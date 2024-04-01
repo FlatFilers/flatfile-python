@@ -50,9 +50,9 @@ class FilesClient:
         Parameters:
             - space_id: typing.Optional[str].
 
-            - page_size: typing.Optional[int]. Number of jobs to return in a page (default 20)
+            - page_size: typing.Optional[int]. Number of files to return in a page (default 20)
 
-            - page_number: typing.Optional[int]. Based on pageSize, which page of jobs to return
+            - page_number: typing.Optional[int]. Based on pageSize, which page of files to return
 
             - mode: typing.Optional[Mode]. The storage mode of file to fetch, defaults to "import"
 
@@ -401,9 +401,9 @@ class AsyncFilesClient:
         Parameters:
             - space_id: typing.Optional[str].
 
-            - page_size: typing.Optional[int]. Number of jobs to return in a page (default 20)
+            - page_size: typing.Optional[int]. Number of files to return in a page (default 20)
 
-            - page_number: typing.Optional[int]. Based on pageSize, which page of jobs to return
+            - page_number: typing.Optional[int]. Based on pageSize, which page of files to return
 
             - mode: typing.Optional[Mode]. The storage mode of file to fetch, defaults to "import"
 

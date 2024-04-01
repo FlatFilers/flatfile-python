@@ -33,6 +33,10 @@ class UserResponse(pydantic.BaseModel):
             updated_at=datetime.datetime.fromisoformat(
                 "2023-10-30 16:59:45.735000+00:00",
             ),
+            last_seen_at=datetime.datetime.fromisoformat(
+                "2023-10-30 16:59:45.735000+00:00",
+            ),
+            dashboard=2,
         ),
     )
     """

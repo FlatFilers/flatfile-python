@@ -4,7 +4,8 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
-from .user import User
+from ...commons.types.pagination import Pagination
+from .prompt import Prompt
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -12,38 +13,37 @@ except ImportError:
     import pydantic  # type: ignore
 
 
-class ListUsersResponse(pydantic.BaseModel):
+class PromptsResponse(pydantic.BaseModel):
     """
     import datetime
 
-    from flatfile import ListUsersResponse, User
+    from flatfile import Pagination, Prompt, PromptsResponse
 
-    ListUsersResponse(
+    PromptsResponse(
         data=[
-            User(
-                id="us_usr_YOUR_ID",
-                email="john.smith@example.com",
-                name="john.smith",
+            Prompt(
+                id="us_pr_YOUR_ID",
+                created_by_id="us_usr_YOUR_ID",
                 account_id="us_acc_YOUR_ID",
-                idp="FRONTEGG",
-                idp_ref="ab1cf38e-e617-4547-b37d-376a7ac9e554",
-                metadata={},
+                prompt="Combine first name and last name into a new column called Full Name",
                 created_at=datetime.datetime.fromisoformat(
-                    "2023-10-30 16:59:45.735000+00:00",
+                    "2021-01-01 00:00:00+00:00",
                 ),
                 updated_at=datetime.datetime.fromisoformat(
-                    "2023-10-30 16:59:45.735000+00:00",
+                    "2021-01-01 00:00:00+00:00",
                 ),
-                last_seen_at=datetime.datetime.fromisoformat(
-                    "2023-10-30 16:59:45.735000+00:00",
-                ),
-                dashboard=2,
             )
         ],
+        pagination=Pagination(
+            current_page=3,
+            page_count=50,
+            total_count=100,
+        ),
     )
     """
 
-    data: typing.List[User]
+    pagination: typing.Optional[Pagination] = None
+    data: typing.List[Prompt]
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

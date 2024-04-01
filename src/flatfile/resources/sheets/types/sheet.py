@@ -21,7 +21,7 @@ class Sheet(pydantic.BaseModel):
     ---
     import datetime
 
-    from flatfile import Property_String, RecordCounts, Sheet, SheetConfig
+    from flatfile import Property_String, Sheet, SheetConfig
 
     Sheet(
         id="us_sh_YOUR_ID",
@@ -50,11 +50,6 @@ class Sheet(pydantic.BaseModel):
             ],
             mapping_confidence_threshold=0.5,
         ),
-        count_records=RecordCounts(
-            valid=1000,
-            error=0,
-            total=1000,
-        ),
         locked_by="Example0",
         updated_at=datetime.datetime.fromisoformat(
             "2021-08-31 18:00:00+00:00",
@@ -70,9 +65,6 @@ class Sheet(pydantic.BaseModel):
     name: str = pydantic.Field(description="The name of the Sheet.")
     slug: str = pydantic.Field(description="The slug of the Sheet.")
     config: SheetConfig = pydantic.Field(description="Describes shape of data as well as behavior")
-    count_records: typing.Optional[RecordCounts] = pydantic.Field(
-        alias="countRecords", default=None, description="The amount of records in the Sheet."
-    )
     namespace: typing.Optional[str] = pydantic.Field(default=None, description="The scoped namespace of the Sheet.")
     locked_by: typing.Optional[str] = pydantic.Field(
         alias="lockedBy", default=None, description="The actor who locked the Sheet."
@@ -81,6 +73,11 @@ class Sheet(pydantic.BaseModel):
     created_at: dt.datetime = pydantic.Field(alias="createdAt", description="Date the sheet was created")
     locked_at: typing.Optional[dt.datetime] = pydantic.Field(
         alias="lockedAt", default=None, description="The time the Sheet was locked."
+    )
+    record_counts: typing.Optional[RecordCounts] = pydantic.Field(
+        alias="recordCounts",
+        default=None,
+        description="The precomputed counts of records in the Sheet (may not exist).",
     )
 
     def json(self, **kwargs: typing.Any) -> str:

@@ -47,7 +47,7 @@ class WorkbooksClient:
         Parameters:
             - space_id: typing.Optional[SpaceId]. The associated Space ID of the Workbook.
 
-            - include_counts: typing.Optional[bool]. Include counts for the workbook
+            - include_counts: typing.Optional[bool]. Include counts for the workbook. **DEPRECATED** Counts will return 0s. Use GET /sheets/:sheetId/counts
 
             - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
@@ -58,7 +58,6 @@ class WorkbooksClient:
         )
         client.workbooks.list(
             space_id="us_sp_YOUR_ID",
-            include_counts=True,
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -461,7 +460,7 @@ class AsyncWorkbooksClient:
         Parameters:
             - space_id: typing.Optional[SpaceId]. The associated Space ID of the Workbook.
 
-            - include_counts: typing.Optional[bool]. Include counts for the workbook
+            - include_counts: typing.Optional[bool]. Include counts for the workbook. **DEPRECATED** Counts will return 0s. Use GET /sheets/:sheetId/counts
 
             - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
@@ -472,7 +471,6 @@ class AsyncWorkbooksClient:
         )
         await client.workbooks.list(
             space_id="us_sp_YOUR_ID",
-            include_counts=True,
         )
         """
         _response = await self._client_wrapper.httpx_client.request(

@@ -10,8 +10,8 @@ class SpaceAccess(str, enum.Enum):
     ALL = "*"
     UPLOAD = "upload"
 
-    def visit(self, all: typing.Callable[[], T_Result], upload: typing.Callable[[], T_Result]) -> T_Result:
+    def visit(self, all_: typing.Callable[[], T_Result], upload: typing.Callable[[], T_Result]) -> T_Result:
         if self is SpaceAccess.ALL:
-            return all()
+            return all_()
         if self is SpaceAccess.UPLOAD:
             return upload()

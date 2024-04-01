@@ -20,7 +20,7 @@ class Filter(str, enum.Enum):
         self,
         valid: typing.Callable[[], T_Result],
         error: typing.Callable[[], T_Result],
-        all: typing.Callable[[], T_Result],
+        all_: typing.Callable[[], T_Result],
         none: typing.Callable[[], T_Result],
     ) -> T_Result:
         if self is Filter.VALID:
@@ -28,6 +28,6 @@ class Filter(str, enum.Enum):
         if self is Filter.ERROR:
             return error()
         if self is Filter.ALL:
-            return all()
+            return all_()
         if self is Filter.NONE:
             return none()

@@ -97,9 +97,9 @@ class RecordsClient:
 
             - ids: typing.Optional[typing.Union[RecordId, typing.Sequence[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records. Maximum of 100 allowed.
 
-            - page_size: typing.Optional[int]. Number of records to return in a page (default 1000 if pageNumber included)
+            - page_size: typing.Optional[int]. Number of records to return in a page (default 10,000)
 
-            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return (Note - numbers start at 1)
 
             - include_counts: typing.Optional[bool]. **DEPRECATED** Use GET /sheets/:sheetId/counts
 
@@ -578,9 +578,9 @@ class AsyncRecordsClient:
 
             - ids: typing.Optional[typing.Union[RecordId, typing.Sequence[RecordId]]]. The Record Ids param (ids) is a list of record ids that can be passed to several record endpoints allowing the user to identify specific records to INCLUDE in the query, or specific records to EXCLUDE, depending on whether or not filters are being applied. When passing a query param that filters the record dataset, such as 'searchValue', or a 'filter' of 'valid' | 'error' | 'all', the 'ids' param will EXCLUDE those records from the filtered results. For basic queries that do not filter the dataset, passing record ids in the 'ids' param will limit the dataset to INCLUDE just those specific records. Maximum of 100 allowed.
 
-            - page_size: typing.Optional[int]. Number of records to return in a page (default 1000 if pageNumber included)
+            - page_size: typing.Optional[int]. Number of records to return in a page (default 10,000)
 
-            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return
+            - page_number: typing.Optional[int]. Based on pageSize, which page of records to return (Note - numbers start at 1)
 
             - include_counts: typing.Optional[bool]. **DEPRECATED** Use GET /sheets/:sheetId/counts
 

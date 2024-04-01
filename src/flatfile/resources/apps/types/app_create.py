@@ -30,6 +30,7 @@ class AppCreate(pydantic.BaseModel):
     entity_plural: typing.Optional[str] = pydantic.Field(alias="entityPlural", default=None)
     icon: typing.Optional[str] = None
     metadata: typing.Optional[typing.Any] = None
+    environment_filters: typing.Optional[typing.Any] = pydantic.Field(alias="environmentFilters", default=None)
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

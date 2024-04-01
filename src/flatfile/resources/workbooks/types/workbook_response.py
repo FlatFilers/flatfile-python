@@ -20,7 +20,6 @@ class WorkbookResponse(pydantic.BaseModel):
         Action,
         ActionMode,
         Property_String,
-        RecordCounts,
         Sheet,
         SheetConfig,
         Workbook,
@@ -61,11 +60,6 @@ class WorkbookResponse(pydantic.BaseModel):
                             ),
                         ],
                         mapping_confidence_threshold=0.5,
-                    ),
-                    count_records=RecordCounts(
-                        valid=1000,
-                        error=0,
-                        total=1000,
                     ),
                     locked_by="Example0",
                     updated_at=datetime.datetime.fromisoformat(

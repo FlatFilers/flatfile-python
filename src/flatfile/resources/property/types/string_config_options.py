@@ -36,7 +36,7 @@ class StringConfigOptions(str, enum.Enum):
         tiny: typing.Callable[[], T_Result],
         normal: typing.Callable[[], T_Result],
         medium: typing.Callable[[], T_Result],
-        long: typing.Callable[[], T_Result],
+        long_: typing.Callable[[], T_Result],
     ) -> T_Result:
         if self is StringConfigOptions.TINY:
             return tiny()
@@ -45,4 +45,4 @@ class StringConfigOptions(str, enum.Enum):
         if self is StringConfigOptions.MEDIUM:
             return medium()
         if self is StringConfigOptions.LONG:
-            return long()
+            return long_()

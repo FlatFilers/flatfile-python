@@ -25,7 +25,9 @@ class SheetConfigUpdate(pydantic.BaseModel):
     description: typing.Optional[str] = pydantic.Field(
         default=None, description="A sentence or two describing the purpose of your Sheet."
     )
-    slug: typing.Optional[str] = pydantic.Field(default=None, description="A unique identifier for your Sheet.")
+    slug: typing.Optional[str] = pydantic.Field(
+        default=None, description="A unique identifier for your Sheet. **Required when updating a Workbook.**"
+    )
     readonly: typing.Optional[bool] = pydantic.Field(
         default=None,
         description="A boolean specifying whether or not this sheet is read only. Read only sheets are not editable by end users.",

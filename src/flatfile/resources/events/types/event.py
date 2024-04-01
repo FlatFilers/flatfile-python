@@ -187,6 +187,15 @@ class Event_SheetDeleted(GenericEvent):
         allow_population_by_field_name = True
 
 
+class Event_SheetCountsUpdated(GenericEvent):
+    topic: typing.Literal["sheet:counts-updated"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
 class Event_SnapshotCreated(GenericEvent):
     topic: typing.Literal["snapshot:created"]
 
@@ -470,6 +479,7 @@ Event = typing.Union[
     Event_SheetCreated,
     Event_SheetUpdated,
     Event_SheetDeleted,
+    Event_SheetCountsUpdated,
     Event_SnapshotCreated,
     Event_RecordsCreated,
     Event_RecordsUpdated,

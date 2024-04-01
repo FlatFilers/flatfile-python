@@ -143,7 +143,7 @@ class SpacesClient:
         )
         client.spaces.create(
             request=SpaceConfig(
-                name="My First Worbook",
+                name="My First Workbook",
                 display_order=1,
                 environment_id="us_env_YOUR_ID",
                 primary_workbook_id="us_wb_YOUR_ID",
@@ -285,14 +285,14 @@ class SpacesClient:
     def bulk_delete(
         self,
         *,
-        ids: typing.Union[SpaceId, typing.Sequence[SpaceId]],
+        space_ids: typing.Union[SpaceId, typing.Sequence[SpaceId]],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Success:
         """
         Delete multiple spaces by id
 
         Parameters:
-            - ids: typing.Union[SpaceId, typing.Sequence[SpaceId]]. List of ids for the spaces to be deleted
+            - space_ids: typing.Union[SpaceId, typing.Sequence[SpaceId]]. List of ids for the spaces to be deleted
 
             - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
@@ -302,7 +302,7 @@ class SpacesClient:
             token="YOUR_TOKEN",
         )
         client.spaces.bulk_delete(
-            ids="us_sp_YOUR_ID",
+            space_ids="us_sp_YOUR_ID",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -311,7 +311,7 @@ class SpacesClient:
             params=jsonable_encoder(
                 remove_none_from_dict(
                     {
-                        "ids": ids,
+                        "spaceIds": space_ids,
                         **(
                             request_options.get("additional_query_parameters", {})
                             if request_options is not None
@@ -575,7 +575,7 @@ class AsyncSpacesClient:
         )
         await client.spaces.create(
             request=SpaceConfig(
-                name="My First Worbook",
+                name="My First Workbook",
                 display_order=1,
                 environment_id="us_env_YOUR_ID",
                 primary_workbook_id="us_wb_YOUR_ID",
@@ -717,14 +717,14 @@ class AsyncSpacesClient:
     async def bulk_delete(
         self,
         *,
-        ids: typing.Union[SpaceId, typing.Sequence[SpaceId]],
+        space_ids: typing.Union[SpaceId, typing.Sequence[SpaceId]],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Success:
         """
         Delete multiple spaces by id
 
         Parameters:
-            - ids: typing.Union[SpaceId, typing.Sequence[SpaceId]]. List of ids for the spaces to be deleted
+            - space_ids: typing.Union[SpaceId, typing.Sequence[SpaceId]]. List of ids for the spaces to be deleted
 
             - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
@@ -734,7 +734,7 @@ class AsyncSpacesClient:
             token="YOUR_TOKEN",
         )
         await client.spaces.bulk_delete(
-            ids="us_sp_YOUR_ID",
+            space_ids="us_sp_YOUR_ID",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -743,7 +743,7 @@ class AsyncSpacesClient:
             params=jsonable_encoder(
                 remove_none_from_dict(
                     {
-                        "ids": ids,
+                        "spaceIds": space_ids,
                         **(
                             request_options.get("additional_query_parameters", {})
                             if request_options is not None

@@ -5,6 +5,7 @@ import typing
 
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.action import Action
+from ...commons.types.app_id import AppId
 from ...commons.types.environment_id import EnvironmentId
 from ...commons.types.space_config_id import SpaceConfigId
 from ...commons.types.workbook_id import WorkbookId
@@ -30,6 +31,9 @@ class InternalSpaceConfigBase(pydantic.BaseModel):
     language_override: typing.Optional[str] = pydantic.Field(alias="languageOverride", default=None)
     archived_at: typing.Optional[dt.datetime] = pydantic.Field(
         alias="archivedAt", default=None, description="Date when space was archived"
+    )
+    app_id: typing.Optional[AppId] = pydantic.Field(
+        alias="appId", default=None, description="The ID of the App that space is associated with"
     )
 
     def json(self, **kwargs: typing.Any) -> str:

@@ -16,13 +16,7 @@ class SheetResponse(pydantic.BaseModel):
     """
     import datetime
 
-    from flatfile import (
-        Property_String,
-        RecordCounts,
-        Sheet,
-        SheetConfig,
-        SheetResponse,
-    )
+    from flatfile import Property_String, Sheet, SheetConfig, SheetResponse
 
     SheetResponse(
         data=Sheet(
@@ -51,11 +45,6 @@ class SheetResponse(pydantic.BaseModel):
                     ),
                 ],
                 mapping_confidence_threshold=0.5,
-            ),
-            count_records=RecordCounts(
-                valid=1000,
-                error=0,
-                total=1000,
             ),
             locked_by="Example0",
             updated_at=datetime.datetime.fromisoformat(

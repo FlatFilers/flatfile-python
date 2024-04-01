@@ -28,6 +28,9 @@ class MutateJobConfig(pydantic.BaseModel):
         default=None,
         description="If the mutation was generated through some sort of id-ed process, this links this job and that process.",
     )
+    snapshot_label: typing.Optional[str] = pydantic.Field(
+        alias="snapshotLabel", default=None, description="If specified, a snapshot will be generated with this label"
+    )
     filter: typing.Optional[Filter] = None
     filter_field: typing.Optional[FilterField] = pydantic.Field(alias="filterField", default=None)
     search_value: typing.Optional[SearchValue] = pydantic.Field(alias="searchValue", default=None)

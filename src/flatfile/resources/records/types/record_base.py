@@ -33,8 +33,14 @@ class RecordBase(pydantic.BaseModel):
         alias="versionId", default=None, description="Deprecated, use `commitId` instead."
     )
     commit_id: typing.Optional[CommitId] = pydantic.Field(alias="commitId", default=None)
-    valid: typing.Optional[bool] = None
-    messages: typing.Optional[typing.List[ValidationMessage]] = None
+    valid: typing.Optional[bool] = pydantic.Field(
+        default=None,
+        description="Auto-generated value based on whether the record contains a field with an error message. Cannot be set via the API.",
+    )
+    messages: typing.Optional[typing.List[ValidationMessage]] = pydantic.Field(
+        default=None,
+        description="This record level `messages` property is deprecated and no longer stored or used. Use the `messages` property on the individual cell values instead. This property will be removed in a future release.",
+    )
     metadata: typing.Optional[typing.Dict[str, typing.Any]] = None
 
     def json(self, **kwargs: typing.Any) -> str:
