@@ -10,6 +10,8 @@ from .enum_property import EnumProperty
 from .enum_property_config import EnumPropertyConfig
 from .enum_property_option import EnumPropertyOption
 from .external_constraint import ExternalConstraint
+from .field_appearance import FieldAppearance
+from .field_size import FieldSize
 from .number_config import NumberConfig
 from .number_property import NumberProperty
 from .property import (
@@ -45,6 +47,8 @@ __all__ = [
     "EnumPropertyConfig",
     "EnumPropertyOption",
     "ExternalConstraint",
+    "FieldAppearance",
+    "FieldSize",
     "NumberConfig",
     "NumberProperty",
     "Property",

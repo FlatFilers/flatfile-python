@@ -89,13 +89,23 @@ class MappingClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete_all_history_for_user(self, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
+    def delete_all_history_for_user(
+        self,
+        *,
+        environment_id: typing.Optional[EnvironmentId] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Success:
         """
         Deletes all history for the authenticated user
 
         Parameters:
+            - environment_id: typing.Optional[EnvironmentId].
+
             - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
+        _request: typing.Dict[str, typing.Any] = {}
+        if environment_id is not OMIT:
+            _request["environmentId"] = environment_id
         _response = self._client_wrapper.httpx_client.request(
             "DELETE",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "mapping"),
@@ -745,13 +755,23 @@ class AsyncMappingClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete_all_history_for_user(self, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
+    async def delete_all_history_for_user(
+        self,
+        *,
+        environment_id: typing.Optional[EnvironmentId] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Success:
         """
         Deletes all history for the authenticated user
 
         Parameters:
+            - environment_id: typing.Optional[EnvironmentId].
+
             - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
+        _request: typing.Dict[str, typing.Any] = {}
+        if environment_id is not OMIT:
+            _request["environmentId"] = environment_id
         _response = await self._client_wrapper.httpx_client.request(
             "DELETE",
             urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", "mapping"),

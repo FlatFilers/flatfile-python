@@ -9,6 +9,8 @@ from .space import Space
 from .space_access import SpaceAccess
 from .space_config import SpaceConfig
 from .space_response import SpaceResponse
+from .space_settings import SpaceSettings
+from .space_sidebar_config import SpaceSidebarConfig
 from .space_size import SpaceSize
 
 __all__ = [
@@ -21,5 +23,7 @@ __all__ = [
     "SpaceAccess",
     "SpaceConfig",
     "SpaceResponse",
+    "SpaceSettings",
+    "SpaceSidebarConfig",
     "SpaceSize",
 ]

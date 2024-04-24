@@ -4,41 +4,35 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
-from .record_base import RecordBase
-from .record_data import RecordData
+from .cell_config import CellConfig
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
-class Record(RecordBase):
+class RecordConfig(pydantic.BaseModel):
     """
-    A single row of data in a Sheet
+    Configuration of a record or specific fields in the record
     ---
-    from flatfile import CellValue, Record, RecordConfig
+    from flatfile import CellConfig, RecordConfig
 
-    Record(
-        id="us_rc_YOUR_ID",
-        version_id="us_vr_YOUR_ID",
-        commit_id="us_vr_YOUR_ID",
-        values={
-            "firstName": CellValue(
-                messages=[],
-                valid=True,
+    RecordConfig(
+        readonly=True,
+        fields={
+            "foo": CellConfig(
+                readonly=True,
             ),
-            "lastName": CellValue(
-                messages=[],
-                valid=True,
-            ),
-            "email": CellValue(
-                messages=[],
-                valid=True,
+            "bar": CellConfig(
+                readonly=True,
             ),
         },
-        valid=True,
-        metadata={},
-        config=RecordConfig(),
     )
     """
 
-    values: RecordData
+    readonly: typing.Optional[bool] = None
+    fields: typing.Optional[typing.Dict[str, CellConfig]] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -51,5 +45,4 @@ class Record(RecordBase):
     class Config:
         frozen = True
         smart_union = True
-        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

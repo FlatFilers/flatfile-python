@@ -48,6 +48,7 @@ class Account(pydantic.BaseModel):
     created_at: dt.datetime = pydantic.Field(alias="createdAt")
     updated_at: dt.datetime = pydantic.Field(alias="updatedAt")
     default_app_id: typing.Optional[AppId] = pydantic.Field(alias="defaultAppId", default=None)
+    dashboard: typing.Optional[int] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

@@ -10,6 +10,8 @@ from .types import (
     SpaceAccess,
     SpaceConfig,
     SpaceResponse,
+    SpaceSettings,
+    SpaceSidebarConfig,
     SpaceSize,
 )
 
@@ -23,5 +25,7 @@ __all__ = [
     "SpaceAccess",
     "SpaceConfig",
     "SpaceResponse",
+    "SpaceSettings",
+    "SpaceSidebarConfig",
     "SpaceSize",
 ]

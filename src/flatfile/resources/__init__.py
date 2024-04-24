@@ -185,7 +185,7 @@ from .events import (
     Progress,
     SheetSlug,
 )
-from .files import File, FileResponse, ListFilesResponse, Mode, ModelFileStatusEnum
+from .files import File, FileOrigin, FileResponse, ListFilesResponse, Mode, ModelFileStatusEnum
 from .guests import (
     CreateGuestResponse,
     Guest,
@@ -292,6 +292,8 @@ from .property import (
     EnumPropertyConfig,
     EnumPropertyOption,
     ExternalConstraint,
+    FieldAppearance,
+    FieldSize,
     NumberConfig,
     NumberProperty,
     Property,
@@ -311,6 +313,7 @@ from .property import (
     UniqueConstraintConfig,
 )
 from .records import (
+    CellConfig,
     CellValue,
     CellValueUnion,
     CellValueWithLinks,
@@ -324,6 +327,7 @@ from .records import (
     GetRecordsResponseData,
     Record,
     RecordBase,
+    RecordConfig,
     RecordCounts,
     RecordData,
     RecordDataWithLinks,
@@ -391,9 +395,19 @@ from .spaces import (
     SpaceAccess,
     SpaceConfig,
     SpaceResponse,
+    SpaceSettings,
+    SpaceSidebarConfig,
     SpaceSize,
 )
-from .users import ListUsersResponse, User, UserConfig, UserCreateAndInviteRequest, UserResponse
+from .users import (
+    ListUsersResponse,
+    User,
+    UserConfig,
+    UserCreateAndInviteRequest,
+    UserResponse,
+    UserWithRoles,
+    UserWithRolesResponse,
+)
 from .versions import Version, VersionResponse
 from .workbooks import (
     CreateWorkbookConfig,
@@ -442,6 +456,7 @@ __all__ = [
     "BooleanProperty",
     "BooleanPropertyConfig",
     "CategoryMapping",
+    "CellConfig",
     "CellValue",
     "CellValueUnion",
     "CellValueWithCounts",
@@ -564,11 +579,14 @@ __all__ = [
     "ExternalConstraint",
     "ExternalSheetConstraint",
     "FamilyId",
+    "FieldAppearance",
     "FieldKey",
     "FieldRecordCounts",
+    "FieldSize",
     "File",
     "FileId",
     "FileJobConfig",
+    "FileOrigin",
     "FileResponse",
     "Filter",
     "FilterField",
@@ -700,6 +718,7 @@ __all__ = [
     "Property_String",
     "Record",
     "RecordBase",
+    "RecordConfig",
     "RecordCounts",
     "RecordCountsResponse",
     "RecordCountsResponseData",
@@ -752,6 +771,8 @@ __all__ = [
     "SpaceConfigId",
     "SpaceId",
     "SpaceResponse",
+    "SpaceSettings",
+    "SpaceSidebarConfig",
     "SpaceSize",
     "StringConfig",
     "StringConfigOptions",
@@ -769,6 +790,8 @@ __all__ = [
     "UserCreateAndInviteRequest",
     "UserId",
     "UserResponse",
+    "UserWithRoles",
+    "UserWithRolesResponse",
     "ValidationMessage",
     "ValidationSource",
     "ValidationType",

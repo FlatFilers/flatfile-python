@@ -18,6 +18,7 @@ class RecordsResponse(pydantic.BaseModel):
 
     from flatfile import (
         CellValueWithLinks,
+        RecordConfig,
         RecordCounts,
         RecordsResponse,
         RecordsResponseData,
@@ -54,6 +55,7 @@ class RecordsResponse(pydantic.BaseModel):
                     },
                     valid=True,
                     metadata={},
+                    config=RecordConfig(),
                 )
             ],
             counts=RecordCounts(

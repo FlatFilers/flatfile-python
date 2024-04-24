@@ -25,6 +25,7 @@ class GetRecordsResponseData(SuccessData):
     from flatfile import (
         CellValueWithLinks,
         GetRecordsResponseData,
+        RecordConfig,
         RecordCounts,
         RecordWithLinks,
     )
@@ -58,6 +59,7 @@ class GetRecordsResponseData(SuccessData):
                 },
                 valid=True,
                 metadata={},
+                config=RecordConfig(),
             )
         ],
         counts=RecordCounts(

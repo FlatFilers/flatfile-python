@@ -31,6 +31,9 @@ class MutateJobConfig(pydantic.BaseModel):
     snapshot_label: typing.Optional[str] = pydantic.Field(
         alias="snapshotLabel", default=None, description="If specified, a snapshot will be generated with this label"
     )
+    snapshot_id: typing.Optional[str] = pydantic.Field(
+        alias="snapshotId", default=None, description="The generated snapshotId will be stored here"
+    )
     filter: typing.Optional[Filter] = None
     filter_field: typing.Optional[FilterField] = pydantic.Field(alias="filterField", default=None)
     search_value: typing.Optional[SearchValue] = pydantic.Field(alias="searchValue", default=None)

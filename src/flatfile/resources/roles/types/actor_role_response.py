@@ -16,6 +16,23 @@ except ImportError:
 
 
 class ActorRoleResponse(pydantic.BaseModel):
+    """
+    import datetime
+
+    from flatfile import ActorRoleResponse
+
+    ActorRoleResponse(
+        id="us_acr_YOUR_ID",
+        role_id="us_rol_YOUR_ID",
+        created_at=datetime.datetime.fromisoformat(
+            "2021-01-01 00:00:00+00:00",
+        ),
+        updated_at=datetime.datetime.fromisoformat(
+            "2021-01-01 00:00:00+00:00",
+        ),
+    )
+    """
+
     id: ActorRoleId
     role_id: RoleId = pydantic.Field(alias="roleId")
     actor_id: ActorIdUnion = pydantic.Field(alias="actorId")

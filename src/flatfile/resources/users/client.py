@@ -22,6 +22,7 @@ from ..roles.types.list_actor_roles_response import ListActorRolesResponse
 from .types.list_users_response import ListUsersResponse
 from .types.user_create_and_invite_request import UserCreateAndInviteRequest
 from .types.user_response import UserResponse
+from .types.user_with_roles_response import UserWithRolesResponse
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -93,7 +94,7 @@ class UsersClient:
 
     def create_and_invite(
         self, *, request: UserCreateAndInviteRequest, request_options: typing.Optional[RequestOptions] = None
-    ) -> UserResponse:
+    ) -> UserWithRolesResponse:
         """
         Creates and invites a new user to your account.
 
@@ -148,7 +149,7 @@ class UsersClient:
             else 60,
         )
         if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(UserResponse, _response.json())  # type: ignore
+            return pydantic.parse_obj_as(UserWithRolesResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
@@ -250,6 +251,41 @@ class UsersClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(UserResponse, _response.json())  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def delete(self, user_id: UserId, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
+        """
+        Deletes a user
+
+        Parameters:
+            - user_id: UserId. The user id
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "DELETE",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"users/{jsonable_encoder(user_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
@@ -464,7 +500,7 @@ class AsyncUsersClient:
 
     async def create_and_invite(
         self, *, request: UserCreateAndInviteRequest, request_options: typing.Optional[RequestOptions] = None
-    ) -> UserResponse:
+    ) -> UserWithRolesResponse:
         """
         Creates and invites a new user to your account.
 
@@ -519,7 +555,7 @@ class AsyncUsersClient:
             else 60,
         )
         if 200 <= _response.status_code < 300:
-            return pydantic.parse_obj_as(UserResponse, _response.json())  # type: ignore
+            return pydantic.parse_obj_as(UserWithRolesResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
@@ -621,6 +657,41 @@ class AsyncUsersClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(UserResponse, _response.json())  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def delete(self, user_id: UserId, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
+        """
+        Deletes a user
+
+        Parameters:
+            - user_id: UserId. The user id
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "DELETE",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"users/{jsonable_encoder(user_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:

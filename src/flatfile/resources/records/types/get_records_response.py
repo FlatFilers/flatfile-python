@@ -20,6 +20,7 @@ class GetRecordsResponse(pydantic.BaseModel):
         CellValueWithLinks,
         GetRecordsResponse,
         GetRecordsResponseData,
+        RecordConfig,
         RecordCounts,
         RecordWithLinks,
     )
@@ -54,6 +55,7 @@ class GetRecordsResponse(pydantic.BaseModel):
                     },
                     valid=True,
                     metadata={},
+                    config=RecordConfig(),
                 )
             ],
             counts=RecordCounts(

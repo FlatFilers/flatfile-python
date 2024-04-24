@@ -622,7 +622,7 @@ class SheetsClient:
         filter_field: typing.Optional[FilterField] = None,
         page_size: typing.Optional[PageSize] = None,
         page_number: typing.Optional[PageNumber] = None,
-        distinct: typing.Optional[Distinct] = None,
+        distinct: Distinct,
         include_counts: typing.Optional[IncludeCounts] = None,
         search_value: typing.Optional[SearchValue] = None,
         request_options: typing.Optional[RequestOptions] = None,
@@ -647,7 +647,7 @@ class SheetsClient:
 
             - page_number: typing.Optional[PageNumber]. Based on pageSize, which page of records to return
 
-            - distinct: typing.Optional[Distinct].
+            - distinct: Distinct. Must be set to true
 
             - include_counts: typing.Optional[IncludeCounts].
 
@@ -663,6 +663,7 @@ class SheetsClient:
         )
         client.sheets.get_cell_values(
             sheet_id="us_sh_YOUR_ID",
+            distinct=True,
             field_key="firstName",
             sort_field="firstName",
             sort_direction=SortDirection.ASC,
@@ -1301,7 +1302,7 @@ class AsyncSheetsClient:
         filter_field: typing.Optional[FilterField] = None,
         page_size: typing.Optional[PageSize] = None,
         page_number: typing.Optional[PageNumber] = None,
-        distinct: typing.Optional[Distinct] = None,
+        distinct: Distinct,
         include_counts: typing.Optional[IncludeCounts] = None,
         search_value: typing.Optional[SearchValue] = None,
         request_options: typing.Optional[RequestOptions] = None,
@@ -1326,7 +1327,7 @@ class AsyncSheetsClient:
 
             - page_number: typing.Optional[PageNumber]. Based on pageSize, which page of records to return
 
-            - distinct: typing.Optional[Distinct].
+            - distinct: Distinct. Must be set to true
 
             - include_counts: typing.Optional[IncludeCounts].
 
@@ -1342,6 +1343,7 @@ class AsyncSheetsClient:
         )
         await client.sheets.get_cell_values(
             sheet_id="us_sh_YOUR_ID",
+            distinct=True,
             field_key="firstName",
             sort_field="firstName",
             sort_direction=SortDirection.ASC,

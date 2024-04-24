@@ -9,6 +9,7 @@ from ...commons.types.file_id import FileId
 from ...commons.types.sheet_id import SheetId
 from ...commons.types.space_id import SpaceId
 from ...commons.types.workbook_id import WorkbookId
+from .file_origin import FileOrigin
 from .mode import Mode
 from .model_file_status_enum import ModelFileStatusEnum
 
@@ -67,6 +68,7 @@ class File(pydantic.BaseModel):
     workbook_id: typing.Optional[WorkbookId] = pydantic.Field(alias="workbookId", default=None)
     sheet_id: typing.Optional[SheetId] = pydantic.Field(alias="sheetId", default=None)
     actions: typing.Optional[typing.List[Action]] = None
+    origin: typing.Optional[FileOrigin] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

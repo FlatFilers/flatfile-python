@@ -7,6 +7,7 @@ from ....core.datetime_utils import serialize_datetime
 from ...commons.types.commit_id import CommitId
 from ...commons.types.record_id import RecordId
 from ...commons.types.version_id import VersionId
+from .record_config import RecordConfig
 from .validation_message import ValidationMessage
 
 try:
@@ -42,6 +43,7 @@ class RecordBase(pydantic.BaseModel):
         description="This record level `messages` property is deprecated and no longer stored or used. Use the `messages` property on the individual cell values instead. This property will be removed in a future release.",
     )
     metadata: typing.Optional[typing.Dict[str, typing.Any]] = None
+    config: typing.Optional[RecordConfig] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

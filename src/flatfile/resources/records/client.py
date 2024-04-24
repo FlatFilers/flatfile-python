@@ -196,7 +196,7 @@ class RecordsClient:
 
             - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
-        from flatfile import CellValue, Record
+        from flatfile import CellValue, Record, RecordConfig
         from flatfile.client import Flatfile
 
         client = Flatfile(
@@ -225,6 +225,7 @@ class RecordsClient:
                     },
                     valid=True,
                     metadata={},
+                    config=RecordConfig(),
                 )
             ],
         )
@@ -677,7 +678,7 @@ class AsyncRecordsClient:
 
             - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
-        from flatfile import CellValue, Record
+        from flatfile import CellValue, Record, RecordConfig
         from flatfile.client import AsyncFlatfile
 
         client = AsyncFlatfile(
@@ -706,6 +707,7 @@ class AsyncRecordsClient:
                     },
                     valid=True,
                     metadata={},
+                    config=RecordConfig(),
                 )
             ],
         )

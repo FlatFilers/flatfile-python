@@ -5,6 +5,7 @@ import typing
 
 from ....core.datetime_utils import serialize_datetime
 from .constraint import Constraint
+from .field_appearance import FieldAppearance
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -20,6 +21,7 @@ class BaseProperty(pydantic.BaseModel):
     )
     constraints: typing.Optional[typing.List[Constraint]] = None
     readonly: typing.Optional[bool] = None
+    appearance: typing.Optional[FieldAppearance] = None
     metadata: typing.Optional[typing.Any] = pydantic.Field(
         default=None, description="Useful for any contextual metadata regarding the schema. Store any valid json here."
     )

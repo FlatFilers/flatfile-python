@@ -5,7 +5,7 @@ import typing
 from .record import Record
 
 """
-from flatfile import CellValue, Record
+from flatfile import CellValue, Record, RecordConfig
 
 [
     Record(
@@ -28,6 +28,7 @@ from flatfile import CellValue, Record
         },
         valid=True,
         metadata={},
+        config=RecordConfig(),
     )
 ]
 """

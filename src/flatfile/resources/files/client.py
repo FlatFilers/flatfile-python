@@ -19,6 +19,7 @@ from ..commons.types.file_id import FileId
 from ..commons.types.space_id import SpaceId
 from ..commons.types.success import Success
 from ..commons.types.workbook_id import WorkbookId
+from .types.file_origin import FileOrigin
 from .types.file_response import FileResponse
 from .types.list_files_response import ListFilesResponse
 from .types.mode import Mode
@@ -111,6 +112,7 @@ class FilesClient:
         mode: typing.Optional[Mode] = None,
         file: core.File,
         actions: typing.Optional[typing.List[Action]] = None,
+        origin: typing.Optional[FileOrigin] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> FileResponse:
         """
@@ -125,6 +127,8 @@ class FilesClient:
 
             - actions: typing.Optional[typing.List[Action]]. The actions attached to the file
 
+            - origin: typing.Optional[FileOrigin]. The origin of the file, ie filesystem
+
             - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -135,14 +139,26 @@ class FilesClient:
             ),
             data=jsonable_encoder(
                 remove_none_from_dict(
-                    {"spaceId": space_id, "environmentId": environment_id, "mode": mode, "actions": actions}
+                    {
+                        "spaceId": space_id,
+                        "environmentId": environment_id,
+                        "mode": mode,
+                        "actions": actions,
+                        "origin": origin,
+                    }
                 )
             )
             if request_options is None or request_options.get("additional_body_parameters") is None
             else {
                 **jsonable_encoder(
                     remove_none_from_dict(
-                        {"spaceId": space_id, "environmentId": environment_id, "mode": mode, "actions": actions}
+                        {
+                            "spaceId": space_id,
+                            "environmentId": environment_id,
+                            "mode": mode,
+                            "actions": actions,
+                            "origin": origin,
+                        }
                     )
                 ),
                 **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
@@ -462,6 +478,7 @@ class AsyncFilesClient:
         mode: typing.Optional[Mode] = None,
         file: core.File,
         actions: typing.Optional[typing.List[Action]] = None,
+        origin: typing.Optional[FileOrigin] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> FileResponse:
         """
@@ -476,6 +493,8 @@ class AsyncFilesClient:
 
             - actions: typing.Optional[typing.List[Action]]. The actions attached to the file
 
+            - origin: typing.Optional[FileOrigin]. The origin of the file, ie filesystem
+
             - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -486,14 +505,26 @@ class AsyncFilesClient:
             ),
             data=jsonable_encoder(
                 remove_none_from_dict(
-                    {"spaceId": space_id, "environmentId": environment_id, "mode": mode, "actions": actions}
+                    {
+                        "spaceId": space_id,
+                        "environmentId": environment_id,
+                        "mode": mode,
+                        "actions": actions,
+                        "origin": origin,
+                    }
                 )
             )
             if request_options is None or request_options.get("additional_body_parameters") is None
             else {
                 **jsonable_encoder(
                     remove_none_from_dict(
-                        {"spaceId": space_id, "environmentId": environment_id, "mode": mode, "actions": actions}
+                        {
+                            "spaceId": space_id,
+                            "environmentId": environment_id,
+                            "mode": mode,
+                            "actions": actions,
+                            "origin": origin,
+                        }
                     )
                 ),
                 **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),

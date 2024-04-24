@@ -7,7 +7,7 @@ from .record_with_links import RecordWithLinks
 """
 import datetime
 
-from flatfile import CellValueWithLinks, RecordWithLinks
+from flatfile import CellValueWithLinks, RecordConfig, RecordWithLinks
 
 [
     RecordWithLinks(
@@ -37,6 +37,7 @@ from flatfile import CellValueWithLinks, RecordWithLinks
         },
         valid=True,
         metadata={},
+        config=RecordConfig(),
     )
 ]
 """

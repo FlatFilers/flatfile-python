@@ -5,5 +5,15 @@ from .user import User
 from .user_config import UserConfig
 from .user_create_and_invite_request import UserCreateAndInviteRequest
 from .user_response import UserResponse
+from .user_with_roles import UserWithRoles
+from .user_with_roles_response import UserWithRolesResponse
 
-__all__ = ["ListUsersResponse", "User", "UserConfig", "UserCreateAndInviteRequest", "UserResponse"]
+__all__ = [
+    "ListUsersResponse",
+    "User",
+    "UserConfig",
+    "UserCreateAndInviteRequest",
+    "UserResponse",
+    "UserWithRoles",
+    "UserWithRolesResponse",
+]

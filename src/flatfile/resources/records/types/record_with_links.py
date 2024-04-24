@@ -5,6 +5,7 @@ import typing
 
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.record_id import RecordId
+from .record_config import RecordConfig
 from .record_data_with_links import RecordDataWithLinks
 from .validation_message import ValidationMessage
 
@@ -20,7 +21,7 @@ class RecordWithLinks(pydantic.BaseModel):
     ---
     import datetime
 
-    from flatfile import CellValueWithLinks, RecordWithLinks
+    from flatfile import CellValueWithLinks, RecordConfig, RecordWithLinks
 
     RecordWithLinks(
         id="us_rc_YOUR_ID",
@@ -49,6 +50,7 @@ class RecordWithLinks(pydantic.BaseModel):
         },
         valid=True,
         metadata={},
+        config=RecordConfig(),
     )
     """
 
@@ -57,6 +59,7 @@ class RecordWithLinks(pydantic.BaseModel):
     valid: typing.Optional[bool] = None
     messages: typing.Optional[typing.List[ValidationMessage]] = None
     metadata: typing.Optional[typing.Dict[str, typing.Any]] = None
+    config: typing.Optional[RecordConfig] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

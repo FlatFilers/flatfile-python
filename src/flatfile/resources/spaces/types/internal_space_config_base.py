@@ -10,6 +10,7 @@ from ...commons.types.environment_id import EnvironmentId
 from ...commons.types.space_config_id import SpaceConfigId
 from ...commons.types.workbook_id import WorkbookId
 from .space_access import SpaceAccess
+from .space_settings import SpaceSettings
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -22,6 +23,7 @@ class InternalSpaceConfigBase(pydantic.BaseModel):
     environment_id: typing.Optional[EnvironmentId] = pydantic.Field(alias="environmentId", default=None)
     primary_workbook_id: typing.Optional[WorkbookId] = pydantic.Field(alias="primaryWorkbookId", default=None)
     metadata: typing.Optional[typing.Any] = pydantic.Field(default=None, description="Metadata for the space")
+    settings: typing.Optional[SpaceSettings] = pydantic.Field(default=None, description="The Space settings.")
     actions: typing.Optional[typing.List[Action]] = None
     access: typing.Optional[typing.List[SpaceAccess]] = None
     auto_configure: typing.Optional[bool] = pydantic.Field(alias="autoConfigure", default=None)
