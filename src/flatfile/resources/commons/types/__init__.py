@@ -53,6 +53,7 @@ from .success_data import SuccessData
 from .success_query_parameter import SuccessQueryParameter
 from .user_id import UserId
 from .version_id import VersionId
+from .view_id import ViewId
 from .workbook_id import WorkbookId
 
 __all__ = [
@@ -109,5 +110,6 @@ __all__ = [
     "SuccessQueryParameter",
     "UserId",
     "VersionId",
+    "ViewId",
     "WorkbookId",
 ]

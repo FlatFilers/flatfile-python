@@ -28,6 +28,7 @@ from .resources.snapshots.client import AsyncSnapshotsClient, SnapshotsClient
 from .resources.spaces.client import AsyncSpacesClient, SpacesClient
 from .resources.users.client import AsyncUsersClient, UsersClient
 from .resources.versions.client import AsyncVersionsClient, VersionsClient
+from .resources.views.client import AsyncViewsClient, ViewsClient
 from .resources.workbooks.client import AsyncWorkbooksClient, WorkbooksClient
 
 
@@ -91,6 +92,7 @@ class Flatfile:
         self.spaces = SpacesClient(client_wrapper=self._client_wrapper)
         self.users = UsersClient(client_wrapper=self._client_wrapper)
         self.versions = VersionsClient(client_wrapper=self._client_wrapper)
+        self.views = ViewsClient(client_wrapper=self._client_wrapper)
         self.workbooks = WorkbooksClient(client_wrapper=self._client_wrapper)
 
 
@@ -154,6 +156,7 @@ class AsyncFlatfile:
         self.spaces = AsyncSpacesClient(client_wrapper=self._client_wrapper)
         self.users = AsyncUsersClient(client_wrapper=self._client_wrapper)
         self.versions = AsyncVersionsClient(client_wrapper=self._client_wrapper)
+        self.views = AsyncViewsClient(client_wrapper=self._client_wrapper)
         self.workbooks = AsyncWorkbooksClient(client_wrapper=self._client_wrapper)
 
 

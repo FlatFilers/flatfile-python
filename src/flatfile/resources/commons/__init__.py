@@ -54,6 +54,7 @@ from .types import (
     SuccessQueryParameter,
     UserId,
     VersionId,
+    ViewId,
     WorkbookId,
 )
 from .errors import BadRequestError, ForbiddenError, NotFoundError
@@ -115,5 +116,6 @@ __all__ = [
     "SuccessQueryParameter",
     "UserId",
     "VersionId",
+    "ViewId",
     "WorkbookId",
 ]

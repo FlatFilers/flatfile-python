@@ -25,6 +25,7 @@ from . import (
     spaces,
     users,
     versions,
+    views,
     workbooks,
 )
 from .accounts import Account, AccountPatch, AccountResponse
@@ -102,6 +103,7 @@ from .commons import (
     SuccessQueryParameter,
     UserId,
     VersionId,
+    ViewId,
     WorkbookId,
 )
 from .data_retention_policies import (
@@ -409,6 +411,7 @@ from .users import (
     UserWithRolesResponse,
 )
 from .versions import Version, VersionResponse
+from .views import ListViewsResponse, View, ViewConfig, ViewCreate, ViewResponse, ViewUpdate
 from .workbooks import (
     CreateWorkbookConfig,
     ListWorkbooksResponse,
@@ -676,6 +679,7 @@ __all__ = [
     "ListSheetsResponse",
     "ListSpacesResponse",
     "ListUsersResponse",
+    "ListViewsResponse",
     "ListWorkbooksResponse",
     "MappingId",
     "MappingProgramJobConfig",
@@ -798,6 +802,12 @@ __all__ = [
     "Version",
     "VersionId",
     "VersionResponse",
+    "View",
+    "ViewConfig",
+    "ViewCreate",
+    "ViewId",
+    "ViewResponse",
+    "ViewUpdate",
     "Workbook",
     "WorkbookConfigSettings",
     "WorkbookId",
@@ -828,5 +838,6 @@ __all__ = [
     "spaces",
     "users",
     "versions",
+    "views",
     "workbooks",
 ]
