@@ -6,6 +6,7 @@ from .boolean_property import BooleanProperty
 from .boolean_property_config import BooleanPropertyConfig
 from .constraint import Constraint, Constraint_Computed, Constraint_External, Constraint_Required, Constraint_Unique
 from .date_property import DateProperty
+from .enum_list_property import EnumListProperty
 from .enum_property import EnumProperty
 from .enum_property_config import EnumPropertyConfig
 from .enum_property_option import EnumPropertyOption
@@ -19,15 +20,18 @@ from .property import (
     Property_Boolean,
     Property_Date,
     Property_Enum,
+    Property_EnumList,
     Property_Number,
     Property_Reference,
     Property_String,
+    Property_StringList,
 )
 from .reference_property import ReferenceProperty
 from .reference_property_config import ReferencePropertyConfig
 from .reference_property_relationship import ReferencePropertyRelationship
 from .string_config import StringConfig
 from .string_config_options import StringConfigOptions
+from .string_list_property import StringListProperty
 from .string_property import StringProperty
 from .unique_constraint import UniqueConstraint
 from .unique_constraint_config import UniqueConstraintConfig
@@ -43,6 +47,7 @@ __all__ = [
     "Constraint_Required",
     "Constraint_Unique",
     "DateProperty",
+    "EnumListProperty",
     "EnumProperty",
     "EnumPropertyConfig",
     "EnumPropertyOption",
@@ -55,14 +60,17 @@ __all__ = [
     "Property_Boolean",
     "Property_Date",
     "Property_Enum",
+    "Property_EnumList",
     "Property_Number",
     "Property_Reference",
     "Property_String",
+    "Property_StringList",
     "ReferenceProperty",
     "ReferencePropertyConfig",
     "ReferencePropertyRelationship",
     "StringConfig",
     "StringConfigOptions",
+    "StringListProperty",
     "StringProperty",
     "UniqueConstraint",
     "UniqueConstraintConfig",
