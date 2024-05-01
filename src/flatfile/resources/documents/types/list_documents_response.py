@@ -4,7 +4,7 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
-from .document_response import DocumentResponse
+from .document import Document
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -16,46 +16,61 @@ class ListDocumentsResponse(pydantic.BaseModel):
     """
     import datetime
 
-    from flatfile import (
-        Action,
-        ActionMode,
-        Document,
-        DocumentResponse,
-        ListDocumentsResponse,
-    )
+    from flatfile import Action, ActionMode, Document, ListDocumentsResponse
 
     ListDocumentsResponse(
         data=[
-            DocumentResponse(
-                data=Document(
-                    id="us_dc_YOUR_ID",
-                    space_id="us_sp_YOUR_ID",
-                    environment_id="us_env_YOUR_ID",
-                    title="My Document 1",
-                    body="My information",
-                    treatments=[],
-                    actions=[
-                        Action(
-                            operation="submitAction",
-                            mode=ActionMode.FOREGROUND,
-                            label="Submit",
-                            description="Submit data to webhook.site",
-                            primary=True,
-                        )
-                    ],
-                    created_at=datetime.datetime.fromisoformat(
-                        "2022-09-18 00:19:57.007000+00:00",
-                    ),
-                    updated_at=datetime.datetime.fromisoformat(
-                        "2022-09-18 00:19:57.007000+00:00",
-                    ),
+            Document(
+                id="us_dc_YOUR_ID",
+                space_id="us_sp_YOUR_ID",
+                environment_id="us_env_YOUR_ID",
+                title="My Document 1",
+                body="My information",
+                treatments=[],
+                actions=[
+                    Action(
+                        operation="submitAction",
+                        mode=ActionMode.FOREGROUND,
+                        label="Submit",
+                        description="Submit data to webhook.site",
+                        primary=True,
+                    )
+                ],
+                created_at=datetime.datetime.fromisoformat(
+                    "2022-09-18 00:19:57.007000+00:00",
                 ),
-            )
+                updated_at=datetime.datetime.fromisoformat(
+                    "2022-09-18 00:19:57.007000+00:00",
+                ),
+            ),
+            Document(
+                id="us_dc_YOUR_ID",
+                space_id="us_sp_YOUR_ID",
+                environment_id="us_env_YOUR_ID",
+                title="Updated Title",
+                body="Updated My information",
+                treatments=[],
+                actions=[
+                    Action(
+                        operation="submitAction",
+                        mode=ActionMode.FOREGROUND,
+                        label="Submit",
+                        description="Submit data to webhook.site",
+                        primary=True,
+                    )
+                ],
+                created_at=datetime.datetime.fromisoformat(
+                    "2022-09-18 00:19:57.007000+00:00",
+                ),
+                updated_at=datetime.datetime.fromisoformat(
+                    "2022-09-18 00:19:57.007000+00:00",
+                ),
+            ),
         ],
     )
     """
 
-    data: typing.List[DocumentResponse]
+    data: typing.List[Document]
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

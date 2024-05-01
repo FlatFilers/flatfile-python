@@ -37,6 +37,7 @@ class ListViewsResponse(pydantic.BaseModel):
                     sort_field="email",
                     sort_direction=SortDirection.ASC,
                 ),
+                created_by="us_usr_YOUR_ID",
             )
         ],
         pagination=Pagination(

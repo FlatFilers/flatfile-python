@@ -33,12 +33,23 @@ class ViewsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def list(self, *, sheet_id: SheetId, request_options: typing.Optional[RequestOptions] = None) -> ListViewsResponse:
+    def list(
+        self,
+        *,
+        sheet_id: SheetId,
+        page_size: typing.Optional[int] = None,
+        page_number: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> ListViewsResponse:
         """
-        Returns all views for user and sheet
+        Returns all views for the sheet
 
         Parameters:
             - sheet_id: SheetId. The associated sheet ID of the view.
+
+            - page_size: typing.Optional[int]. Number of prompts to return in a page (default 10)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of prompts to return
 
             - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
@@ -58,6 +69,8 @@ class ViewsClient:
                 remove_none_from_dict(
                     {
                         "sheetId": sheet_id,
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
                         **(
                             request_options.get("additional_query_parameters", {})
                             if request_options is not None
@@ -322,13 +335,22 @@ class AsyncViewsClient:
         self._client_wrapper = client_wrapper
 
     async def list(
-        self, *, sheet_id: SheetId, request_options: typing.Optional[RequestOptions] = None
+        self,
+        *,
+        sheet_id: SheetId,
+        page_size: typing.Optional[int] = None,
+        page_number: typing.Optional[int] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> ListViewsResponse:
         """
-        Returns all views for user and sheet
+        Returns all views for the sheet
 
         Parameters:
             - sheet_id: SheetId. The associated sheet ID of the view.
+
+            - page_size: typing.Optional[int]. Number of prompts to return in a page (default 10)
+
+            - page_number: typing.Optional[int]. Based on pageSize, which page of prompts to return
 
             - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
@@ -348,6 +370,8 @@ class AsyncViewsClient:
                 remove_none_from_dict(
                     {
                         "sheetId": sheet_id,
+                        "pageSize": page_size,
+                        "pageNumber": page_number,
                         **(
                             request_options.get("additional_query_parameters", {})
                             if request_options is not None

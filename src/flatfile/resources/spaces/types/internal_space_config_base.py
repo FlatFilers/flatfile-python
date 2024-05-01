@@ -21,7 +21,11 @@ except ImportError:
 class InternalSpaceConfigBase(pydantic.BaseModel):
     space_config_id: typing.Optional[SpaceConfigId] = pydantic.Field(alias="spaceConfigId", default=None)
     environment_id: typing.Optional[EnvironmentId] = pydantic.Field(alias="environmentId", default=None)
-    primary_workbook_id: typing.Optional[WorkbookId] = pydantic.Field(alias="primaryWorkbookId", default=None)
+    primary_workbook_id: typing.Optional[WorkbookId] = pydantic.Field(
+        alias="primaryWorkbookId",
+        default=None,
+        description="The ID of the primary workbook for the space. This should not be included in create space requests.",
+    )
     metadata: typing.Optional[typing.Any] = pydantic.Field(default=None, description="Metadata for the space")
     settings: typing.Optional[SpaceSettings] = pydantic.Field(default=None, description="The Space settings.")
     actions: typing.Optional[typing.List[Action]] = None

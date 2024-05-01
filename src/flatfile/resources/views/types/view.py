@@ -31,6 +31,7 @@ class View(pydantic.BaseModel):
             sort_field="email",
             sort_direction=SortDirection.ASC,
         ),
+        created_by="us_usr_YOUR_ID",
     )
     """
 
@@ -38,6 +39,7 @@ class View(pydantic.BaseModel):
     sheet_id: SheetId = pydantic.Field(alias="sheetId", description="The associated sheet ID of the view")
     name: str = pydantic.Field(description="The name of the view")
     config: ViewConfig = pydantic.Field(description="The view filters of the view")
+    created_by: str = pydantic.Field(alias="createdBy", description="ID of the actor who created the view")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
