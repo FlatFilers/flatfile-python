@@ -22,8 +22,14 @@ class DeleteRecordsJobConfig(pydantic.BaseModel):
     The configuration for a delete job
     """
 
-    filter: typing.Optional[Filter] = None
-    filter_field: typing.Optional[FilterField] = pydantic.Field(alias="filterField", default=None)
+    filter: typing.Optional[Filter] = pydantic.Field(
+        default=None, description="Options to filter records (default=none)"
+    )
+    filter_field: typing.Optional[FilterField] = pydantic.Field(
+        alias="filterField",
+        default=None,
+        description="Use this to narrow the valid/error filter results to a specific field (Requires filter to be set)",
+    )
     search_value: typing.Optional[SearchValue] = pydantic.Field(alias="searchValue", default=None)
     search_field: typing.Optional[SearchField] = pydantic.Field(alias="searchField", default=None)
     q: typing.Optional[str] = pydantic.Field(default=None, description="FFQL query to filter records")

@@ -26,6 +26,9 @@ class SheetUpdate(pydantic.BaseModel):
     config: typing.Optional[SheetConfig] = pydantic.Field(
         default=None, description="Describes shape of data as well as behavior."
     )
+    metadata: typing.Optional[typing.Any] = pydantic.Field(
+        default=None, description="Useful for any contextual metadata regarding the sheet. Store any valid json"
+    )
     namespace: typing.Optional[str] = pydantic.Field(default=None, description="The scoped namespace of the Sheet.")
     updated_at: typing.Optional[dt.datetime] = pydantic.Field(
         alias="updatedAt", default=None, description="Date the sheet was last updated"

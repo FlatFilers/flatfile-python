@@ -77,6 +77,11 @@ class JobConfig(pydantic.BaseModel):
     parent_id: typing.Optional[JobId] = pydantic.Field(
         alias="parentId", default=None, description="The id of the parent job"
     )
+    predecessor_ids: typing.Optional[typing.List[JobId]] = pydantic.Field(
+        alias="predecessorIds",
+        default=None,
+        description="The ids of the jobs that must complete before this job can start",
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

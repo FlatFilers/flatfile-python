@@ -23,6 +23,7 @@ from .types import (
     SheetConstraint_Unique,
     SheetResponse,
     SheetUpdate,
+    SheetUpdateRequest,
 )
 
 __all__ = [
@@ -48,4 +49,5 @@ __all__ = [
     "SheetConstraint_Unique",
     "SheetResponse",
     "SheetUpdate",
+    "SheetUpdateRequest",
 ]

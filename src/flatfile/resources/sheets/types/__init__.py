@@ -20,6 +20,7 @@ from .sheet_config_update import SheetConfigUpdate
 from .sheet_constraint import SheetConstraint, SheetConstraint_External, SheetConstraint_Unique
 from .sheet_response import SheetResponse
 from .sheet_update import SheetUpdate
+from .sheet_update_request import SheetUpdateRequest
 
 __all__ = [
     "CellValueWithCounts",
@@ -44,4 +45,5 @@ __all__ = [
     "SheetConstraint_Unique",
     "SheetResponse",
     "SheetUpdate",
+    "SheetUpdateRequest",
 ]

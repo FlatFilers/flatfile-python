@@ -24,6 +24,7 @@ class Domain(str, enum.Enum):
     PROGRAM = "program"
     SECRET = "secret"
     CRON = "cron"
+    ENVIRONMENT = "environment"
 
     def visit(
         self,
@@ -36,6 +37,7 @@ class Domain(str, enum.Enum):
         program: typing.Callable[[], T_Result],
         secret: typing.Callable[[], T_Result],
         cron: typing.Callable[[], T_Result],
+        environment: typing.Callable[[], T_Result],
     ) -> T_Result:
         if self is Domain.FILE:
             return file()
@@ -55,3 +57,5 @@ class Domain(str, enum.Enum):
             return secret()
         if self is Domain.CRON:
             return cron()
+        if self is Domain.ENVIRONMENT:
+            return environment()

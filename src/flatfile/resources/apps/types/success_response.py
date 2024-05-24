@@ -4,9 +4,6 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
-from ...commons.types.json_path_string import JsonPathString
-from .validation_source import ValidationSource
-from .validation_type import ValidationType
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -14,18 +11,16 @@ except ImportError:
     import pydantic  # type: ignore
 
 
-class ValidationMessage(pydantic.BaseModel):
+class SuccessResponse(pydantic.BaseModel):
     """
-    Record data validation messages
+    from flatfile import SuccessResponse
+
+    SuccessResponse(
+        success=True,
+    )
     """
 
-    field: typing.Optional[str] = None
-    type: typing.Optional[ValidationType] = None
-    source: typing.Optional[ValidationSource] = None
-    message: typing.Optional[str] = None
-    path: typing.Optional[JsonPathString] = pydantic.Field(
-        default=None, description="This JSONPath is based on the root of mapped cell object."
-    )
+    success: bool
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

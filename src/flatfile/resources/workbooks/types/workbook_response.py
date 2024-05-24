@@ -61,7 +61,7 @@ class WorkbookResponse(pydantic.BaseModel):
                         ],
                         mapping_confidence_threshold=0.5,
                     ),
-                    locked_by="Example0",
+                    metadata={"rowHeaders": [4]},
                     updated_at=datetime.datetime.fromisoformat(
                         "2021-08-31 18:00:00+00:00",
                     ),

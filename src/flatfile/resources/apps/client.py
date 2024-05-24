@@ -14,6 +14,7 @@ from .types.app_create import AppCreate
 from .types.app_patch import AppPatch
 from .types.app_response import AppResponse
 from .types.apps_response import AppsResponse
+from .types.success_response import SuccessResponse
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -207,6 +208,50 @@ class AppsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def delete(self, app_id: AppId, *, request_options: typing.Optional[RequestOptions] = None) -> SuccessResponse:
+        """
+        Deletes an app
+
+        Parameters:
+            - app_id: AppId. ID of app to delete
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            token="YOUR_TOKEN",
+        )
+        client.apps.delete(
+            app_id="us_app_YOUR_ID",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "DELETE",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"apps/{jsonable_encoder(app_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(SuccessResponse, _response.json())  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
 
 class AsyncAppsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
@@ -387,6 +432,52 @@ class AsyncAppsClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(AppResponse, _response.json())  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def delete(
+        self, app_id: AppId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> SuccessResponse:
+        """
+        Deletes an app
+
+        Parameters:
+            - app_id: AppId. ID of app to delete
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            token="YOUR_TOKEN",
+        )
+        await client.apps.delete(
+            app_id="us_app_YOUR_ID",
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "DELETE",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"apps/{jsonable_encoder(app_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(SuccessResponse, _response.json())  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:

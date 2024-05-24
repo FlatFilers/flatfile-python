@@ -5,10 +5,12 @@ from __future__ import annotations
 import typing
 
 from .job_outcome_next_download import JobOutcomeNextDownload
+from .job_outcome_next_files import JobOutcomeNextFiles
 from .job_outcome_next_id import JobOutcomeNextId
 from .job_outcome_next_retry import JobOutcomeNextRetry
 from .job_outcome_next_snapshot import JobOutcomeNextSnapshot
 from .job_outcome_next_url import JobOutcomeNextUrl
+from .job_outcome_next_view import JobOutcomeNextView
 from .job_outcome_next_wait import JobOutcomeNextWait
 
 
@@ -32,6 +34,15 @@ class JobOutcomeNext_Url(JobOutcomeNextUrl):
 
 class JobOutcomeNext_Download(JobOutcomeNextDownload):
     type: typing.Literal["download"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+class JobOutcomeNext_Files(JobOutcomeNextFiles):
+    type: typing.Literal["files"]
 
     class Config:
         frozen = True
@@ -66,6 +77,15 @@ class JobOutcomeNext_Retry(JobOutcomeNextRetry):
         allow_population_by_field_name = True
 
 
+class JobOutcomeNext_View(JobOutcomeNextView):
+    type: typing.Literal["view"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
 """
 from flatfile import JobOutcomeNext_Id
 
@@ -78,7 +98,9 @@ JobOutcomeNext = typing.Union[
     JobOutcomeNext_Id,
     JobOutcomeNext_Url,
     JobOutcomeNext_Download,
+    JobOutcomeNext_Files,
     JobOutcomeNext_Wait,
     JobOutcomeNext_Snapshot,
     JobOutcomeNext_Retry,
+    JobOutcomeNext_View,
 ]

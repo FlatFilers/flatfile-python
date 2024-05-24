@@ -66,6 +66,9 @@ class EventTopic(str, enum.Enum):
     CRON_HOURLY = "cron:hourly"
     CRON_DAILY = "cron:daily"
     CRON_WEEKLY = "cron:weekly"
+    ENVIRONMENT_CREATED = "environment:created"
+    ENVIRONMENT_UPDATED = "environment:updated"
+    ENVIRONMENT_DELETED = "environment:deleted"
 
     def visit(
         self,
@@ -120,6 +123,9 @@ class EventTopic(str, enum.Enum):
         cron_hourly: typing.Callable[[], T_Result],
         cron_daily: typing.Callable[[], T_Result],
         cron_weekly: typing.Callable[[], T_Result],
+        environment_created: typing.Callable[[], T_Result],
+        environment_updated: typing.Callable[[], T_Result],
+        environment_deleted: typing.Callable[[], T_Result],
     ) -> T_Result:
         if self is EventTopic.AGENT_CREATED:
             return agent_created()
@@ -223,3 +229,9 @@ class EventTopic(str, enum.Enum):
             return cron_daily()
         if self is EventTopic.CRON_WEEKLY:
             return cron_weekly()
+        if self is EventTopic.ENVIRONMENT_CREATED:
+            return environment_created()
+        if self is EventTopic.ENVIRONMENT_UPDATED:
+            return environment_updated()
+        if self is EventTopic.ENVIRONMENT_DELETED:
+            return environment_deleted()

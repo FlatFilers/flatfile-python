@@ -430,6 +430,33 @@ class Event_LayerCreated(GenericEvent):
         allow_population_by_field_name = True
 
 
+class Event_EnvironmentCreated(GenericEvent):
+    topic: typing.Literal["environment:created"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+class Event_EnvironmentUpdated(GenericEvent):
+    topic: typing.Literal["environment:updated"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+class Event_EnvironmentDeleted(GenericEvent):
+    topic: typing.Literal["environment:deleted"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
 """
 import datetime
 
@@ -506,4 +533,7 @@ Event = typing.Union[
     Event_SecretUpdated,
     Event_SecretDeleted,
     Event_LayerCreated,
+    Event_EnvironmentCreated,
+    Event_EnvironmentUpdated,
+    Event_EnvironmentDeleted,
 ]

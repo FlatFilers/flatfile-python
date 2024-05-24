@@ -50,7 +50,7 @@ class Sheet(pydantic.BaseModel):
             ],
             mapping_confidence_threshold=0.5,
         ),
-        locked_by="Example0",
+        metadata={"rowHeaders": [4]},
         updated_at=datetime.datetime.fromisoformat(
             "2021-08-31 18:00:00+00:00",
         ),
@@ -65,6 +65,9 @@ class Sheet(pydantic.BaseModel):
     name: str = pydantic.Field(description="The name of the Sheet.")
     slug: str = pydantic.Field(description="The slug of the Sheet.")
     config: SheetConfig = pydantic.Field(description="Describes shape of data as well as behavior")
+    metadata: typing.Optional[typing.Any] = pydantic.Field(
+        default=None, description="Useful for any contextual metadata regarding the sheet. Store any valid json"
+    )
     namespace: typing.Optional[str] = pydantic.Field(default=None, description="The scoped namespace of the Sheet.")
     locked_by: typing.Optional[str] = pydantic.Field(
         alias="lockedBy", default=None, description="The actor who locked the Sheet."

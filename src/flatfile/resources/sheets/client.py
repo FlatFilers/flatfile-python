@@ -34,11 +34,15 @@ from .types.include_counts import IncludeCounts
 from .types.list_sheets_response import ListSheetsResponse
 from .types.record_counts_response import RecordCountsResponse
 from .types.sheet_response import SheetResponse
+from .types.sheet_update_request import SheetUpdateRequest
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
 except ImportError:
     import pydantic  # type: ignore
+
+# this is used as the default value for optional parameters
+OMIT = typing.cast(typing.Any, ...)
 
 
 class SheetsClient:
@@ -710,6 +714,69 @@ class SheetsClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(CellsResponse, _response.json())  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def update_sheet(
+        self, sheet_id: SheetId, *, request: SheetUpdateRequest, request_options: typing.Optional[RequestOptions] = None
+    ) -> SheetResponse:
+        """
+        Updates Sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - request: SheetUpdateRequest.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        ---
+        from flatfile import SheetUpdateRequest
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            token="YOUR_TOKEN",
+        )
+        client.sheets.update_sheet(
+            sheet_id="us_sh_YOUR_ID",
+            request=SheetUpdateRequest(
+                name="New Sheet Name",
+                metadata={"rowHeaders": [6]},
+            ),
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "PATCH",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(SheetResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:
@@ -1390,6 +1457,69 @@ class AsyncSheetsClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(CellsResponse, _response.json())  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def update_sheet(
+        self, sheet_id: SheetId, *, request: SheetUpdateRequest, request_options: typing.Optional[RequestOptions] = None
+    ) -> SheetResponse:
+        """
+        Updates Sheet
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - request: SheetUpdateRequest.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        ---
+        from flatfile import SheetUpdateRequest
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            token="YOUR_TOKEN",
+        )
+        await client.sheets.update_sheet(
+            sheet_id="us_sh_YOUR_ID",
+            request=SheetUpdateRequest(
+                name="New Sheet Name",
+                metadata={"rowHeaders": [6]},
+            ),
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "PATCH",
+            urllib.parse.urljoin(f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}"),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(SheetResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         try:
             _response_json = _response.json()
         except JSONDecodeError:

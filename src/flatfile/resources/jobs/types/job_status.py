@@ -23,6 +23,7 @@ class JobStatus(str, enum.Enum):
     COMPLETE = "complete"
     FAILED = "failed"
     CANCELED = "canceled"
+    WAITING = "waiting"
 
     def visit(
         self,
@@ -34,6 +35,7 @@ class JobStatus(str, enum.Enum):
         complete: typing.Callable[[], T_Result],
         failed: typing.Callable[[], T_Result],
         canceled: typing.Callable[[], T_Result],
+        waiting: typing.Callable[[], T_Result],
     ) -> T_Result:
         if self is JobStatus.CREATED:
             return created()
@@ -51,3 +53,5 @@ class JobStatus(str, enum.Enum):
             return failed()
         if self is JobStatus.CANCELED:
             return canceled()
+        if self is JobStatus.WAITING:
+            return waiting()

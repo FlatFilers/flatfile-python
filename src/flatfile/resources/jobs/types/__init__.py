@@ -29,17 +29,22 @@ from .job_outcome import JobOutcome
 from .job_outcome_next import (
     JobOutcomeNext,
     JobOutcomeNext_Download,
+    JobOutcomeNext_Files,
     JobOutcomeNext_Id,
     JobOutcomeNext_Retry,
     JobOutcomeNext_Snapshot,
     JobOutcomeNext_Url,
+    JobOutcomeNext_View,
     JobOutcomeNext_Wait,
 )
 from .job_outcome_next_download import JobOutcomeNextDownload
+from .job_outcome_next_file_object import JobOutcomeNextFileObject
+from .job_outcome_next_files import JobOutcomeNextFiles
 from .job_outcome_next_id import JobOutcomeNextId
 from .job_outcome_next_retry import JobOutcomeNextRetry
 from .job_outcome_next_snapshot import JobOutcomeNextSnapshot
 from .job_outcome_next_url import JobOutcomeNextUrl
+from .job_outcome_next_view import JobOutcomeNextView
 from .job_outcome_next_wait import JobOutcomeNextWait
 from .job_part_execution import JobPartExecution
 from .job_parts import JobParts
@@ -92,16 +97,21 @@ __all__ = [
     "JobOutcome",
     "JobOutcomeNext",
     "JobOutcomeNextDownload",
+    "JobOutcomeNextFileObject",
+    "JobOutcomeNextFiles",
     "JobOutcomeNextId",
     "JobOutcomeNextRetry",
     "JobOutcomeNextSnapshot",
     "JobOutcomeNextUrl",
+    "JobOutcomeNextView",
     "JobOutcomeNextWait",
     "JobOutcomeNext_Download",
+    "JobOutcomeNext_Files",
     "JobOutcomeNext_Id",
     "JobOutcomeNext_Retry",
     "JobOutcomeNext_Snapshot",
     "JobOutcomeNext_Url",
+    "JobOutcomeNext_View",
     "JobOutcomeNext_Wait",
     "JobPartExecution",
     "JobParts",

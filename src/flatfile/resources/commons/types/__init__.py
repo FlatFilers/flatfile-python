@@ -31,6 +31,7 @@ from .input_field import InputField
 from .input_form import InputForm
 from .input_form_type import InputFormType
 from .job_id import JobId
+from .json_path_string import JsonPathString
 from .mapping_id import MappingId
 from .page_number import PageNumber
 from .page_size import PageSize
@@ -88,6 +89,7 @@ __all__ = [
     "InputForm",
     "InputFormType",
     "JobId",
+    "JsonPathString",
     "MappingId",
     "PageNumber",
     "PageSize",

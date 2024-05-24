@@ -409,6 +409,55 @@ class MappingClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def delete_multiple_rules(
+        self,
+        program_id: ProgramId,
+        *,
+        rule_ids: typing.Sequence[MappingId],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Success:
+        """
+        Deletes multiple mapping rules from a program
+
+        Parameters:
+            - program_id: ProgramId. ID of the program
+
+            - rule_ids: typing.Sequence[MappingId]. Array of rule IDs to be deleted
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "DELETE",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"mapping/{jsonable_encoder(program_id)}/rules"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     def list_rules(
         self, program_id: ProgramId, *, request_options: typing.Optional[RequestOptions] = None
     ) -> MappingRulesResponse:
@@ -1065,6 +1114,55 @@ class AsyncMappingClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(MappingRulesResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def delete_multiple_rules(
+        self,
+        program_id: ProgramId,
+        *,
+        rule_ids: typing.Sequence[MappingId],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Success:
+        """
+        Deletes multiple mapping rules from a program
+
+        Parameters:
+            - program_id: ProgramId. ID of the program
+
+            - rule_ids: typing.Sequence[MappingId]. Array of rule IDs to be deleted
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "DELETE",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"mapping/{jsonable_encoder(program_id)}/rules"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
         if _response.status_code == 400:
             raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         if _response.status_code == 404:
