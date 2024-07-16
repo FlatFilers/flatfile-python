@@ -250,6 +250,7 @@ from .jobs import (
     JobOutcomeNext_Url,
     JobOutcomeNext_View,
     JobOutcomeNext_Wait,
+    JobOutcomeTrigger,
     JobPartExecution,
     JobParts,
     JobPartsArray,
@@ -417,6 +418,7 @@ from .spaces import (
 )
 from .users import (
     ListUsersResponse,
+    ListUsersSortField,
     User,
     UserConfig,
     UserCreateAndInviteRequest,
@@ -432,6 +434,7 @@ from .workbooks import (
     Workbook,
     WorkbookConfigSettings,
     WorkbookResponse,
+    WorkbookTreatments,
     WorkbookUpdate,
 )
 
@@ -672,6 +675,7 @@ __all__ = [
     "JobOutcomeNext_Url",
     "JobOutcomeNext_View",
     "JobOutcomeNext_Wait",
+    "JobOutcomeTrigger",
     "JobPartExecution",
     "JobParts",
     "JobPartsArray",
@@ -703,6 +707,7 @@ __all__ = [
     "ListSheetsResponse",
     "ListSpacesResponse",
     "ListUsersResponse",
+    "ListUsersSortField",
     "ListViewsResponse",
     "ListWorkbooksResponse",
     "MappingId",
@@ -841,6 +846,7 @@ __all__ = [
     "WorkbookConfigSettings",
     "WorkbookId",
     "WorkbookResponse",
+    "WorkbookTreatments",
     "WorkbookUpdate",
     "WriteSecret",
     "accounts",

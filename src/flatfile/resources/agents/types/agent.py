@@ -4,12 +4,21 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
+from ...commons.types.account_id import AccountId
 from ...commons.types.agent_id import AgentId
+from ...commons.types.environment_id import EnvironmentId
 from .agent_config import AgentConfig
+
+try:
+    import pydantic.v1 as pydantic  # type: ignore
+except ImportError:
+    import pydantic  # type: ignore
 
 
 class Agent(AgentConfig):
     """
+    import datetime
+
     from flatfile import Agent, Compiler, EventTopic
 
     Agent(
@@ -18,10 +27,22 @@ class Agent(AgentConfig):
         compiler=Compiler.JS,
         source="module.exports = { routeEvent: async (...args) => { console.log(args) } }",
         slug="default",
+        created_at=datetime.datetime.fromisoformat(
+            "2023-10-30 16:59:45.735000+00:00",
+        ),
+        updated_at=datetime.datetime.fromisoformat(
+            "2023-10-30 16:59:45.735000+00:00",
+        ),
+        account_id="us_acc_YOUR_ID",
+        environment_id="us_env_YOUR_ID",
     )
     """
 
     id: AgentId
+    created_at: dt.datetime = pydantic.Field(alias="createdAt")
+    updated_at: dt.datetime = pydantic.Field(alias="updatedAt")
+    account_id: AccountId = pydantic.Field(alias="accountId")
+    environment_id: EnvironmentId = pydantic.Field(alias="environmentId")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

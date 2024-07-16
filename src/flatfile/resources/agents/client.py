@@ -176,14 +176,14 @@ class AgentsClient:
         self,
         agent_id: AgentId,
         *,
-        environment_id: EnvironmentId,
+        environment_id: typing.Optional[EnvironmentId] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AgentResponse:
         """
         Parameters:
             - agent_id: AgentId.
 
-            - environment_id: EnvironmentId.
+            - environment_id: typing.Optional[EnvironmentId].
 
             - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
@@ -877,14 +877,14 @@ class AsyncAgentsClient:
         self,
         agent_id: AgentId,
         *,
-        environment_id: EnvironmentId,
+        environment_id: typing.Optional[EnvironmentId] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AgentResponse:
         """
         Parameters:
             - agent_id: AgentId.
 
-            - environment_id: EnvironmentId.
+            - environment_id: typing.Optional[EnvironmentId].
 
             - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---

@@ -15,6 +15,11 @@ except ImportError:
 class CompositeUniqueConstraint(pydantic.BaseModel):
     name: str = pydantic.Field(description="The name of the constraint")
     fields: typing.List[str] = pydantic.Field(description="The fields that must be unique together")
+    required_fields: typing.Optional[typing.List[str]] = pydantic.Field(
+        alias="requiredFields",
+        default=None,
+        description="Fields that, when empty, will cause this unique constraint to be ignored",
+    )
     strategy: CompositeUniqueConstraintStrategy
 
     def json(self, **kwargs: typing.Any) -> str:
@@ -28,4 +33,5 @@ class CompositeUniqueConstraint(pydantic.BaseModel):
     class Config:
         frozen = True
         smart_union = True
+        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

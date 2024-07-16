@@ -14,6 +14,8 @@ except ImportError:
 
 class AgentResponse(pydantic.BaseModel):
     """
+    import datetime
+
     from flatfile import Agent, AgentResponse, Compiler, EventTopic
 
     AgentResponse(
@@ -23,6 +25,14 @@ class AgentResponse(pydantic.BaseModel):
             compiler=Compiler.JS,
             source="module.exports = { routeEvent: async (...args) => { console.log(args) } }",
             slug="default",
+            created_at=datetime.datetime.fromisoformat(
+                "2023-10-30 16:59:45.735000+00:00",
+            ),
+            updated_at=datetime.datetime.fromisoformat(
+                "2023-10-30 16:59:45.735000+00:00",
+            ),
+            account_id="us_acc_YOUR_ID",
+            environment_id="us_env_YOUR_ID",
         ),
     )
     """

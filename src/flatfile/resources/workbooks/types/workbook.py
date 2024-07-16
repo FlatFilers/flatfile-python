@@ -10,6 +10,7 @@ from ...commons.types.space_id import SpaceId
 from ...commons.types.workbook_id import WorkbookId
 from ...sheets.types.sheet import Sheet
 from .workbook_config_settings import WorkbookConfigSettings
+from .workbook_treatments import WorkbookTreatments
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -119,6 +120,9 @@ class Workbook(pydantic.BaseModel):
         default=None, description="The Workbook settings."
     )
     metadata: typing.Optional[typing.Any] = pydantic.Field(default=None, description="Metadata for the workbook")
+    treatments: typing.Optional[typing.List[WorkbookTreatments]] = pydantic.Field(
+        default=None, description="Treatments for the workbook"
+    )
     namespace: typing.Optional[str] = None
     updated_at: dt.datetime = pydantic.Field(alias="updatedAt", description="Date the workbook was last updated")
     created_at: dt.datetime = pydantic.Field(alias="createdAt", description="Date the workbook was created")

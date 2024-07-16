@@ -4,6 +4,7 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
+from ...commons.types.action import Action
 from .constraint import Constraint
 from .field_appearance import FieldAppearance
 
@@ -22,6 +23,9 @@ class BaseProperty(pydantic.BaseModel):
     constraints: typing.Optional[typing.List[Constraint]] = None
     readonly: typing.Optional[bool] = None
     appearance: typing.Optional[FieldAppearance] = None
+    actions: typing.Optional[typing.List[Action]] = pydantic.Field(
+        default=None, description="An array of actions that end users can perform on this Column."
+    )
     metadata: typing.Optional[typing.Any] = pydantic.Field(
         default=None, description="Useful for any contextual metadata regarding the schema. Store any valid json here."
     )

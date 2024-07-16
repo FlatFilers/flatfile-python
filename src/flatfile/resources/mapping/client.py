@@ -599,6 +599,7 @@ class MappingClient:
                 name="Assign mapping rule",
                 type="assign",
                 config={},
+                metadata={},
             ),
         )
         """
@@ -1314,6 +1315,7 @@ class AsyncMappingClient:
                 name="Assign mapping rule",
                 type="assign",
                 config={},
+                metadata={},
             ),
         )
         """

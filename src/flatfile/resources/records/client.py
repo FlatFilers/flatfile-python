@@ -65,6 +65,7 @@ class RecordsClient:
         include_length: typing.Optional[bool] = None,
         include_links: typing.Optional[bool] = None,
         include_messages: typing.Optional[bool] = None,
+        fields: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         for_: typing.Optional[EventId] = None,
         q: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
@@ -109,6 +110,8 @@ class RecordsClient:
 
             - include_messages: typing.Optional[bool]. Include error messages, defaults to false.
 
+            - fields: typing.Optional[typing.Union[str, typing.Sequence[str]]]. A list of field keys to include in the response. If not provided, all fields will be included.
+
             - for_: typing.Optional[EventId]. if "for" is provided, the query parameters will be pulled from the event payload
 
             - q: typing.Optional[str]. An FFQL query used to filter the result set
@@ -149,6 +152,7 @@ class RecordsClient:
                         "includeLength": include_length,
                         "includeLinks": include_links,
                         "includeMessages": include_messages,
+                        "fields": fields,
                         "for": for_,
                         "q": q,
                         **(
@@ -547,6 +551,7 @@ class AsyncRecordsClient:
         include_length: typing.Optional[bool] = None,
         include_links: typing.Optional[bool] = None,
         include_messages: typing.Optional[bool] = None,
+        fields: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         for_: typing.Optional[EventId] = None,
         q: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
@@ -591,6 +596,8 @@ class AsyncRecordsClient:
 
             - include_messages: typing.Optional[bool]. Include error messages, defaults to false.
 
+            - fields: typing.Optional[typing.Union[str, typing.Sequence[str]]]. A list of field keys to include in the response. If not provided, all fields will be included.
+
             - for_: typing.Optional[EventId]. if "for" is provided, the query parameters will be pulled from the event payload
 
             - q: typing.Optional[str]. An FFQL query used to filter the result set
@@ -631,6 +638,7 @@ class AsyncRecordsClient:
                         "includeLength": include_length,
                         "includeLinks": include_links,
                         "includeMessages": include_messages,
+                        "fields": fields,
                         "for": for_,
                         "q": q,
                         **(

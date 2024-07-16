@@ -5,6 +5,7 @@ from .list_workbooks_response import ListWorkbooksResponse
 from .workbook import Workbook
 from .workbook_config_settings import WorkbookConfigSettings
 from .workbook_response import WorkbookResponse
+from .workbook_treatments import WorkbookTreatments
 from .workbook_update import WorkbookUpdate
 
 __all__ = [
@@ -13,5 +14,6 @@ __all__ = [
     "Workbook",
     "WorkbookConfigSettings",
     "WorkbookResponse",
+    "WorkbookTreatments",
     "WorkbookUpdate",
 ]

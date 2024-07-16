@@ -5,6 +5,7 @@ import typing
 
 from ....core.datetime_utils import serialize_datetime
 from .job_outcome_next import JobOutcomeNext
+from .job_outcome_trigger import JobOutcomeTrigger
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -31,6 +32,7 @@ class JobOutcome(pydantic.BaseModel):
     """
 
     acknowledge: typing.Optional[bool] = None
+    trigger: typing.Optional[JobOutcomeTrigger] = None
     button_text: typing.Optional[str] = pydantic.Field(alias="buttonText", default=None)
     next: typing.Optional[JobOutcomeNext] = None
     heading: typing.Optional[str] = None

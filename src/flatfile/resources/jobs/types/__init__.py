@@ -46,6 +46,7 @@ from .job_outcome_next_snapshot import JobOutcomeNextSnapshot
 from .job_outcome_next_url import JobOutcomeNextUrl
 from .job_outcome_next_view import JobOutcomeNextView
 from .job_outcome_next_wait import JobOutcomeNextWait
+from .job_outcome_trigger import JobOutcomeTrigger
 from .job_part_execution import JobPartExecution
 from .job_parts import JobParts
 from .job_parts_array import JobPartsArray
@@ -113,6 +114,7 @@ __all__ = [
     "JobOutcomeNext_Url",
     "JobOutcomeNext_View",
     "JobOutcomeNext_Wait",
+    "JobOutcomeTrigger",
     "JobPartExecution",
     "JobParts",
     "JobPartsArray",

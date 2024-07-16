@@ -32,6 +32,7 @@ class MappingRuleResponse(pydantic.BaseModel):
             updated_at=datetime.datetime.fromisoformat(
                 "2021-01-01 00:00:00+00:00",
             ),
+            metadata={},
         ),
     )
     """

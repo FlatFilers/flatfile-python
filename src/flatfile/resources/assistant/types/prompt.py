@@ -5,7 +5,9 @@ import typing
 
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.account_id import AccountId
+from ...commons.types.environment_id import EnvironmentId
 from ...commons.types.prompt_id import PromptId
+from ...commons.types.space_id import SpaceId
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -23,6 +25,8 @@ class Prompt(pydantic.BaseModel):
         id="us_pr_YOUR_ID",
         created_by_id="us_usr_YOUR_ID",
         account_id="us_acc_YOUR_ID",
+        environment_id="us_env_YOUR_ID",
+        space_id="us_sp_YOUR_ID",
         prompt="Combine first name and last name into a new column called Full Name",
         created_at=datetime.datetime.fromisoformat(
             "2021-01-01 00:00:00+00:00",
@@ -36,6 +40,8 @@ class Prompt(pydantic.BaseModel):
     id: PromptId
     created_by_id: str = pydantic.Field(alias="createdById", description="ID of the user/guest who created the prompt")
     account_id: AccountId = pydantic.Field(alias="accountId")
+    environment_id: typing.Optional[EnvironmentId] = pydantic.Field(alias="environmentId", default=None)
+    space_id: typing.Optional[SpaceId] = pydantic.Field(alias="spaceId", default=None)
     prompt: str = pydantic.Field(description="Text for prompts for AI Assist")
     created_at: dt.datetime = pydantic.Field(alias="createdAt")
     updated_at: dt.datetime = pydantic.Field(alias="updatedAt")

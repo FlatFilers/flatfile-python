@@ -48,7 +48,10 @@ class Snapshot(pydantic.BaseModel):
     id: SnapshotId = pydantic.Field(description="The ID of the Snapshot.")
     sheet_id: SheetId = pydantic.Field(alias="sheetId", description="The ID of the Sheet.")
     label: typing.Optional[str] = pydantic.Field(default=None, description="The title of the Snapshot.")
-    summary: typing.Optional[SnapshotSummary] = pydantic.Field(default=None, description="A summary of the Snapshot.")
+    summary: typing.Optional[SnapshotSummary] = pydantic.Field(
+        default=None,
+        description="A summary of the Snapshot. This field is only available on the single get snapshot endpoint. It is not available for the list snapshots endpoint.",
+    )
     created_at: dt.datetime = pydantic.Field(alias="createdAt", description="The time the Snapshot was created.")
     created_by: UserId = pydantic.Field(alias="createdBy", description="The actor who created the Snapshot.")
 

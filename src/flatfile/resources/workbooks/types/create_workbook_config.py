@@ -9,6 +9,7 @@ from ...commons.types.environment_id import EnvironmentId
 from ...commons.types.space_id import SpaceId
 from ...sheets.types.sheet_config import SheetConfig
 from .workbook_config_settings import WorkbookConfigSettings
+from .workbook_treatments import WorkbookTreatments
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -94,6 +95,9 @@ class CreateWorkbookConfig(pydantic.BaseModel):
         default=None, description="The Workbook settings."
     )
     metadata: typing.Optional[typing.Any] = pydantic.Field(default=None, description="Metadata for the workbook")
+    treatments: typing.Optional[typing.List[WorkbookTreatments]] = pydantic.Field(
+        default=None, description="Treatments for the workbook"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

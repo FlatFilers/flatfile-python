@@ -2,6 +2,7 @@
 
 from .types import (
     ListUsersResponse,
+    ListUsersSortField,
     User,
     UserConfig,
     UserCreateAndInviteRequest,
@@ -12,6 +13,7 @@ from .types import (
 
 __all__ = [
     "ListUsersResponse",
+    "ListUsersSortField",
     "User",
     "UserConfig",
     "UserCreateAndInviteRequest",

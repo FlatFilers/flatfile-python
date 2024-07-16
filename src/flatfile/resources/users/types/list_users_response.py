@@ -4,6 +4,7 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
+from ...commons.types.pagination import Pagination
 from .user import User
 
 try:
@@ -44,6 +45,7 @@ class ListUsersResponse(pydantic.BaseModel):
     """
 
     data: typing.List[User]
+    pagination: typing.Optional[Pagination] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

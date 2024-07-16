@@ -6,6 +6,7 @@ from .types import (
     Workbook,
     WorkbookConfigSettings,
     WorkbookResponse,
+    WorkbookTreatments,
     WorkbookUpdate,
 )
 
@@ -15,5 +16,6 @@ __all__ = [
     "Workbook",
     "WorkbookConfigSettings",
     "WorkbookResponse",
+    "WorkbookTreatments",
     "WorkbookUpdate",
 ]

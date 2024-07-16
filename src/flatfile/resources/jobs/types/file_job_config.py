@@ -17,6 +17,11 @@ class FileJobConfig(pydantic.BaseModel):
     options: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(
         default=None, description="The options to use for extracting data from the file"
     )
+    detected_header_row: typing.Optional[int] = pydantic.Field(
+        alias="detectedHeaderRow",
+        default=None,
+        description="The row number of the header row detected at extraction time",
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -29,4 +34,5 @@ class FileJobConfig(pydantic.BaseModel):
     class Config:
         frozen = True
         smart_union = True
+        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

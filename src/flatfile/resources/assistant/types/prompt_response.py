@@ -23,6 +23,8 @@ class PromptResponse(pydantic.BaseModel):
             id="us_pr_YOUR_ID",
             created_by_id="us_usr_YOUR_ID",
             account_id="us_acc_YOUR_ID",
+            environment_id="us_env_YOUR_ID",
+            space_id="us_sp_YOUR_ID",
             prompt="Combine first name and last name into a new column called Full Name",
             created_at=datetime.datetime.fromisoformat(
                 "2021-01-01 00:00:00+00:00",

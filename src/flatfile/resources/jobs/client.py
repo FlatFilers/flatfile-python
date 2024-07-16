@@ -54,6 +54,7 @@ class JobsClient:
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
         sort_direction: typing.Optional[SortDirection] = None,
+        exclude_child_jobs: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListJobsResponse:
         """
@@ -73,6 +74,8 @@ class JobsClient:
             - page_number: typing.Optional[int]. Based on pageSize, which page of jobs to return
 
             - sort_direction: typing.Optional[SortDirection]. Sort direction - asc (ascending) or desc (descending)
+
+            - exclude_child_jobs: typing.Optional[bool]. When true, only top-level jobs will be returned unless a parentId is specified
 
             - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
@@ -100,6 +103,7 @@ class JobsClient:
                         "pageSize": page_size,
                         "pageNumber": page_number,
                         "sortDirection": sort_direction,
+                        "excludeChildJobs": exclude_child_jobs,
                         **(
                             request_options.get("additional_query_parameters", {})
                             if request_options is not None
@@ -1054,6 +1058,7 @@ class AsyncJobsClient:
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
         sort_direction: typing.Optional[SortDirection] = None,
+        exclude_child_jobs: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListJobsResponse:
         """
@@ -1073,6 +1078,8 @@ class AsyncJobsClient:
             - page_number: typing.Optional[int]. Based on pageSize, which page of jobs to return
 
             - sort_direction: typing.Optional[SortDirection]. Sort direction - asc (ascending) or desc (descending)
+
+            - exclude_child_jobs: typing.Optional[bool]. When true, only top-level jobs will be returned unless a parentId is specified
 
             - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
@@ -1100,6 +1107,7 @@ class AsyncJobsClient:
                         "pageSize": page_size,
                         "pageNumber": page_number,
                         "sortDirection": sort_direction,
+                        "excludeChildJobs": exclude_child_jobs,
                         **(
                             request_options.get("additional_query_parameters", {})
                             if request_options is not None

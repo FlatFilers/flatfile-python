@@ -13,6 +13,7 @@ class GetSpacesSortField(str, enum.Enum):
     ENVIRONMENT_ID = "environmentId"
     CREATED_BY_USER_NAME = "createdByUserName"
     CREATED_AT = "createdAt"
+    LAST_ACTIVITY_AT = "lastActivityAt"
 
     def visit(
         self,
@@ -22,6 +23,7 @@ class GetSpacesSortField(str, enum.Enum):
         environment_id: typing.Callable[[], T_Result],
         created_by_user_name: typing.Callable[[], T_Result],
         created_at: typing.Callable[[], T_Result],
+        last_activity_at: typing.Callable[[], T_Result],
     ) -> T_Result:
         if self is GetSpacesSortField.NAME:
             return name()
@@ -35,3 +37,5 @@ class GetSpacesSortField(str, enum.Enum):
             return created_by_user_name()
         if self is GetSpacesSortField.CREATED_AT:
             return created_at()
+        if self is GetSpacesSortField.LAST_ACTIVITY_AT:
+            return last_activity_at()

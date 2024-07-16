@@ -4,6 +4,8 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
+from ...commons.types.environment_id import EnvironmentId
+from ...commons.types.space_id import SpaceId
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -19,10 +21,14 @@ class PromptCreate(pydantic.BaseModel):
 
     PromptCreate(
         prompt="Combine first name and last name into a new column called Full Name",
+        environment_id="us_env_YOUR_ID",
+        space_id="us_sp_YOUR_ID",
     )
     """
 
     prompt: str
+    environment_id: EnvironmentId = pydantic.Field(alias="environmentId")
+    space_id: SpaceId = pydantic.Field(alias="spaceId")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -35,4 +41,5 @@ class PromptCreate(pydantic.BaseModel):
     class Config:
         frozen = True
         smart_union = True
+        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

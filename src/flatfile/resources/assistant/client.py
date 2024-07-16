@@ -211,6 +211,8 @@ class AssistantClient:
         client.assistant.create(
             request=PromptCreate(
                 prompt="Combine first name and last name into a new column called Full Name",
+                environment_id="us_env_YOUR_ID",
+                space_id="us_sp_YOUR_ID",
             ),
         )
         """
@@ -479,6 +481,8 @@ class AsyncAssistantClient:
         await client.assistant.create(
             request=PromptCreate(
                 prompt="Combine first name and last name into a new column called Full Name",
+                environment_id="us_env_YOUR_ID",
+                space_id="us_sp_YOUR_ID",
             ),
         )
         """

@@ -20,6 +20,7 @@ class MappingRuleConfig(pydantic.BaseModel):
         name="Assign mapping rule",
         type="assign",
         config={},
+        metadata={},
     )
     """
 
@@ -32,6 +33,7 @@ class MappingRuleConfig(pydantic.BaseModel):
     accepted_by: typing.Optional[UserId] = pydantic.Field(
         alias="acceptedBy", default=None, description="User ID of the contributor of the mapping rule"
     )
+    metadata: typing.Optional[typing.Any] = pydantic.Field(default=None, description="Metadata of the mapping rule")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
