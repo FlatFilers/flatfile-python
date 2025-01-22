@@ -457,6 +457,96 @@ class Event_EnvironmentDeleted(GenericEvent):
         allow_population_by_field_name = True
 
 
+class Event_ActionCreated(GenericEvent):
+    topic: typing.Literal["action:created"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+class Event_ActionUpdated(GenericEvent):
+    topic: typing.Literal["action:updated"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+class Event_ActionDeleted(GenericEvent):
+    topic: typing.Literal["action:deleted"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+class Event_DataClipCreated(GenericEvent):
+    topic: typing.Literal["data-clip:created"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+class Event_DataClipUpdated(GenericEvent):
+    topic: typing.Literal["data-clip:updated"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+class Event_DataClipDeleted(GenericEvent):
+    topic: typing.Literal["data-clip:deleted"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+class Event_DataClipCollaboratorUpdated(GenericEvent):
+    topic: typing.Literal["data-clip:collaborator-updated"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+class Event_DataClipResolutionsCreated(GenericEvent):
+    topic: typing.Literal["data-clip:resolutions-created"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+class Event_DataClipResolutionsUpdated(GenericEvent):
+    topic: typing.Literal["data-clip:resolutions-updated"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+class Event_DataClipResolutionsRefreshed(GenericEvent):
+    topic: typing.Literal["data-clip:resolutions-refreshed"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
 """
 import datetime
 
@@ -536,4 +626,14 @@ Event = typing.Union[
     Event_EnvironmentCreated,
     Event_EnvironmentUpdated,
     Event_EnvironmentDeleted,
+    Event_ActionCreated,
+    Event_ActionUpdated,
+    Event_ActionDeleted,
+    Event_DataClipCreated,
+    Event_DataClipUpdated,
+    Event_DataClipDeleted,
+    Event_DataClipCollaboratorUpdated,
+    Event_DataClipResolutionsCreated,
+    Event_DataClipResolutionsUpdated,
+    Event_DataClipResolutionsRefreshed,
 ]

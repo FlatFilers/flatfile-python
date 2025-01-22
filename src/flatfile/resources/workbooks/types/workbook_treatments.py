@@ -16,7 +16,12 @@ class WorkbookTreatments(str, enum.Enum):
     """
 
     EXTRACTED_FROM_SOURCE = "EXTRACTED_FROM_SOURCE"
+    SMALL_DATA = "SMALL_DATA"
 
-    def visit(self, extracted_from_source: typing.Callable[[], T_Result]) -> T_Result:
+    def visit(
+        self, extracted_from_source: typing.Callable[[], T_Result], small_data: typing.Callable[[], T_Result]
+    ) -> T_Result:
         if self is WorkbookTreatments.EXTRACTED_FROM_SOURCE:
             return extracted_from_source()
+        if self is WorkbookTreatments.SMALL_DATA:
+            return small_data()

@@ -41,6 +41,11 @@ class InternalSpaceConfigBase(pydantic.BaseModel):
     app_id: typing.Optional[AppId] = pydantic.Field(
         alias="appId", default=None, description="The ID of the App that space is associated with"
     )
+    is_app_template: typing.Optional[bool] = pydantic.Field(
+        alias="isAppTemplate",
+        default=None,
+        description="Whether the space is an app template. Only one space per app can be an app template.",
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

@@ -3,4 +3,4 @@
 import datetime as dt
 import typing
 
-CellValueUnion = typing.Union[str, int, int, float, bool, dt.date, dt.datetime]
+CellValueUnion = typing.Union[str, int, int, float, bool, dt.date, dt.datetime, typing.List[str]]

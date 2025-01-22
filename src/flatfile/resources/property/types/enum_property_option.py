@@ -12,9 +12,7 @@ except ImportError:
 
 
 class EnumPropertyOption(pydantic.BaseModel):
-    label: typing.Optional[str] = pydantic.Field(
-        default=None, description="A visual label for this option, defaults to value if not provided"
-    )
+    label: typing.Optional[str] = pydantic.Field(default=None, description="A visual label for this option")
     description: typing.Optional[str] = pydantic.Field(default=None, description="A short description for this option")
     color: typing.Optional[str] = pydantic.Field(default=None, description="An optional color to assign this option")
     icon: typing.Optional[str] = pydantic.Field(
@@ -33,6 +31,9 @@ class EnumPropertyOption(pydantic.BaseModel):
     )
     alternative_names: typing.Optional[typing.List[str]] = pydantic.Field(
         alias="alternativeNames", default=None, description="Alternative names to match this enum option to"
+    )
+    ordinal: typing.Optional[int] = pydantic.Field(
+        default=None, description="The order of this option in the list. SortBy must be set to `ordinal` to use this."
     )
 
     def json(self, **kwargs: typing.Any) -> str:

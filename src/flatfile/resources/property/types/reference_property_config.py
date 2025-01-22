@@ -15,7 +15,9 @@ except ImportError:
 class ReferencePropertyConfig(pydantic.BaseModel):
     ref: str = pydantic.Field(description="Full path reference to a sheet configuration. Must be in the same workbook.")
     key: str = pydantic.Field(description="Key of the property to use as the reference key. Defaults to `id`")
-    relationship: ReferencePropertyRelationship = pydantic.Field(description="The type of relationship this defines")
+    relationship: typing.Optional[ReferencePropertyRelationship] = pydantic.Field(
+        default=None, description="The type of relationship this defines"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

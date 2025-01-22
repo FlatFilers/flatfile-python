@@ -10,13 +10,19 @@ from ...core.jsonable_encoder import jsonable_encoder
 from ...core.remove_none_from_dict import remove_none_from_dict
 from ...core.request_options import RequestOptions
 from ..commons.errors.bad_request_error import BadRequestError
+from ..commons.errors.forbidden_error import ForbiddenError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.environment_id import EnvironmentId
 from ..commons.types.errors import Errors
+from ..commons.types.guidance_id import GuidanceId
 from ..commons.types.sort_direction import SortDirection
 from ..commons.types.space_id import SpaceId
 from ..commons.types.success import Success
 from .types.get_spaces_sort_field import GetSpacesSortField
+from .types.guidance_api_create_data import GuidanceApiCreateData
+from .types.guidance_api_update_data import GuidanceApiUpdateData
+from .types.guidance_list_response import GuidanceListResponse
+from .types.guidance_resource import GuidanceResource
 from .types.list_spaces_response import ListSpacesResponse
 from .types.space_config import SpaceConfig
 from .types.space_response import SpaceResponse
@@ -46,6 +52,7 @@ class SpacesClient:
         sort_field: typing.Optional[GetSpacesSortField] = None,
         sort_direction: typing.Optional[SortDirection] = None,
         is_collaborative: typing.Optional[bool] = None,
+        is_app_template: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListSpacesResponse:
         """
@@ -69,6 +76,8 @@ class SpacesClient:
             - sort_direction: typing.Optional[SortDirection]. Direction of sorting
 
             - is_collaborative: typing.Optional[bool]. Flag for collaborative (project) spaces
+
+            - is_app_template: typing.Optional[bool]. Flag for app templates
 
             - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
@@ -96,6 +105,7 @@ class SpacesClient:
                         "sortField": sort_field,
                         "sortDirection": sort_direction,
                         "isCollaborative": is_collaborative,
+                        "isAppTemplate": is_app_template,
                         **(
                             request_options.get("additional_query_parameters", {})
                             if request_options is not None
@@ -459,6 +469,349 @@ class SpacesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def unarchive_space(self, space_id: SpaceId, *, request_options: typing.Optional[RequestOptions] = None) -> Success:
+        """
+        Sets archivedAt timestamp on a space to null
+
+        Parameters:
+            - space_id: SpaceId. ID of space to unarchive
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            token="YOUR_TOKEN",
+        )
+        client.spaces.unarchive_space(
+            space_id="us_sp_YOUR_ID",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"spaces/{jsonable_encoder(space_id)}/unarchive"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))
+            if request_options is not None
+            else None,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def create_guidance(
+        self,
+        space_id: SpaceId,
+        *,
+        request: GuidanceApiCreateData,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GuidanceResource:
+        """
+        Creates a new guidance
+
+        Parameters:
+            - space_id: SpaceId. ID of the space
+
+            - request: GuidanceApiCreateData.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"spaces/{jsonable_encoder(space_id)}/guidance"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GuidanceResource, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def list_guidance(
+        self,
+        space_id: SpaceId,
+        *,
+        guide: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GuidanceListResponse:
+        """
+        Lists guidances
+
+        Parameters:
+            - space_id: SpaceId. ID of the space
+
+            - guide: typing.Optional[str]. Include the guide with the guidance
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"spaces/{jsonable_encoder(space_id)}/guidance"
+            ),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "guide": guide,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GuidanceListResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def get_guidance(
+        self,
+        space_id: SpaceId,
+        guidance_id: GuidanceId,
+        *,
+        guide: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GuidanceResource:
+        """
+        Retrieves a guidance by its id
+
+        Parameters:
+            - space_id: SpaceId. ID of the space
+
+            - guidance_id: GuidanceId. ID of the guidance
+
+            - guide: typing.Optional[str]. Include the guide with the guidance
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"spaces/{jsonable_encoder(space_id)}/guidance/{jsonable_encoder(guidance_id)}",
+            ),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "guide": guide,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GuidanceResource, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def update_guidance(
+        self,
+        space_id: SpaceId,
+        guidance_id: GuidanceId,
+        *,
+        request: GuidanceApiUpdateData,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GuidanceResource:
+        """
+        Updates a guidance with the given id
+
+        Parameters:
+            - space_id: SpaceId. ID of the space
+
+            - guidance_id: GuidanceId. ID of the guidance
+
+            - request: GuidanceApiUpdateData.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "PATCH",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"spaces/{jsonable_encoder(space_id)}/guidance/{jsonable_encoder(guidance_id)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GuidanceResource, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def delete_guidance(
+        self, space_id: SpaceId, guidance_id: GuidanceId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
+        """
+        Deletes a guidance by its id
+
+        Parameters:
+            - space_id: SpaceId. ID of the space
+
+            - guidance_id: GuidanceId. ID of the guidance
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "DELETE",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"spaces/{jsonable_encoder(space_id)}/guidance/{jsonable_encoder(guidance_id)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
 
 class AsyncSpacesClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
@@ -476,6 +829,7 @@ class AsyncSpacesClient:
         sort_field: typing.Optional[GetSpacesSortField] = None,
         sort_direction: typing.Optional[SortDirection] = None,
         is_collaborative: typing.Optional[bool] = None,
+        is_app_template: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListSpacesResponse:
         """
@@ -499,6 +853,8 @@ class AsyncSpacesClient:
             - sort_direction: typing.Optional[SortDirection]. Direction of sorting
 
             - is_collaborative: typing.Optional[bool]. Flag for collaborative (project) spaces
+
+            - is_app_template: typing.Optional[bool]. Flag for app templates
 
             - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
@@ -526,6 +882,7 @@ class AsyncSpacesClient:
                         "sortField": sort_field,
                         "sortDirection": sort_direction,
                         "isCollaborative": is_collaborative,
+                        "isAppTemplate": is_app_template,
                         **(
                             request_options.get("additional_query_parameters", {})
                             if request_options is not None
@@ -885,6 +1242,351 @@ class AsyncSpacesClient:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
         if _response.status_code == 400:
             raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def unarchive_space(
+        self, space_id: SpaceId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
+        """
+        Sets archivedAt timestamp on a space to null
+
+        Parameters:
+            - space_id: SpaceId. ID of space to unarchive
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            token="YOUR_TOKEN",
+        )
+        await client.spaces.unarchive_space(
+            space_id="us_sp_YOUR_ID",
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"spaces/{jsonable_encoder(space_id)}/unarchive"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))
+            if request_options is not None
+            else None,
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def create_guidance(
+        self,
+        space_id: SpaceId,
+        *,
+        request: GuidanceApiCreateData,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GuidanceResource:
+        """
+        Creates a new guidance
+
+        Parameters:
+            - space_id: SpaceId. ID of the space
+
+            - request: GuidanceApiCreateData.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"spaces/{jsonable_encoder(space_id)}/guidance"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GuidanceResource, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def list_guidance(
+        self,
+        space_id: SpaceId,
+        *,
+        guide: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GuidanceListResponse:
+        """
+        Lists guidances
+
+        Parameters:
+            - space_id: SpaceId. ID of the space
+
+            - guide: typing.Optional[str]. Include the guide with the guidance
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"spaces/{jsonable_encoder(space_id)}/guidance"
+            ),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "guide": guide,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GuidanceListResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def get_guidance(
+        self,
+        space_id: SpaceId,
+        guidance_id: GuidanceId,
+        *,
+        guide: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GuidanceResource:
+        """
+        Retrieves a guidance by its id
+
+        Parameters:
+            - space_id: SpaceId. ID of the space
+
+            - guidance_id: GuidanceId. ID of the guidance
+
+            - guide: typing.Optional[str]. Include the guide with the guidance
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"spaces/{jsonable_encoder(space_id)}/guidance/{jsonable_encoder(guidance_id)}",
+            ),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "guide": guide,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GuidanceResource, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def update_guidance(
+        self,
+        space_id: SpaceId,
+        guidance_id: GuidanceId,
+        *,
+        request: GuidanceApiUpdateData,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GuidanceResource:
+        """
+        Updates a guidance with the given id
+
+        Parameters:
+            - space_id: SpaceId. ID of the space
+
+            - guidance_id: GuidanceId. ID of the guidance
+
+            - request: GuidanceApiUpdateData.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "PATCH",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"spaces/{jsonable_encoder(space_id)}/guidance/{jsonable_encoder(guidance_id)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GuidanceResource, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def delete_guidance(
+        self, space_id: SpaceId, guidance_id: GuidanceId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> Success:
+        """
+        Deletes a guidance by its id
+
+        Parameters:
+            - space_id: SpaceId. ID of the space
+
+            - guidance_id: GuidanceId. ID of the guidance
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "DELETE",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"spaces/{jsonable_encoder(space_id)}/guidance/{jsonable_encoder(guidance_id)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 403:
+            raise ForbiddenError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         if _response.status_code == 404:
             raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         try:

@@ -5,6 +5,7 @@ from __future__ import annotations
 import typing
 
 from .external_constraint import ExternalConstraint
+from .stored_constraint import StoredConstraint
 from .unique_constraint import UniqueConstraint
 
 try:
@@ -47,4 +48,15 @@ class Constraint_External(ExternalConstraint):
         allow_population_by_field_name = True
 
 
-Constraint = typing.Union[Constraint_Required, Constraint_Unique, Constraint_Computed, Constraint_External]
+class Constraint_Stored(StoredConstraint):
+    type: typing.Literal["stored"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
+Constraint = typing.Union[
+    Constraint_Required, Constraint_Unique, Constraint_Computed, Constraint_External, Constraint_Stored
+]

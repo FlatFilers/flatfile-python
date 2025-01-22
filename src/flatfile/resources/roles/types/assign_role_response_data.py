@@ -4,9 +4,9 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
+from ...commons.types.actor_id_union import ActorIdUnion
 from ...commons.types.actor_role_id import ActorRoleId
 from ...commons.types.role_id import RoleId
-from .actor_id_union import ActorIdUnion
 from .resource_id_union import ResourceIdUnion
 
 try:

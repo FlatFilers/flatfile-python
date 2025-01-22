@@ -6,6 +6,7 @@ import typing
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.environment_id import EnvironmentId
 from ...commons.types.space_id import SpaceId
+from .prompt_type_enum import PromptTypeEnum
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -26,6 +27,9 @@ class PromptCreate(pydantic.BaseModel):
     )
     """
 
+    prompt_type: typing.Optional[PromptTypeEnum] = pydantic.Field(
+        alias="promptType", default=None, description="Type of prompt; Defaults to AI_ASSIST"
+    )
     prompt: str
     environment_id: EnvironmentId = pydantic.Field(alias="environmentId")
     space_id: SpaceId = pydantic.Field(alias="spaceId")

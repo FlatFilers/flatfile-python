@@ -37,6 +37,9 @@ class DeleteRecordsJobConfig(pydantic.BaseModel):
     exceptions: typing.Optional[typing.List[RecordId]] = pydantic.Field(
         default=None, description="List of record ids to exclude from deletion"
     )
+    snapshot_label: typing.Optional[str] = pydantic.Field(
+        alias="snapshotLabel", default=None, description="If specified, a snapshot will be generated with this label"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

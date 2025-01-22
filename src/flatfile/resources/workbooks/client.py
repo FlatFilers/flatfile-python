@@ -38,6 +38,11 @@ class WorkbooksClient:
         self,
         *,
         space_id: typing.Optional[SpaceId] = None,
+        name: typing.Optional[str] = None,
+        namespace: typing.Optional[str] = None,
+        label: typing.Optional[str] = None,
+        treatment: typing.Optional[str] = None,
+        include_sheets: typing.Optional[bool] = None,
         include_counts: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListWorkbooksResponse:
@@ -46,6 +51,16 @@ class WorkbooksClient:
 
         Parameters:
             - space_id: typing.Optional[SpaceId]. The associated Space ID of the Workbook.
+
+            - name: typing.Optional[str]. Filter by name. Precede with - to negate the filter
+
+            - namespace: typing.Optional[str]. Filter by namespace. Precede with - to negate the filter
+
+            - label: typing.Optional[str]. Filter by label. Precede with - to negate the filter
+
+            - treatment: typing.Optional[str]. Filter by treatment.
+
+            - include_sheets: typing.Optional[bool]. Include sheets for the workbook (default true)
 
             - include_counts: typing.Optional[bool]. Include counts for the workbook. **DEPRECATED** Counts will return 0s. Use GET /sheets/:sheetId/counts
 
@@ -67,6 +82,11 @@ class WorkbooksClient:
                 remove_none_from_dict(
                     {
                         "spaceId": space_id,
+                        "name": name,
+                        "namespace": namespace,
+                        "label": label,
+                        "treatment": treatment,
+                        "includeSheets": include_sheets,
                         "includeCounts": include_counts,
                         **(
                             request_options.get("additional_query_parameters", {})
@@ -451,6 +471,11 @@ class AsyncWorkbooksClient:
         self,
         *,
         space_id: typing.Optional[SpaceId] = None,
+        name: typing.Optional[str] = None,
+        namespace: typing.Optional[str] = None,
+        label: typing.Optional[str] = None,
+        treatment: typing.Optional[str] = None,
+        include_sheets: typing.Optional[bool] = None,
         include_counts: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListWorkbooksResponse:
@@ -459,6 +484,16 @@ class AsyncWorkbooksClient:
 
         Parameters:
             - space_id: typing.Optional[SpaceId]. The associated Space ID of the Workbook.
+
+            - name: typing.Optional[str]. Filter by name. Precede with - to negate the filter
+
+            - namespace: typing.Optional[str]. Filter by namespace. Precede with - to negate the filter
+
+            - label: typing.Optional[str]. Filter by label. Precede with - to negate the filter
+
+            - treatment: typing.Optional[str]. Filter by treatment.
+
+            - include_sheets: typing.Optional[bool]. Include sheets for the workbook (default true)
 
             - include_counts: typing.Optional[bool]. Include counts for the workbook. **DEPRECATED** Counts will return 0s. Use GET /sheets/:sheetId/counts
 
@@ -480,6 +515,11 @@ class AsyncWorkbooksClient:
                 remove_none_from_dict(
                     {
                         "spaceId": space_id,
+                        "name": name,
+                        "namespace": namespace,
+                        "label": label,
+                        "treatment": treatment,
+                        "includeSheets": include_sheets,
                         "includeCounts": include_counts,
                         **(
                             request_options.get("additional_query_parameters", {})

@@ -5,6 +5,15 @@ from .environment_config_create import EnvironmentConfigCreate
 from .environment_config_update import EnvironmentConfigUpdate
 from .environment_response import EnvironmentResponse
 from .guest_authentication_enum import GuestAuthenticationEnum
+from .guide_create_request import GuideCreateRequest
+from .guide_delete_response import GuideDeleteResponse
+from .guide_delete_response_data import GuideDeleteResponseData
+from .guide_detail_response import GuideDetailResponse
+from .guide_list_response import GuideListResponse
+from .guide_resource import GuideResource
+from .guide_update_request import GuideUpdateRequest
+from .guide_version_resource import GuideVersionResource
+from .guide_version_response import GuideVersionResponse
 from .list_environments_response import ListEnvironmentsResponse
 
 __all__ = [
@@ -13,5 +22,14 @@ __all__ = [
     "EnvironmentConfigUpdate",
     "EnvironmentResponse",
     "GuestAuthenticationEnum",
+    "GuideCreateRequest",
+    "GuideDeleteResponse",
+    "GuideDeleteResponseData",
+    "GuideDetailResponse",
+    "GuideListResponse",
+    "GuideResource",
+    "GuideUpdateRequest",
+    "GuideVersionResource",
+    "GuideVersionResponse",
     "ListEnvironmentsResponse",
 ]

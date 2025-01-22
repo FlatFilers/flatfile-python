@@ -36,6 +36,9 @@ class JobUpdate(pydantic.BaseModel):
         description="the time that the job's outcome has been acknowledged by a user",
     )
     info: typing.Optional[str] = pydantic.Field(default=None, description="Current status of job in text")
+    metadata: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(
+        default=None, description="Additional metadata for the job"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

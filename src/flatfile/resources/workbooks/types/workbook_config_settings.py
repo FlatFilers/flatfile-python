@@ -4,6 +4,7 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
+from ...commons.types.sheet_id import SheetId
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -20,6 +21,16 @@ class WorkbookConfigSettings(pydantic.BaseModel):
         alias="trackChanges",
         default=None,
         description="Whether to track changes for this workbook. Defaults to false. Tracking changes on a workbook allows for disabling workbook and sheet actions while data in the workbook is still being processed. You must run a recordHook listener if you enable this feature.",
+    )
+    no_mapping_redirect: typing.Optional[bool] = pydantic.Field(
+        alias="noMappingRedirect",
+        default=None,
+        description="When noMappingRedirect is set to true, dragging a file into a sheet will not redirect to the mapping screen. Defaults to false.",
+    )
+    sheet_sidebar_order: typing.Optional[typing.List[SheetId]] = pydantic.Field(
+        alias="sheetSidebarOrder",
+        default=None,
+        description="Used to set the order of sheets in the sidebar. Sheets that are not specified will be shown after those listed.",
     )
 
     def json(self, **kwargs: typing.Any) -> str:

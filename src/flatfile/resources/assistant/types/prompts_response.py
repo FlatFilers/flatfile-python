@@ -17,7 +17,7 @@ class PromptsResponse(pydantic.BaseModel):
     """
     import datetime
 
-    from flatfile import Pagination, Prompt, PromptsResponse
+    from flatfile import Pagination, Prompt, PromptsResponse, PromptTypeEnum
 
     PromptsResponse(
         data=[
@@ -27,6 +27,7 @@ class PromptsResponse(pydantic.BaseModel):
                 account_id="us_acc_YOUR_ID",
                 environment_id="us_env_YOUR_ID",
                 space_id="us_sp_YOUR_ID",
+                prompt_type=PromptTypeEnum.AI_ASSIST,
                 prompt="Combine first name and last name into a new column called Full Name",
                 created_at=datetime.datetime.fromisoformat(
                     "2021-01-01 00:00:00+00:00",

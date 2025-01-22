@@ -4,6 +4,16 @@ from .prompt import Prompt
 from .prompt_create import PromptCreate
 from .prompt_patch import PromptPatch
 from .prompt_response import PromptResponse
+from .prompt_type_enum import PromptTypeEnum
+from .prompt_type_query_enum import PromptTypeQueryEnum
 from .prompts_response import PromptsResponse
 
-__all__ = ["Prompt", "PromptCreate", "PromptPatch", "PromptResponse", "PromptsResponse"]
+__all__ = [
+    "Prompt",
+    "PromptCreate",
+    "PromptPatch",
+    "PromptResponse",
+    "PromptTypeEnum",
+    "PromptTypeQueryEnum",
+    "PromptsResponse",
+]

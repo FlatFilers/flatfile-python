@@ -2,6 +2,9 @@
 
 from .change_type import ChangeType
 from .restore_options import RestoreOptions
+from .schema_diff_data import SchemaDiffData
+from .schema_diff_enum import SchemaDiffEnum
+from .schema_diff_record import SchemaDiffRecord
 from .snapshot import Snapshot
 from .snapshot_response import SnapshotResponse
 from .snapshot_summary import SnapshotSummary
@@ -11,6 +14,9 @@ from .summary_section import SummarySection
 __all__ = [
     "ChangeType",
     "RestoreOptions",
+    "SchemaDiffData",
+    "SchemaDiffEnum",
+    "SchemaDiffRecord",
     "Snapshot",
     "SnapshotResponse",
     "SnapshotSummary",

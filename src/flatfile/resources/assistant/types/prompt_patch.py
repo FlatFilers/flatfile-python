@@ -22,7 +22,7 @@ class PromptPatch(pydantic.BaseModel):
     )
     """
 
-    prompt: typing.Optional[str] = None
+    prompt: str
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

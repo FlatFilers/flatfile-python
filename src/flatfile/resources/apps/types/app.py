@@ -35,6 +35,7 @@ class App(pydantic.BaseModel):
     icon: typing.Optional[str] = None
     metadata: typing.Any
     environment_filters: typing.Any = pydantic.Field(alias="environmentFilters")
+    blueprint: typing.Optional[typing.Any] = None
     created_at: dt.datetime = pydantic.Field(alias="createdAt")
     updated_at: dt.datetime = pydantic.Field(alias="updatedAt")
     deleted_at: typing.Optional[dt.datetime] = pydantic.Field(alias="deletedAt", default=None)

@@ -7,6 +7,7 @@ import httpx
 from .core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from .environment import FlatfileEnvironment
 from .resources.accounts.client import AccountsClient, AsyncAccountsClient
+from .resources.actions.client import ActionsClient, AsyncActionsClient
 from .resources.agents.client import AgentsClient, AsyncAgentsClient
 from .resources.apps.client import AppsClient, AsyncAppsClient
 from .resources.assistant.client import AssistantClient, AsyncAssistantClient
@@ -71,6 +72,7 @@ class Flatfile:
             httpx_client=httpx.Client(timeout=timeout) if httpx_client is None else httpx_client,
         )
         self.accounts = AccountsClient(client_wrapper=self._client_wrapper)
+        self.actions = ActionsClient(client_wrapper=self._client_wrapper)
         self.agents = AgentsClient(client_wrapper=self._client_wrapper)
         self.apps = AppsClient(client_wrapper=self._client_wrapper)
         self.assistant = AssistantClient(client_wrapper=self._client_wrapper)
@@ -135,6 +137,7 @@ class AsyncFlatfile:
             httpx_client=httpx.AsyncClient(timeout=timeout) if httpx_client is None else httpx_client,
         )
         self.accounts = AsyncAccountsClient(client_wrapper=self._client_wrapper)
+        self.actions = AsyncActionsClient(client_wrapper=self._client_wrapper)
         self.agents = AsyncAgentsClient(client_wrapper=self._client_wrapper)
         self.apps = AsyncAppsClient(client_wrapper=self._client_wrapper)
         self.assistant = AsyncAssistantClient(client_wrapper=self._client_wrapper)

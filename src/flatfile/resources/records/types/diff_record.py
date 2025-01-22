@@ -4,6 +4,7 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
+from ...data_clips.types.resolve import Resolve
 from .diff_data import DiffData
 from .record_base import RecordBase
 
@@ -23,6 +24,7 @@ class DiffRecord(RecordBase):
     """
 
     values: DiffData
+    resolves: typing.Optional[typing.List[Resolve]] = None
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

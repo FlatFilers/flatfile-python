@@ -8,6 +8,7 @@ from ...commons.types.account_id import AccountId
 from ...commons.types.environment_id import EnvironmentId
 from ...commons.types.prompt_id import PromptId
 from ...commons.types.space_id import SpaceId
+from .prompt_type_enum import PromptTypeEnum
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -19,7 +20,7 @@ class Prompt(pydantic.BaseModel):
     """
     import datetime
 
-    from flatfile import Prompt
+    from flatfile import Prompt, PromptTypeEnum
 
     Prompt(
         id="us_pr_YOUR_ID",
@@ -27,6 +28,7 @@ class Prompt(pydantic.BaseModel):
         account_id="us_acc_YOUR_ID",
         environment_id="us_env_YOUR_ID",
         space_id="us_sp_YOUR_ID",
+        prompt_type=PromptTypeEnum.AI_ASSIST,
         prompt="Combine first name and last name into a new column called Full Name",
         created_at=datetime.datetime.fromisoformat(
             "2021-01-01 00:00:00+00:00",
@@ -42,6 +44,7 @@ class Prompt(pydantic.BaseModel):
     account_id: AccountId = pydantic.Field(alias="accountId")
     environment_id: typing.Optional[EnvironmentId] = pydantic.Field(alias="environmentId", default=None)
     space_id: typing.Optional[SpaceId] = pydantic.Field(alias="spaceId", default=None)
+    prompt_type: PromptTypeEnum = pydantic.Field(alias="promptType", description="Type of prompt")
     prompt: str = pydantic.Field(description="Text for prompts for AI Assist")
     created_at: dt.datetime = pydantic.Field(alias="createdAt")
     updated_at: dt.datetime = pydantic.Field(alias="updatedAt")

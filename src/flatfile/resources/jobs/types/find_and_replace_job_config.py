@@ -44,6 +44,9 @@ class FindAndReplaceJobConfig(pydantic.BaseModel):
         default=None, description="The value to replace found values with"
     )
     field_key: str = pydantic.Field(alias="fieldKey", description="A unique key used to identify a field in a sheet")
+    snapshot_label: typing.Optional[str] = pydantic.Field(
+        alias="snapshotLabel", default=None, description="If specified, a snapshot will be generated with this label"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

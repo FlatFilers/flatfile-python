@@ -20,7 +20,10 @@ class BaseProperty(pydantic.BaseModel):
     description: typing.Optional[str] = pydantic.Field(
         default=None, description="A short description of the field. Markdown syntax is supported."
     )
-    constraints: typing.Optional[typing.List[Constraint]] = None
+    constraints: typing.Optional[typing.List[Constraint]] = pydantic.Field(
+        default=None,
+        description="A list of constraints that should be applied to this field. This is limited to a maximum of 10 constraints and all external and stored constraints must have unique validator values.",
+    )
     readonly: typing.Optional[bool] = None
     appearance: typing.Optional[FieldAppearance] = None
     actions: typing.Optional[typing.List[Action]] = pydantic.Field(

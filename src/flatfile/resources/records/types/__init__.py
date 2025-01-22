@@ -10,6 +10,7 @@ from .diff_records import DiffRecords
 from .diff_records_response import DiffRecordsResponse
 from .diff_value import DiffValue
 from .field_record_counts import FieldRecordCounts
+from .get_record_indices_response import GetRecordIndicesResponse
 from .get_records_response import GetRecordsResponse
 from .get_records_response_data import GetRecordsResponseData
 from .record import Record
@@ -18,6 +19,7 @@ from .record_config import RecordConfig
 from .record_counts import RecordCounts
 from .record_data import RecordData
 from .record_data_with_links import RecordDataWithLinks
+from .record_indices import RecordIndices
 from .record_with_links import RecordWithLinks
 from .records import Records
 from .records_response import RecordsResponse
@@ -38,6 +40,7 @@ __all__ = [
     "DiffRecordsResponse",
     "DiffValue",
     "FieldRecordCounts",
+    "GetRecordIndicesResponse",
     "GetRecordsResponse",
     "GetRecordsResponseData",
     "Record",
@@ -46,6 +49,7 @@ __all__ = [
     "RecordCounts",
     "RecordData",
     "RecordDataWithLinks",
+    "RecordIndices",
     "RecordWithLinks",
     "Records",
     "RecordsResponse",

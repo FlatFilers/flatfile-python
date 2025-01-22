@@ -82,6 +82,9 @@ class JobConfig(pydantic.BaseModel):
         default=None,
         description="The ids of the jobs that must complete before this job can start",
     )
+    metadata: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(
+        default=None, description="Additional metadata for the job"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

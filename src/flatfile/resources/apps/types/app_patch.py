@@ -29,6 +29,7 @@ class AppPatch(pydantic.BaseModel):
     icon: typing.Optional[str] = None
     metadata: typing.Optional[typing.Any] = None
     environment_filters: typing.Optional[typing.Any] = pydantic.Field(alias="environmentFilters", default=None)
+    blueprint: typing.Optional[typing.Any] = None
     activated_at: typing.Optional[dt.datetime] = pydantic.Field(alias="activatedAt", default=None)
 
     def json(self, **kwargs: typing.Any) -> str:

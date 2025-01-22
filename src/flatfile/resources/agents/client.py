@@ -14,6 +14,7 @@ from ..commons.errors.forbidden_error import ForbiddenError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.actor_role_id import ActorRoleId
 from ..commons.types.agent_id import AgentId
+from ..commons.types.agent_version_id import AgentVersionId
 from ..commons.types.environment_id import EnvironmentId
 from ..commons.types.errors import Errors
 from ..commons.types.event_id import EventId
@@ -27,10 +28,12 @@ from ..roles.types.assign_role_response import AssignRoleResponse
 from ..roles.types.list_actor_roles_response import ListActorRolesResponse
 from .types.agent_config import AgentConfig
 from .types.agent_response import AgentResponse
+from .types.agent_version_response import AgentVersionResponse
 from .types.get_agent_logs_response import GetAgentLogsResponse
 from .types.get_detailed_agent_log_response import GetDetailedAgentLogResponse
 from .types.get_detailed_agent_logs_response import GetDetailedAgentLogsResponse
 from .types.get_executions_response import GetExecutionsResponse
+from .types.list_agent_versions_response import ListAgentVersionsResponse
 from .types.list_agents_response import ListAgentsResponse
 
 try:
@@ -126,6 +129,7 @@ class AgentsClient:
                 topics=[EventTopic.WORKBOOK_UPDATED],
                 compiler=Compiler.JS,
                 source="module.exports = { routeEvent: async (...args) => { console.log(args) } }",
+                options={"namespace": "space:blue"},
             ),
         )
         """
@@ -226,6 +230,95 @@ class AgentsClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(AgentResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def list_versions(
+        self, agent_id: AgentId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> ListAgentVersionsResponse:
+        """
+        Parameters:
+            - agent_id: AgentId.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"agents/{jsonable_encoder(agent_id)}/versions"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(ListAgentVersionsResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def revert(
+        self,
+        agent_id: AgentId,
+        agent_version_id: AgentVersionId,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AgentVersionResponse:
+        """
+        Parameters:
+            - agent_id: AgentId.
+
+            - agent_version_id: AgentVersionId.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"agents/{jsonable_encoder(agent_id)}/versions/{jsonable_encoder(agent_version_id)}/revert",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(AgentVersionResponse, _response.json())  # type: ignore
         if _response.status_code == 400:
             raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         if _response.status_code == 404:
@@ -827,6 +920,7 @@ class AsyncAgentsClient:
                 topics=[EventTopic.WORKBOOK_UPDATED],
                 compiler=Compiler.JS,
                 source="module.exports = { routeEvent: async (...args) => { console.log(args) } }",
+                options={"namespace": "space:blue"},
             ),
         )
         """
@@ -927,6 +1021,95 @@ class AsyncAgentsClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(AgentResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def list_versions(
+        self, agent_id: AgentId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> ListAgentVersionsResponse:
+        """
+        Parameters:
+            - agent_id: AgentId.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"agents/{jsonable_encoder(agent_id)}/versions"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(ListAgentVersionsResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def revert(
+        self,
+        agent_id: AgentId,
+        agent_version_id: AgentVersionId,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AgentVersionResponse:
+        """
+        Parameters:
+            - agent_id: AgentId.
+
+            - agent_version_id: AgentVersionId.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"agents/{jsonable_encoder(agent_id)}/versions/{jsonable_encoder(agent_version_id)}/revert",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(AgentVersionResponse, _response.json())  # type: ignore
         if _response.status_code == 400:
             raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         if _response.status_code == 404:

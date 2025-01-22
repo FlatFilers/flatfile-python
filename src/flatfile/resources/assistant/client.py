@@ -14,6 +14,7 @@ from ..commons.types.success import Success
 from .types.prompt_create import PromptCreate
 from .types.prompt_patch import PromptPatch
 from .types.prompt_response import PromptResponse
+from .types.prompt_type_query_enum import PromptTypeQueryEnum
 from .types.prompts_response import PromptsResponse
 
 try:
@@ -32,6 +33,7 @@ class AssistantClient:
     def list(
         self,
         *,
+        prompt_type: typing.Optional[PromptTypeQueryEnum] = None,
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
         request_options: typing.Optional[RequestOptions] = None,
@@ -40,6 +42,8 @@ class AssistantClient:
         Returns prompts created by user
 
         Parameters:
+            - prompt_type: typing.Optional[PromptTypeQueryEnum]. Type of prompt (default AI_ASSIST)
+
             - page_size: typing.Optional[int]. Number of prompts to return in a page (default 7)
 
             - page_number: typing.Optional[int]. Based on pageSize, which page of prompts to return
@@ -59,6 +63,7 @@ class AssistantClient:
             params=jsonable_encoder(
                 remove_none_from_dict(
                     {
+                        "promptType": prompt_type,
                         "pageSize": page_size,
                         "pageNumber": page_number,
                         **(
@@ -300,6 +305,7 @@ class AsyncAssistantClient:
     async def list(
         self,
         *,
+        prompt_type: typing.Optional[PromptTypeQueryEnum] = None,
         page_size: typing.Optional[int] = None,
         page_number: typing.Optional[int] = None,
         request_options: typing.Optional[RequestOptions] = None,
@@ -308,6 +314,8 @@ class AsyncAssistantClient:
         Returns prompts created by user
 
         Parameters:
+            - prompt_type: typing.Optional[PromptTypeQueryEnum]. Type of prompt (default AI_ASSIST)
+
             - page_size: typing.Optional[int]. Number of prompts to return in a page (default 7)
 
             - page_number: typing.Optional[int]. Based on pageSize, which page of prompts to return
@@ -327,6 +335,7 @@ class AsyncAssistantClient:
             params=jsonable_encoder(
                 remove_none_from_dict(
                     {
+                        "promptType": prompt_type,
                         "pageSize": page_size,
                         "pageNumber": page_number,
                         **(

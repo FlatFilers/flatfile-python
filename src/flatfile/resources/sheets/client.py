@@ -274,7 +274,7 @@ class SheetsClient:
 
             - version_id: typing.Optional[str]. Deprecated, use `sinceCommitId` instead.
 
-            - commit_id: typing.Optional[CommitId]. Returns records that were changed in that version in that version and only those records.
+            - commit_id: typing.Optional[CommitId]. Returns records that were changed in that version  in that version and only those records.
 
             - since_version_id: typing.Optional[VersionId]. Deprecated, use `sinceCommitId` instead.
 
@@ -1013,7 +1013,7 @@ class AsyncSheetsClient:
 
             - version_id: typing.Optional[str]. Deprecated, use `sinceCommitId` instead.
 
-            - commit_id: typing.Optional[CommitId]. Returns records that were changed in that version in that version and only those records.
+            - commit_id: typing.Optional[CommitId]. Returns records that were changed in that version  in that version and only those records.
 
             - since_version_id: typing.Optional[VersionId]. Deprecated, use `sinceCommitId` instead.
 

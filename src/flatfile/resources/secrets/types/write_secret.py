@@ -4,6 +4,7 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
+from ...commons.types.actor_id_union import ActorIdUnion
 from ...commons.types.environment_id import EnvironmentId
 from ...commons.types.space_id import SpaceId
 from .secret_name import SecretName
@@ -36,6 +37,9 @@ class WriteSecret(pydantic.BaseModel):
     )
     space_id: typing.Optional[SpaceId] = pydantic.Field(
         alias="spaceId", default=None, description="The Space of the secret."
+    )
+    actor_id: typing.Optional[ActorIdUnion] = pydantic.Field(
+        alias="actorId", default=None, description="The Actor of the secret."
     )
 
     def json(self, **kwargs: typing.Any) -> str:

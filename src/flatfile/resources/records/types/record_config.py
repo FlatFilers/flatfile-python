@@ -33,6 +33,7 @@ class RecordConfig(pydantic.BaseModel):
 
     readonly: typing.Optional[bool] = None
     fields: typing.Optional[typing.Dict[str, CellConfig]] = None
+    marked_for_deletion: typing.Optional[bool] = pydantic.Field(alias="markedForDeletion", default=None)
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -45,4 +46,5 @@ class RecordConfig(pydantic.BaseModel):
     class Config:
         frozen = True
         smart_union = True
+        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

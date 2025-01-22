@@ -22,6 +22,7 @@ class EventTopic(str, enum.Enum):
     SPACE_UPDATED = "space:updated"
     SPACE_DELETED = "space:deleted"
     SPACE_ARCHIVED = "space:archived"
+    SPACE_UNARCHIVED = "space:unarchived"
     SPACE_EXPIRED = "space:expired"
     SPACE_GUEST_ADDED = "space:guestAdded"
     SPACE_GUEST_REMOVED = "space:guestRemoved"
@@ -69,6 +70,16 @@ class EventTopic(str, enum.Enum):
     ENVIRONMENT_CREATED = "environment:created"
     ENVIRONMENT_UPDATED = "environment:updated"
     ENVIRONMENT_DELETED = "environment:deleted"
+    ACTION_CREATED = "action:created"
+    ACTION_UPDATED = "action:updated"
+    ACTION_DELETED = "action:deleted"
+    DATA_CLIP_CREATED = "data-clip:created"
+    DATA_CLIP_UPDATED = "data-clip:updated"
+    DATA_CLIP_DELETED = "data-clip:deleted"
+    DATA_CLIP_COLLABORATOR_UPDATED = "data-clip:collaborator-updated"
+    DATA_CLIP_RESOLUTIONS_CREATED = "data-clip:resolutions-created"
+    DATA_CLIP_RESOLUTIONS_UPDATED = "data-clip:resolutions-updated"
+    DATA_CLIP_RESOLUTIONS_REFRESHED = "data-clip:resolutions-refreshed"
 
     def visit(
         self,
@@ -79,6 +90,7 @@ class EventTopic(str, enum.Enum):
         space_updated: typing.Callable[[], T_Result],
         space_deleted: typing.Callable[[], T_Result],
         space_archived: typing.Callable[[], T_Result],
+        space_unarchived: typing.Callable[[], T_Result],
         space_expired: typing.Callable[[], T_Result],
         space_guest_added: typing.Callable[[], T_Result],
         space_guest_removed: typing.Callable[[], T_Result],
@@ -126,6 +138,16 @@ class EventTopic(str, enum.Enum):
         environment_created: typing.Callable[[], T_Result],
         environment_updated: typing.Callable[[], T_Result],
         environment_deleted: typing.Callable[[], T_Result],
+        action_created: typing.Callable[[], T_Result],
+        action_updated: typing.Callable[[], T_Result],
+        action_deleted: typing.Callable[[], T_Result],
+        data_clip_created: typing.Callable[[], T_Result],
+        data_clip_updated: typing.Callable[[], T_Result],
+        data_clip_deleted: typing.Callable[[], T_Result],
+        data_clip_collaborator_updated: typing.Callable[[], T_Result],
+        data_clip_resolutions_created: typing.Callable[[], T_Result],
+        data_clip_resolutions_updated: typing.Callable[[], T_Result],
+        data_clip_resolutions_refreshed: typing.Callable[[], T_Result],
     ) -> T_Result:
         if self is EventTopic.AGENT_CREATED:
             return agent_created()
@@ -141,6 +163,8 @@ class EventTopic(str, enum.Enum):
             return space_deleted()
         if self is EventTopic.SPACE_ARCHIVED:
             return space_archived()
+        if self is EventTopic.SPACE_UNARCHIVED:
+            return space_unarchived()
         if self is EventTopic.SPACE_EXPIRED:
             return space_expired()
         if self is EventTopic.SPACE_GUEST_ADDED:
@@ -235,3 +259,23 @@ class EventTopic(str, enum.Enum):
             return environment_updated()
         if self is EventTopic.ENVIRONMENT_DELETED:
             return environment_deleted()
+        if self is EventTopic.ACTION_CREATED:
+            return action_created()
+        if self is EventTopic.ACTION_UPDATED:
+            return action_updated()
+        if self is EventTopic.ACTION_DELETED:
+            return action_deleted()
+        if self is EventTopic.DATA_CLIP_CREATED:
+            return data_clip_created()
+        if self is EventTopic.DATA_CLIP_UPDATED:
+            return data_clip_updated()
+        if self is EventTopic.DATA_CLIP_DELETED:
+            return data_clip_deleted()
+        if self is EventTopic.DATA_CLIP_COLLABORATOR_UPDATED:
+            return data_clip_collaborator_updated()
+        if self is EventTopic.DATA_CLIP_RESOLUTIONS_CREATED:
+            return data_clip_resolutions_created()
+        if self is EventTopic.DATA_CLIP_RESOLUTIONS_UPDATED:
+            return data_clip_resolutions_updated()
+        if self is EventTopic.DATA_CLIP_RESOLUTIONS_REFRESHED:
+            return data_clip_resolutions_refreshed()

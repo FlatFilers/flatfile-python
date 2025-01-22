@@ -16,7 +16,9 @@ except ImportError:
 class CellValue(pydantic.BaseModel):
     valid: typing.Optional[bool] = None
     messages: typing.Optional[typing.List[ValidationMessage]] = None
-    metadata: typing.Optional[typing.Dict[str, typing.Any]] = None
+    metadata: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(
+        default=None, description="Deprecated, use record level metadata instead."
+    )
     value: typing.Optional[CellValueUnion] = None
     layer: typing.Optional[str] = None
     updated_at: typing.Optional[dt.datetime] = pydantic.Field(alias="updatedAt", default=None)

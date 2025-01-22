@@ -34,6 +34,7 @@ class ListAgentsResponse(pydantic.BaseModel):
                 ),
                 account_id="us_acc_YOUR_ID",
                 environment_id="us_env_YOUR_ID",
+                options={"namespace": "space:blue"},
             )
         ],
     )

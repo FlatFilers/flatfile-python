@@ -3,6 +3,9 @@
 from .types import (
     ChangeType,
     RestoreOptions,
+    SchemaDiffData,
+    SchemaDiffEnum,
+    SchemaDiffRecord,
     Snapshot,
     SnapshotResponse,
     SnapshotSummary,
@@ -13,6 +16,9 @@ from .types import (
 __all__ = [
     "ChangeType",
     "RestoreOptions",
+    "SchemaDiffData",
+    "SchemaDiffEnum",
+    "SchemaDiffRecord",
     "Snapshot",
     "SnapshotResponse",
     "SnapshotSummary",

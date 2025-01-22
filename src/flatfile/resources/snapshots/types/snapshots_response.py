@@ -17,6 +17,9 @@ class SnapshotsResponse(pydantic.BaseModel):
     import datetime
 
     from flatfile import (
+        Property_String,
+        SchemaDiffEnum,
+        SheetConfig,
         Snapshot,
         SnapshotsResponse,
         SnapshotSummary,
@@ -40,6 +43,33 @@ class SnapshotsResponse(pydantic.BaseModel):
                     deleted_since=SummarySection(
                         total=5,
                         by_field={"firstName": 1},
+                    ),
+                    schema_diff={
+                        "firstName": SchemaDiffEnum.ADDED,
+                        "lastName": SchemaDiffEnum.REMOVED,
+                        "email": SchemaDiffEnum.UNCHANGED,
+                    },
+                    config=SheetConfig(
+                        name="Contacts",
+                        slug="contacts",
+                        fields=[
+                            Property_String(
+                                type="string",
+                                key="firstName",
+                                label="First Name",
+                            ),
+                            Property_String(
+                                type="string",
+                                key="lastName",
+                                label="Last Name",
+                            ),
+                            Property_String(
+                                type="string",
+                                key="email",
+                                label="Email",
+                            ),
+                        ],
+                        mapping_confidence_threshold=0.5,
                     ),
                 ),
                 created_at=datetime.datetime.fromisoformat(

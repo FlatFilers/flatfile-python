@@ -9,6 +9,7 @@ from .date_property import DateProperty
 from .enum_list_property import EnumListProperty
 from .enum_property import EnumProperty
 from .number_property import NumberProperty
+from .reference_list_property import ReferenceListProperty
 from .reference_property import ReferenceProperty
 from .string_list_property import StringListProperty
 from .string_property import StringProperty
@@ -68,6 +69,15 @@ class Property_Reference(ReferenceProperty):
         allow_population_by_field_name = True
 
 
+class Property_ReferenceList(ReferenceListProperty):
+    type: typing.Literal["reference-list"]
+
+    class Config:
+        frozen = True
+        smart_union = True
+        allow_population_by_field_name = True
+
+
 class Property_StringList(StringListProperty):
     type: typing.Literal["string-list"]
 
@@ -120,6 +130,7 @@ Property = typing.Union[
     Property_Date,
     Property_Enum,
     Property_Reference,
+    Property_ReferenceList,
     Property_StringList,
     Property_EnumList,
 ]

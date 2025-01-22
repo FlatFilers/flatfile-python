@@ -11,6 +11,7 @@ from ...core.remove_none_from_dict import remove_none_from_dict
 from ...core.request_options import RequestOptions
 from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
+from ..commons.types.actor_id_union import ActorIdUnion
 from ..commons.types.environment_id import EnvironmentId
 from ..commons.types.errors import Errors
 from ..commons.types.secret_id import SecretId
@@ -36,6 +37,7 @@ class SecretsClient:
         *,
         environment_id: typing.Optional[EnvironmentId] = None,
         space_id: typing.Optional[SpaceId] = None,
+        actor_id: typing.Optional[ActorIdUnion] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SecretsResponse:
         """
@@ -45,6 +47,8 @@ class SecretsClient:
             - environment_id: typing.Optional[EnvironmentId]. The Environment of the secret.
 
             - space_id: typing.Optional[SpaceId]. The Space of the secret.
+
+            - actor_id: typing.Optional[ActorIdUnion]. The Actor of the secret.
 
             - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
@@ -65,6 +69,7 @@ class SecretsClient:
                     {
                         "environmentId": environment_id,
                         "spaceId": space_id,
+                        "actorId": actor_id,
                         **(
                             request_options.get("additional_query_parameters", {})
                             if request_options is not None
@@ -219,6 +224,7 @@ class AsyncSecretsClient:
         *,
         environment_id: typing.Optional[EnvironmentId] = None,
         space_id: typing.Optional[SpaceId] = None,
+        actor_id: typing.Optional[ActorIdUnion] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SecretsResponse:
         """
@@ -228,6 +234,8 @@ class AsyncSecretsClient:
             - environment_id: typing.Optional[EnvironmentId]. The Environment of the secret.
 
             - space_id: typing.Optional[SpaceId]. The Space of the secret.
+
+            - actor_id: typing.Optional[ActorIdUnion]. The Actor of the secret.
 
             - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
         ---
@@ -248,6 +256,7 @@ class AsyncSecretsClient:
                     {
                         "environmentId": environment_id,
                         "spaceId": space_id,
+                        "actorId": actor_id,
                         **(
                             request_options.get("additional_query_parameters", {})
                             if request_options is not None

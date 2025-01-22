@@ -13,12 +13,19 @@ from ..commons.errors.bad_request_error import BadRequestError
 from ..commons.errors.not_found_error import NotFoundError
 from ..commons.types.environment_id import EnvironmentId
 from ..commons.types.errors import Errors
+from ..commons.types.guide_id import GuideId
 from ..commons.types.success import Success
 from ..spaces.types.event_token_response import EventTokenResponse
 from .types.environment import Environment
 from .types.environment_config_create import EnvironmentConfigCreate
 from .types.environment_config_update import EnvironmentConfigUpdate
 from .types.environment_response import EnvironmentResponse
+from .types.guide_create_request import GuideCreateRequest
+from .types.guide_delete_response import GuideDeleteResponse
+from .types.guide_detail_response import GuideDetailResponse
+from .types.guide_list_response import GuideListResponse
+from .types.guide_update_request import GuideUpdateRequest
+from .types.guide_version_response import GuideVersionResponse
 from .types.list_environments_response import ListEnvironmentsResponse
 
 try:
@@ -373,6 +380,373 @@ class EnvironmentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def list_guides(
+        self, environment_id: EnvironmentId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> GuideListResponse:
+        """
+        Returns guides in an account
+
+        Parameters:
+            - environment_id: EnvironmentId. ID of the environment
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"environments/{jsonable_encoder(environment_id)}/guides"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GuideListResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def get_guide(
+        self,
+        environment_id: EnvironmentId,
+        guide_id: GuideId,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GuideDetailResponse:
+        """
+        Returns a guide
+
+        Parameters:
+            - environment_id: EnvironmentId. ID of the environment
+
+            - guide_id: GuideId. ID of guide
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            token="YOUR_TOKEN",
+        )
+        client.environments.get_guide(
+            environment_id="us_env_YOUR_ID",
+            guide_id="us_gu_YOUR_ID",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"environments/{jsonable_encoder(environment_id)}/guides/{jsonable_encoder(guide_id)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GuideDetailResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def update_guide(
+        self,
+        environment_id: EnvironmentId,
+        guide_id: GuideId,
+        *,
+        request: GuideUpdateRequest,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GuideDetailResponse:
+        """
+        Updates a guide
+
+        Parameters:
+            - environment_id: EnvironmentId. ID of the environment
+
+            - guide_id: GuideId. ID of guide
+
+            - request: GuideUpdateRequest.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        ---
+        from flatfile import GuideUpdateRequest
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            token="YOUR_TOKEN",
+        )
+        client.environments.update_guide(
+            environment_id="us_env_YOUR_ID",
+            guide_id="us_gu_YOUR_ID",
+            request=GuideUpdateRequest(
+                description="Updated getting started guide",
+                title="Data import made easy",
+                slug="getting-started",
+                environment_id="commons.EnvironmentId",
+                metadata={"category": "onboarding"},
+            ),
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "PATCH",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"environments/{jsonable_encoder(environment_id)}/guides/{jsonable_encoder(guide_id)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GuideDetailResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def create_guide(
+        self,
+        environment_id: EnvironmentId,
+        *,
+        request: GuideCreateRequest,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GuideDetailResponse:
+        """
+        Creates a guide
+
+        Parameters:
+            - environment_id: EnvironmentId. ID of the environment
+
+            - request: GuideCreateRequest.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        ---
+        from flatfile import GuideCreateRequest
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            token="YOUR_TOKEN",
+        )
+        client.environments.create_guide(
+            environment_id="us_env_YOUR_ID",
+            request=GuideCreateRequest(
+                description="Getting started guide",
+                title="Data import made easy",
+                slug="getting-started",
+                environment_id="commons.EnvironmentId",
+                versions=[],
+                blocks=[],
+                metadata={"category": "onboarding"},
+            ),
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"environments/{jsonable_encoder(environment_id)}/guides"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GuideDetailResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def delete_guide(
+        self,
+        environment_id: EnvironmentId,
+        guide_id: GuideId,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GuideDeleteResponse:
+        """
+        Deletes a guide
+
+        Parameters:
+            - environment_id: EnvironmentId. ID of the environment
+
+            - guide_id: GuideId. ID of guide to delete
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            token="YOUR_TOKEN",
+        )
+        client.environments.delete_guide(
+            environment_id="us_env_YOUR_ID",
+            guide_id="us_gu_YOUR_ID",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "DELETE",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"environments/{jsonable_encoder(environment_id)}/guides/{jsonable_encoder(guide_id)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GuideDeleteResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def get_guide_version(
+        self,
+        environment_id: EnvironmentId,
+        guide_id: GuideId,
+        version: int,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GuideVersionResponse:
+        """
+        Returns a specified version of a specific guide
+
+        Parameters:
+            - environment_id: EnvironmentId. ID of the environment
+
+            - guide_id: GuideId. ID of the guide
+
+            - version: int. Version of the guide
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"environments/{jsonable_encoder(environment_id)}/guides/{jsonable_encoder(guide_id)}/versions/{jsonable_encoder(version)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GuideVersionResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
 
 class AsyncEnvironmentsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
@@ -707,6 +1081,373 @@ class AsyncEnvironmentsClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(Success, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def list_guides(
+        self, environment_id: EnvironmentId, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> GuideListResponse:
+        """
+        Returns guides in an account
+
+        Parameters:
+            - environment_id: EnvironmentId. ID of the environment
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"environments/{jsonable_encoder(environment_id)}/guides"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GuideListResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def get_guide(
+        self,
+        environment_id: EnvironmentId,
+        guide_id: GuideId,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GuideDetailResponse:
+        """
+        Returns a guide
+
+        Parameters:
+            - environment_id: EnvironmentId. ID of the environment
+
+            - guide_id: GuideId. ID of guide
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            token="YOUR_TOKEN",
+        )
+        await client.environments.get_guide(
+            environment_id="us_env_YOUR_ID",
+            guide_id="us_gu_YOUR_ID",
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"environments/{jsonable_encoder(environment_id)}/guides/{jsonable_encoder(guide_id)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GuideDetailResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def update_guide(
+        self,
+        environment_id: EnvironmentId,
+        guide_id: GuideId,
+        *,
+        request: GuideUpdateRequest,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GuideDetailResponse:
+        """
+        Updates a guide
+
+        Parameters:
+            - environment_id: EnvironmentId. ID of the environment
+
+            - guide_id: GuideId. ID of guide
+
+            - request: GuideUpdateRequest.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        ---
+        from flatfile import GuideUpdateRequest
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            token="YOUR_TOKEN",
+        )
+        await client.environments.update_guide(
+            environment_id="us_env_YOUR_ID",
+            guide_id="us_gu_YOUR_ID",
+            request=GuideUpdateRequest(
+                description="Updated getting started guide",
+                title="Data import made easy",
+                slug="getting-started",
+                environment_id="commons.EnvironmentId",
+                metadata={"category": "onboarding"},
+            ),
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "PATCH",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"environments/{jsonable_encoder(environment_id)}/guides/{jsonable_encoder(guide_id)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GuideDetailResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def create_guide(
+        self,
+        environment_id: EnvironmentId,
+        *,
+        request: GuideCreateRequest,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GuideDetailResponse:
+        """
+        Creates a guide
+
+        Parameters:
+            - environment_id: EnvironmentId. ID of the environment
+
+            - request: GuideCreateRequest.
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        ---
+        from flatfile import GuideCreateRequest
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            token="YOUR_TOKEN",
+        )
+        await client.environments.create_guide(
+            environment_id="us_env_YOUR_ID",
+            request=GuideCreateRequest(
+                description="Getting started guide",
+                title="Data import made easy",
+                slug="getting-started",
+                environment_id="commons.EnvironmentId",
+                versions=[],
+                blocks=[],
+                metadata={"category": "onboarding"},
+            ),
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "POST",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"environments/{jsonable_encoder(environment_id)}/guides"
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            json=jsonable_encoder(request)
+            if request_options is None or request_options.get("additional_body_parameters") is None
+            else {
+                **jsonable_encoder(request),
+                **(jsonable_encoder(remove_none_from_dict(request_options.get("additional_body_parameters", {})))),
+            },
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GuideDetailResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def delete_guide(
+        self,
+        environment_id: EnvironmentId,
+        guide_id: GuideId,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GuideDeleteResponse:
+        """
+        Deletes a guide
+
+        Parameters:
+            - environment_id: EnvironmentId. ID of the environment
+
+            - guide_id: GuideId. ID of guide to delete
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            token="YOUR_TOKEN",
+        )
+        await client.environments.delete_guide(
+            environment_id="us_env_YOUR_ID",
+            guide_id="us_gu_YOUR_ID",
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "DELETE",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"environments/{jsonable_encoder(environment_id)}/guides/{jsonable_encoder(guide_id)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GuideDeleteResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def get_guide_version(
+        self,
+        environment_id: EnvironmentId,
+        guide_id: GuideId,
+        version: int,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GuideVersionResponse:
+        """
+        Returns a specified version of a specific guide
+
+        Parameters:
+            - environment_id: EnvironmentId. ID of the environment
+
+            - guide_id: GuideId. ID of the guide
+
+            - version: int. Version of the guide
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/",
+                f"environments/{jsonable_encoder(environment_id)}/guides/{jsonable_encoder(guide_id)}/versions/{jsonable_encoder(version)}",
+            ),
+            params=jsonable_encoder(
+                request_options.get("additional_query_parameters") if request_options is not None else None
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GuideVersionResponse, _response.json())  # type: ignore
         if _response.status_code == 400:
             raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         if _response.status_code == 404:

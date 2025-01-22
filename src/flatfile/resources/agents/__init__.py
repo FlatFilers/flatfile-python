@@ -5,6 +5,8 @@ from .types import (
     AgentConfig,
     AgentLog,
     AgentResponse,
+    AgentVersion,
+    AgentVersionResponse,
     Compiler,
     DetailedAgentLog,
     Execution,
@@ -12,6 +14,7 @@ from .types import (
     GetDetailedAgentLogResponse,
     GetDetailedAgentLogsResponse,
     GetExecutionsResponse,
+    ListAgentVersionsResponse,
     ListAgentsResponse,
 )
 
@@ -20,6 +23,8 @@ __all__ = [
     "AgentConfig",
     "AgentLog",
     "AgentResponse",
+    "AgentVersion",
+    "AgentVersionResponse",
     "Compiler",
     "DetailedAgentLog",
     "Execution",
@@ -27,5 +32,6 @@ __all__ = [
     "GetDetailedAgentLogResponse",
     "GetDetailedAgentLogsResponse",
     "GetExecutionsResponse",
+    "ListAgentVersionsResponse",
     "ListAgentsResponse",
 ]

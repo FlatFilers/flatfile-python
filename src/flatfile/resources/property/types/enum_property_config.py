@@ -5,6 +5,7 @@ import typing
 
 from ....core.datetime_utils import serialize_datetime
 from .enum_property_option import EnumPropertyOption
+from .enum_property_sort_by import EnumPropertySortBy
 
 try:
     import pydantic.v1 as pydantic  # type: ignore
@@ -17,6 +18,9 @@ class EnumPropertyConfig(pydantic.BaseModel):
         alias="allowCustom", default=None, description="Permit the user to create new options for this specific field."
     )
     options: typing.List[EnumPropertyOption]
+    sort_by: typing.Optional[EnumPropertySortBy] = pydantic.Field(
+        alias="sortBy", default=None, description="Sort the options by the value of this property. Defaults to `label`."
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

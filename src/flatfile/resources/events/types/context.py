@@ -5,8 +5,10 @@ import typing
 
 from ....core.datetime_utils import serialize_datetime
 from ...commons.types.account_id import AccountId
+from ...commons.types.action_id import ActionId
 from ...commons.types.app_id import AppId
 from ...commons.types.commit_id import CommitId
+from ...commons.types.data_clip_id import DataClipId
 from ...commons.types.document_id import DocumentId
 from ...commons.types.environment_id import EnvironmentId
 from ...commons.types.event_id import EventId
@@ -70,6 +72,8 @@ class Context(pydantic.BaseModel):
         alias="actorId", default=None, description="Can be a UserId, GuestId, or AgentId"
     )
     app_id: typing.Optional[AppId] = pydantic.Field(alias="appId", default=None)
+    action_id: typing.Optional[ActionId] = pydantic.Field(alias="actionId", default=None)
+    data_clip_id: typing.Optional[DataClipId] = pydantic.Field(alias="dataClipId", default=None)
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

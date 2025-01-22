@@ -23,6 +23,7 @@ class AgentConfig(pydantic.BaseModel):
         topics=[EventTopic.WORKBOOK_UPDATED],
         compiler=Compiler.JS,
         source="module.exports = { routeEvent: async (...args) => { console.log(args) } }",
+        options={"namespace": "space:blue"},
     )
     """
 
@@ -31,7 +32,13 @@ class AgentConfig(pydantic.BaseModel):
     )
     compiler: typing.Optional[Compiler] = pydantic.Field(default=None, description="The compiler of the agent")
     source: typing.Optional[str] = pydantic.Field(default=None, description="The source of the agent")
+    source_map: typing.Optional[str] = pydantic.Field(
+        alias="sourceMap", default=None, description="The source map of the agent"
+    )
     slug: typing.Optional[str] = pydantic.Field(default=None, description="The slug of the agent")
+    options: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(
+        default=None, description="Options for the agent"
+    )
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
@@ -44,4 +51,5 @@ class AgentConfig(pydantic.BaseModel):
     class Config:
         frozen = True
         smart_union = True
+        allow_population_by_field_name = True
         json_encoders = {dt.datetime: serialize_datetime}

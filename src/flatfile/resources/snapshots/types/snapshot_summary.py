@@ -4,6 +4,8 @@ import datetime as dt
 import typing
 
 from ....core.datetime_utils import serialize_datetime
+from ...sheets.types.sheet_config import SheetConfig
+from .schema_diff_record import SchemaDiffRecord
 from .summary_section import SummarySection
 
 try:
@@ -16,6 +18,10 @@ class SnapshotSummary(pydantic.BaseModel):
     created_since: SummarySection = pydantic.Field(alias="createdSince")
     updated_since: SummarySection = pydantic.Field(alias="updatedSince")
     deleted_since: SummarySection = pydantic.Field(alias="deletedSince")
+    schema_diff: SchemaDiffRecord = pydantic.Field(
+        alias="schemaDiff", description="The schema diff between the snapshot and the current sheet schema."
+    )
+    config: SheetConfig = pydantic.Field(description="The sheet configuration at the time of the snapshot.")
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

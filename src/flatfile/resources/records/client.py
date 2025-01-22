@@ -26,6 +26,7 @@ from ..commons.types.success import Success
 from ..commons.types.version_id import VersionId
 from ..versions.types.version_response import VersionResponse
 from .types.cell_value_union import CellValueUnion
+from .types.get_record_indices_response import GetRecordIndicesResponse
 from .types.get_records_response import GetRecordsResponse
 from .types.record_data import RecordData
 from .types.records import Records
@@ -177,6 +178,110 @@ class RecordsClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(GetRecordsResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def indices(
+        self,
+        sheet_id: SheetId,
+        *,
+        commit_id: typing.Optional[CommitId] = None,
+        since_commit_id: typing.Optional[CommitId] = None,
+        sort_field: typing.Optional[SortField] = None,
+        sort_direction: typing.Optional[SortDirection] = None,
+        filter: typing.Optional[Filter] = None,
+        filter_field: typing.Optional[FilterField] = None,
+        search_value: typing.Optional[SearchValue] = None,
+        search_field: typing.Optional[SearchField] = None,
+        ids: typing.Union[RecordId, typing.Sequence[RecordId]],
+        q: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetRecordIndicesResponse:
+        """
+        Returns indices of records from a sheet in a workbook
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - commit_id: typing.Optional[CommitId].
+
+            - since_commit_id: typing.Optional[CommitId].
+
+            - sort_field: typing.Optional[SortField].
+
+            - sort_direction: typing.Optional[SortDirection].
+
+            - filter: typing.Optional[Filter].
+
+            - filter_field: typing.Optional[FilterField]. Name of field by which to filter records
+
+            - search_value: typing.Optional[SearchValue].
+
+            - search_field: typing.Optional[SearchField].
+
+            - ids: typing.Union[RecordId, typing.Sequence[RecordId]]. List of record IDs to include in the query. Limit 100.
+
+            - q: typing.Optional[str]. An FFQL query used to filter the result set
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        ---
+        from flatfile.client import Flatfile
+
+        client = Flatfile(
+            token="YOUR_TOKEN",
+        )
+        client.records.indices(
+            sheet_id="us_sh_YOUR_ID",
+            ids="list<$commons.RecordId.Example0, $commons.RecordId.Example1>",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/records/indices"
+            ),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "commitId": commit_id,
+                        "sinceCommitId": since_commit_id,
+                        "sortField": sort_field,
+                        "sortDirection": sort_direction,
+                        "filter": filter,
+                        "filterField": filter_field,
+                        "searchValue": search_value,
+                        "searchField": search_field,
+                        "ids": ids,
+                        "q": q,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GetRecordIndicesResponse, _response.json())  # type: ignore
         if _response.status_code == 400:
             raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         if _response.status_code == 404:
@@ -663,6 +768,110 @@ class AsyncRecordsClient:
         )
         if 200 <= _response.status_code < 300:
             return pydantic.parse_obj_as(GetRecordsResponse, _response.json())  # type: ignore
+        if _response.status_code == 400:
+            raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        if _response.status_code == 404:
+            raise NotFoundError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
+        try:
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def indices(
+        self,
+        sheet_id: SheetId,
+        *,
+        commit_id: typing.Optional[CommitId] = None,
+        since_commit_id: typing.Optional[CommitId] = None,
+        sort_field: typing.Optional[SortField] = None,
+        sort_direction: typing.Optional[SortDirection] = None,
+        filter: typing.Optional[Filter] = None,
+        filter_field: typing.Optional[FilterField] = None,
+        search_value: typing.Optional[SearchValue] = None,
+        search_field: typing.Optional[SearchField] = None,
+        ids: typing.Union[RecordId, typing.Sequence[RecordId]],
+        q: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> GetRecordIndicesResponse:
+        """
+        Returns indices of records from a sheet in a workbook
+
+        Parameters:
+            - sheet_id: SheetId. ID of sheet
+
+            - commit_id: typing.Optional[CommitId].
+
+            - since_commit_id: typing.Optional[CommitId].
+
+            - sort_field: typing.Optional[SortField].
+
+            - sort_direction: typing.Optional[SortDirection].
+
+            - filter: typing.Optional[Filter].
+
+            - filter_field: typing.Optional[FilterField]. Name of field by which to filter records
+
+            - search_value: typing.Optional[SearchValue].
+
+            - search_field: typing.Optional[SearchField].
+
+            - ids: typing.Union[RecordId, typing.Sequence[RecordId]]. List of record IDs to include in the query. Limit 100.
+
+            - q: typing.Optional[str]. An FFQL query used to filter the result set
+
+            - request_options: typing.Optional[RequestOptions]. Request-specific configuration.
+        ---
+        from flatfile.client import AsyncFlatfile
+
+        client = AsyncFlatfile(
+            token="YOUR_TOKEN",
+        )
+        await client.records.indices(
+            sheet_id="us_sh_YOUR_ID",
+            ids="list<$commons.RecordId.Example0, $commons.RecordId.Example1>",
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "GET",
+            urllib.parse.urljoin(
+                f"{self._client_wrapper.get_base_url()}/", f"sheets/{jsonable_encoder(sheet_id)}/records/indices"
+            ),
+            params=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        "commitId": commit_id,
+                        "sinceCommitId": since_commit_id,
+                        "sortField": sort_field,
+                        "sortDirection": sort_direction,
+                        "filter": filter,
+                        "filterField": filter_field,
+                        "searchValue": search_value,
+                        "searchField": search_field,
+                        "ids": ids,
+                        "q": q,
+                        **(
+                            request_options.get("additional_query_parameters", {})
+                            if request_options is not None
+                            else {}
+                        ),
+                    }
+                )
+            ),
+            headers=jsonable_encoder(
+                remove_none_from_dict(
+                    {
+                        **self._client_wrapper.get_headers(),
+                        **(request_options.get("additional_headers", {}) if request_options is not None else {}),
+                    }
+                )
+            ),
+            timeout=request_options.get("timeout_in_seconds")
+            if request_options is not None and request_options.get("timeout_in_seconds") is not None
+            else 60,
+        )
+        if 200 <= _response.status_code < 300:
+            return pydantic.parse_obj_as(GetRecordIndicesResponse, _response.json())  # type: ignore
         if _response.status_code == 400:
             raise BadRequestError(pydantic.parse_obj_as(Errors, _response.json()))  # type: ignore
         if _response.status_code == 404:

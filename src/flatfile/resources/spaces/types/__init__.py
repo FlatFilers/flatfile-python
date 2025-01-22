@@ -3,8 +3,14 @@
 from .event_token import EventToken
 from .event_token_response import EventTokenResponse
 from .get_spaces_sort_field import GetSpacesSortField
+from .guidance_api_create_data import GuidanceApiCreateData
+from .guidance_api_update_data import GuidanceApiUpdateData
+from .guidance_list_response import GuidanceListResponse
+from .guidance_options import GuidanceOptions
+from .guidance_resource import GuidanceResource
 from .internal_space_config_base import InternalSpaceConfigBase
 from .list_spaces_response import ListSpacesResponse
+from .role_enum import RoleEnum
 from .space import Space
 from .space_access import SpaceAccess
 from .space_config import SpaceConfig
@@ -12,13 +18,21 @@ from .space_response import SpaceResponse
 from .space_settings import SpaceSettings
 from .space_sidebar_config import SpaceSidebarConfig
 from .space_size import SpaceSize
+from .trigger_enum import TriggerEnum
+from .type_enum import TypeEnum
 
 __all__ = [
     "EventToken",
     "EventTokenResponse",
     "GetSpacesSortField",
+    "GuidanceApiCreateData",
+    "GuidanceApiUpdateData",
+    "GuidanceListResponse",
+    "GuidanceOptions",
+    "GuidanceResource",
     "InternalSpaceConfigBase",
     "ListSpacesResponse",
+    "RoleEnum",
     "Space",
     "SpaceAccess",
     "SpaceConfig",
@@ -26,4 +40,6 @@ __all__ = [
     "SpaceSettings",
     "SpaceSidebarConfig",
     "SpaceSize",
+    "TriggerEnum",
+    "TypeEnum",
 ]
